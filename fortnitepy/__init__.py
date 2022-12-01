@@ -34,7 +34,7 @@ from .auth import (Auth, EmailAndPasswordAuth, ExchangeCodeAuth,
 from .friend import Friend, IncomingPendingFriend, OutgoingPendingFriend
 from .message import FriendMessage, PartyMessage
 from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, PartyMember,
-                    ClientPartyMember, JustChattingClientPartyMember, Party, 
+                    ClientPartyMember, JustChattingClientPartyMember, Party,
                     ClientParty, ReceivedPartyInvitation, SentPartyInvitation,
                     PartyJoinConfirmation, PartyJoinRequest, SquadAssignment)
 from .presence import Presence, PresenceGameplayStats, PresenceParty
@@ -49,3 +49,4 @@ from .playlist import Playlist
 from .avatar import Avatar
 from .http import HTTPRetryConfig, Route
 from .utils import *
+from .profile import *

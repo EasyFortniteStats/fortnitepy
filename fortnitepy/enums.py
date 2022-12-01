@@ -104,7 +104,7 @@ class PartyDiscoverability(Enum):
 class PartyJoinability(Enum):
     OPEN              = 'OPEN'
     INVITE_ONLY       = 'INVITE_ONLY'
-    INVITE_AND_FORMER = 'INVITE_AND_FORMER' 
+    INVITE_AND_FORMER = 'INVITE_AND_FORMER'
 
 
 class DefaultCharactersChapter1(Enum):
@@ -254,3 +254,10 @@ class BattlePassStat(Enum):
 
 class StatsCollectionType(Enum):
     FISH = 'collection_fish'
+
+
+class Profile(Enum):
+    BATTLE_ROYALE = 'athena'
+    SAVE_THE_WORLD = 'campaign'
+    COMMON = 'common_core'
+    COMMON_PUBLIC = 'common_public'

@@ -30,7 +30,7 @@ import re
 import time
 import functools
 
-from typing import TYPE_CHECKING, Iterable, List, Optional, Any, Union, Tuple
+from typing import TYPE_CHECKING, Iterable, List, Optional, Any, Union, Tuple, Literal
 from urllib.parse import quote as urllibquote
 
 from .utils import MaybeLock
@@ -1245,6 +1245,40 @@ class HTTPClient:
     async def fortnite_get_timeline(self) -> dict:
         r = FortnitePublicService('/fortnite/api/calendar/v1/timeline')
         return await self.get(r)
+
+    async def query_profile(self, profile_id: Literal['athena', 'campaign', 'common_core']) -> dict:
+        r = FortnitePublicService(
+            '/fortnite/api/game/v2/profile/{client_id}/client/QueryProfile?profileId={profile_id}&rvn=-1',
+            client_id=self.client.user.id,
+            profile_id=profile_id,
+        )
+        return await self.post(r, json={})
+
+    async def query_public_profile(self, user_id: str, profile_id: Literal['campaign']) -> dict:
+        r = FortnitePublicService(
+            '/fortnite/api/game/v2/profile/{user_id}/client/QueryProfile?profileId={profile_id}&rvn=-1',
+            user_id=user_id,
+            profile_id=profile_id,
+        )
+        return await self.post(r, json={})
+
+    async def claim_login_reward(self, profile_id: Literal['campaign', 'profile0']) -> dict:
+        r = FortnitePublicService(
+            '/fortnite/api/game/v2/profile/{client_id}/client/ClaimLoginReward?profileId={profile_id}&rvn=-1',
+            client_id=self.client.user.id,
+            profile_id=profile_id,
+        )
+        return await self.post(r, json={})
+
+    async def set_creator_code(self, creator_code: str) -> dict:
+        r = FortnitePublicService(
+            '/fortnite/api/game/v2/profile/{client_id}/client/SetAffiliateName?profileId=common_core&rvn=-1',
+            client_id=self.client.user.id,
+        )
+        payload = {
+            "affiliateName": creator_code
+        }
+        return await self.post(r, json=payload)
 
     ###################################
     #        Fortnite Content         #

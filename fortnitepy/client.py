@@ -32,6 +32,8 @@ from aiohttp import BaseConnector
 from typing import (Iterable, Union, Optional, Any, Awaitable, Callable, Dict,
                     List, Tuple)
 
+from . import Profile
+from .profile import BattleRoyaleProfile, CommonCoreProfile
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
                      DuplicateFriendship, FriendshipRequestAlreadySent,
                      MaxFriendshipsExceeded, InviteeMaxFriendshipsExceeded,
@@ -2502,6 +2504,26 @@ class BasicClient:
         raise NotImplementedError(
             'BasicClient does not support party actions.'
         )
+
+    async def fetch_battle_royale_profile(self) -> Optional[BattleRoyaleProfile]:
+        profile_data = await self.http.query_profile('athena')
+        if not profile_data or not profile_data['profileChanges']:
+            return None
+        profile_change = profile_data['profileChanges'][0]
+        return BattleRoyaleProfile(profile_change['profile'])
+
+    async def fetch_common_profile(self) -> Optional[CommonCoreProfile]:
+        profile_data = await self.http.query_profile('common_core')
+        if not profile_data or not profile_data['profileChanges']:
+            return None
+        profile_change = profile_data['profileChanges'][0]
+        return CommonCoreProfile(profile_change['profile'])
+
+    async def set_creator_code(self, code: str):
+        await self.http.set_creator_code(code)
+
+    async def claim_login_rewards(self):
+        await self.http.claim_login_reward('campaign')
 
 
 class Client(BasicClient):
