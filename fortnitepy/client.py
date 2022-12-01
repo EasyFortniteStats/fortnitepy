@@ -32,7 +32,6 @@ from aiohttp import BaseConnector
 from typing import (Iterable, Union, Optional, Any, Awaitable, Callable, Dict,
                     List, Tuple)
 
-from . import Profile
 from .profile import BattleRoyaleProfile, CommonCoreProfile
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
                      DuplicateFriendship, FriendshipRequestAlreadySent,
