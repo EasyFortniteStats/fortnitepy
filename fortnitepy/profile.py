@@ -54,7 +54,7 @@ class BattleRoyaleProfile:
 
         self.has_purchased_book: bool = stats.get('book_purchased', False)
         self.book_level: int = stats['book_level']
-        self.book_xp: int = stats['book_xp']
+        self.book_xp: Optional[int] = stats.get('book_xp')
 
         self.creative_dynamic_xp: Optional[dict] = stats.get('creative_dynamic_xp')
         self.vote_data: Optional[dict] = stats.get('vote_data')
