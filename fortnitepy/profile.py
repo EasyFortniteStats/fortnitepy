@@ -21,9 +21,9 @@ class BattleRoyaleProfile:
             from_iso(stats['last_match_end_datetime']) if stats['last_match_end_datetime'] else None
 
         self.total_season_battlestars: int = stats['battlestars_season_total']
-        self.battle_stars: int = stats.get('battle_stars', 0)
+        self.battle_stars: int = stats.get('battlestars', 0)
         self.purchased_battlepass_offers: List[PurchasedBattlePassOffer] = [
-            PurchasedBattlePassOffer(offer) for offer in stats.get('purchased_battlepass_offers', [])
+            PurchasedBattlePassOffer(offer) for offer in stats.get('purchased_bp_offers', [])
         ]
 
         self.total_season_style_points: int = stats.get('style_points_season_total', 0)
@@ -47,10 +47,13 @@ class BattleRoyaleProfile:
 
         self.xp = stats['xp']
         self.last_xp_interaction: datetime = from_iso(stats['last_xp_interaction'])
+        self.rested_xp: int = stats['rested_xp']
         self.rested_xp_multiplier: float = stats['rested_xp_mult']
         self.rested_xp_overflow: int = stats['rested_xp_overflow']
         self.rested_xp_exchange: float = stats['rested_xp_exchange']
         self.rested_xp_golden_path_granted: int = stats.get('rested_xp_golden_path_granted', 0)
+        self.rested_xp_cumulative: int = stats.get('rested_xp_cumulative', 0)
+        self.rested_xp_consumed_cumulative: int = stats.get('rested_xp_consumed_cumulative', 0)
 
         self.has_purchased_book: bool = stats.get('book_purchased', False)
         self.book_level: int = stats['book_level']
@@ -116,7 +119,7 @@ class PurchasedBattlePassOffer:
         self.free_reward: bool = data['bIsFreePassReward']
         self.purchase_date: datetime = from_iso(data['purchaseDate'])
         self.items = [
-            Item(item) for item in data['items']
+            Item(item) for item in data['lootResult']
         ]
         self.currency: str = data['currencyType']
         self.currency_paid: int = data['totalCurrencyPaid']
@@ -133,7 +136,7 @@ class Item:
         self.type: str = item_type_split[0]
         self.id: str = item_type_split[1]
         self.guid: str = data['itemGuid']
-        self.profile = ItemProfile(data['itemProfile'])
+        self.profile: str = data['itemProfile']
         self.quantity: int = data['quantity']
 
 
@@ -181,13 +184,21 @@ class CommonCoreProfile:
 
         self.survey_data: dict = stats['survey_data']
         self.intro_game_played: bool = stats['intro_game_played']
-        self.purchase_history = []
+        self.vbucks_purchase_history = VBucksPurchaseHistory(stats['mtx_purchase_history']) \
+            if stats.get('mtx_purchase_history') else None
+        self.money_purchase_history = MoneyPurchaseHistory(stats['rmt_purchase_history']) \
+            if stats.get('rmt_purchase_history') else None
+        self.gift_history = GiftHistory(stats['gift_history']) if stats.get('gift_history') else None
+
+        self.undo_cooldowns: List[UndoCooldown] = [UndoCooldown(cooldown) for cooldown in
+                                                   stats.get('undo_cooldowns', [])]
 
         self.creator_code: Optional[str] = stats.get('mtx_affiliate')
         self.creator_code_owner_id: Optional[str] = stats.get('mtx_affiliate_id')
         self.creator_code_set_on: Optional[datetime] = from_iso(stats.get('mtx_affiliate_set_time'))
 
         self.current_payment_platform: str = stats['current_mtx_platform']
+        self.receipt_ids: List[str] = stats['in_app_purchases'].get('receipts', [])
 
         self.allowed_sending_gifts: bool = stats['allowed_to_send_gifts']
         self.allowed_receiving_gifts: bool = stats['allowed_to_receive_gifts']
@@ -198,7 +209,7 @@ class CommonCoreProfile:
 
     def get_overall_vbucks_count(self) -> int:
         return sum((self.get_save_the_world_vbucks(), self.get_purchased_vbucks(), self.get_free_obtained_vbucks())) \
-               - self.get_vbucks_debt()
+            - self.get_vbucks_debt()
 
     def get_save_the_world_vbucks(self) -> int:
         return sum(item.quantity for item in self.items if item.type == 'Currency' and item.id == 'MtxComplimentary')
@@ -229,13 +240,44 @@ class CommonCoreProfile:
         return any(item.id == 'campaignaccess' for item in self.items)
 
 
-class PurchaseHistory:
+class VBucksPurchaseHistory:
 
     def __init__(self, data: dict):
         self.refunds_used: int = data['refundsUsed']
         self.refund_credits: int = data['refundCredits']
         self.next_refund_grant_at: datetime = from_iso(data['tokenRefreshReferenceTime']) + timedelta(days=365)
         self.purchases: List[Purchase] = [Purchase(purchase) for purchase in data['purchases']]
+
+
+class MoneyPurchaseHistory:
+
+    def __init__(self, data: dict):
+        self.purchases: List[Purchase] = [Purchase(purchase) for purchase in data['purchases']]
+
+
+class GiftUser:
+
+    def __init__(self, user_id: str, timestamp: str):
+        self.user_id: str = user_id
+        self.timestamp: datetime = from_iso(timestamp)
+
+
+class Gift:
+
+    def __init__(self, data: dict):
+        self.date: datetime = from_iso(data['date'])
+        self.offer_id: str = data['offerId']
+        self.recipient_user_id: str = data['toAccountId']
+
+
+class GiftHistory:
+
+    def __init__(self, data: dict):
+        self.sent_count: int = data['num_sent']
+        self.received_count: int = data['num_received']
+        self.sent_to: List[GiftUser] = [GiftUser(uid, ts) for uid, ts in data['sentTo'].items()]
+        self.received_from: List[GiftUser] = [GiftUser(uid, ts) for uid, ts in data['receivedFrom'].items()]
+        self.gifts: List[Gift] = [Gift(gift) for gift in data['gifts']]
 
 
 class Purchase:
@@ -249,4 +291,11 @@ class Purchase:
         self.creator_code: Optional[str] = data['metadata'].get('mtx_affiliate')
         self.creator_code_owner_id: Optional[str] = data['metadata'].get('mtx_affiliate_id')
         self.game_context: Optional[str] = data.get('gameContext')
-        self.items: List[Item] = [Item(item) for item in data['items']]
+        self.items: List[Item] = [Item(item) for item in data['lootResult']]
+
+
+class UndoCooldown:
+
+    def __init__(self, data: dict):
+        self.offer_id: str = data['offerId']
+        self.expires_at: datetime = from_iso(data['cooldownExpires'])
