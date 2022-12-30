@@ -1282,13 +1282,13 @@ class HTTPClient:
         )
         return await self.post(r, json={})
 
-    async def set_creator_code(self, creator_code: str) -> dict:
+    async def set_affiliate_name(self, affiliate_name: str) -> dict:
         r = FortnitePublicService(
             '/fortnite/api/game/v2/profile/{client_id}/client/SetAffiliateName?profileId=common_core&rvn=-1',
             client_id=self.client.user.id,
         )
         payload = {
-            "affiliateName": creator_code
+            "affiliateName": affiliate_name
         }
         return await self.post(r, json=payload)
 

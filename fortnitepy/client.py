@@ -2518,8 +2518,8 @@ class BasicClient:
         profile_change = profile_data['profileChanges'][0]
         return CommonCoreProfile(profile_change['profile'])
 
-    async def set_creator_code(self, code: str):
-        await self.http.set_creator_code(code)
+    async def set_creator_code(self, creator_code: str):
+        await self.http.set_affiliate_name(creator_code)
 
     async def claim_login_rewards(self):
         await self.http.claim_login_reward('campaign')
