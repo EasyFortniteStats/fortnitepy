@@ -260,13 +260,13 @@ class VBucksPurchaseHistory:
         self.next_refund_grant_at: Optional[datetime] = (
                 from_iso(data['tokenRefreshReferenceTime']) + timedelta(days=365)
         ) if data.get('tokenRefreshReferenceTime') else None
-        self.purchases: List[Purchase] = [Purchase(purchase) for purchase in data['purchases']]
+        self.purchases: List[VBucksPurchase] = [VBucksPurchase(purchase) for purchase in data['purchases']]
 
 
 class MoneyPurchaseHistory:
 
     def __init__(self, data: dict):
-        self.purchases: List[Purchase] = [Purchase(purchase) for purchase in data['purchases']]
+        self.purchases: List[MoneyPurchase] = [MoneyPurchase(purchase) for purchase in data['purchases']]
 
 
 class GiftUser:
@@ -294,7 +294,7 @@ class GiftHistory:
         self.gifts: List[Gift] = [Gift(gift) for gift in data['gifts']]
 
 
-class Purchase:
+class VBucksPurchase:
     def __init__(self, data: dict):
         self.id: str = data['purchaseId']
         self.offer_id: str = data['offerId']
@@ -305,6 +305,13 @@ class Purchase:
         self.creator_code: Optional[str] = data['metadata'].get('mtx_affiliate')
         self.creator_code_owner_id: Optional[str] = data['metadata'].get('mtx_affiliate_id')
         self.game_context: Optional[str] = data.get('gameContext')
+        self.items: List[Item] = [Item(item) for item in data['lootResult']]
+
+
+class MoneyPurchase:
+    def __init__(self, data: dict):
+        self.fulfillment_id: str = data['fulfillmentId']
+        self.purchased_at: datetime = from_iso(data['purchaseDate'])
         self.items: List[Item] = [Item(item) for item in data['lootResult']]
 
 
