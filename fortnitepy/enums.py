@@ -273,6 +273,6 @@ class PaymentPlatform(Enum):
     SAMSUNG = 'Samsung'
     EPIC = 'Epic'
     WE_GAME = 'WeGame'
-    PC_Korea = 'EpicPCKorea'
+    PC_KOREA = 'EpicPCKorea'
     GOOGLE_PLAY = 'GooglePlay'
     SHARED = 'Shared'
