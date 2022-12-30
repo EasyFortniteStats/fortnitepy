@@ -2,6 +2,7 @@ import datetime
 from datetime import timedelta
 from typing import Optional, List
 
+from .enums import PaymentPlatform
 from .utils import from_iso
 
 
@@ -197,7 +198,7 @@ class CommonCoreProfile:
         self.creator_code_owner_id: Optional[str] = stats.get('mtx_affiliate_id')
         self.creator_code_set_on: Optional[datetime] = from_iso(stats.get('mtx_affiliate_set_time'))
 
-        self.current_payment_platform: str = stats['current_mtx_platform']
+        self.current_payment_platform: PaymentPlatform = PaymentPlatform(stats['current_mtx_platform'])
         self.receipt_ids: List[str] = stats['in_app_purchases'].get('receipts', [])
 
         self.allowed_sending_gifts: bool = stats['allowed_to_send_gifts']
@@ -207,18 +208,29 @@ class CommonCoreProfile:
 
         self.raw_data: dict = data
 
-    def get_overall_vbucks_count(self) -> int:
-        return sum((self.get_save_the_world_vbucks(), self.get_purchased_vbucks(), self.get_free_obtained_vbucks())) \
-            - self.get_vbucks_debt()
+    def get_overall_vbucks_count(self, platform: Optional[PaymentPlatform] = None, strict: bool = False) -> int:
+        return sum((
+            self.get_save_the_world_vbucks(),
+            self.get_purchased_vbucks(platform, strict),
+            self.get_free_obtained_vbucks()
+        )) - self.get_vbucks_debt()
 
     def get_save_the_world_vbucks(self) -> int:
         return sum(item.quantity for item in self.items if item.type == 'Currency' and item.id == 'MtxComplimentary')
 
-    def get_purchased_vbucks(self, platform: Optional[str] = None) -> int:
+    def get_purchased_vbucks(self, platform: Optional[PaymentPlatform] = None, strict: bool = False) -> int:
+        platforms = {platform}
+        if not strict:
+            if platform is not PaymentPlatform.NINTENDO:
+                platforms = set(PaymentPlatform) - {PaymentPlatform.NINTENDO}
+            else:
+                platforms = {PaymentPlatform.NINTENDO}
+        platforms = [platform.value for platform in platforms]
+
         return sum(
             item.quantity for item in self.items
             if item.type == 'Currency' and item.id == 'MtxPurchased' and
-            (platform is None or item.attributes['platform'] == platform)
+            (platform is None or item.attributes['platform'] in platforms)
         )
 
     def get_free_obtained_vbucks(self) -> int:

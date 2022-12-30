@@ -261,3 +261,18 @@ class Profile(Enum):
     SAVE_THE_WORLD = 'campaign'
     COMMON = 'common_core'
     COMMON_PUBLIC = 'common_public'
+
+
+class PaymentPlatform(Enum):
+    PC = 'EpicPC'
+    ANDROID = 'EpicAndroid'
+    PLAYSTATION = 'PSN'
+    XBOX = 'Live'
+    IOS = 'IOSAppStore'
+    NINTENDO = 'Nintendo'
+    SAMSUNG = 'Samsung'
+    EPIC = 'Epic'
+    WE_GAME = 'WeGame'
+    PC_Korea = 'EpicPCKorea'
+    GOOGLE_PLAY = 'GooglePlay'
+    SHARED = 'Shared'
