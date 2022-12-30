@@ -1292,6 +1292,16 @@ class HTTPClient:
         }
         return await self.post(r, json=payload)
 
+    async def set_mtx_platform(self, new_platform: str) -> dict:
+        r = FortnitePublicService(
+            '/fortnite/api/game/v2/profile/{client_id}/client/SetMtxPlatform?profileId=common_core&rvn=-1',
+            client_id=self.client.user.id,
+        )
+        payload = {
+            "newPlatform": new_platform
+        }
+        return await self.post(r, json=payload)
+
     ###################################
     #        Fortnite Content         #
     ###################################

@@ -44,7 +44,7 @@ from .user import (ClientUser, User, BlockedUser, SacSearchEntryUser,
 from .friend import Friend, IncomingPendingFriend, OutgoingPendingFriend
 from .enums import (Platform, Region, UserSearchPlatform, AwayStatus,
                     SeasonStartTimestamp, SeasonEndTimestamp,
-                    BattlePassStat, StatsCollectionType)
+                    BattlePassStat, StatsCollectionType, PaymentPlatform)
 from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty,
                     Party)
 from .stats import StatsV2, StatsCollection, _StatsBase
@@ -2523,6 +2523,9 @@ class BasicClient:
 
     async def claim_login_rewards(self):
         await self.http.claim_login_reward('campaign')
+
+    async def set_payment_platform(self, platform: PaymentPlatform):
+        await self.http.set_mtx_platform(platform.value)
 
 
 class Client(BasicClient):
