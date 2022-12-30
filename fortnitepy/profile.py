@@ -198,7 +198,7 @@ class CommonCoreProfile:
         self.creator_code_owner_id: Optional[str] = stats.get('mtx_affiliate_id')
         self.creator_code_set_on: Optional[datetime] = from_iso(stats.get('mtx_affiliate_set_time'))
 
-        self.current_payment_platform: PaymentPlatform = PaymentPlatform(stats['current_mtx_platform'])
+        self.current_vbucks_platform: PaymentPlatform = PaymentPlatform(stats['current_mtx_platform'])
         self.receipt_ids: List[str] = stats['in_app_purchases'].get('receipts', [])
 
         self.allowed_sending_gifts: bool = stats['allowed_to_send_gifts']
