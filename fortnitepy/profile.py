@@ -257,7 +257,9 @@ class VBucksPurchaseHistory:
     def __init__(self, data: dict):
         self.refunds_used: int = data['refundsUsed']
         self.refund_credits: int = data['refundCredits']
-        self.next_refund_grant_at: datetime = from_iso(data['tokenRefreshReferenceTime']) + timedelta(days=365)
+        self.next_refund_grant_at: Optional[datetime] = (
+                from_iso(data['tokenRefreshReferenceTime']) + timedelta(days=365)
+        ) if data.get('tokenRefreshReferenceTime') else None
         self.purchases: List[Purchase] = [Purchase(purchase) for purchase in data['purchases']]
 
 
