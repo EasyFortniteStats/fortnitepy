@@ -1266,7 +1266,7 @@ class HTTPClient:
         )
         return await self.post(r, json={})
 
-    async def query_public_profile(self, user_id: str, profile_id: Literal['campaign']) -> dict:
+    async def query_public_profile(self, user_id: str, profile_id: Literal['campaign', 'common_public']) -> dict:
         r = FortnitePublicService(
             '/fortnite/api/game/v2/profile/{user_id}/client/QueryProfile?profileId={profile_id}&rvn=-1',
             user_id=user_id,
