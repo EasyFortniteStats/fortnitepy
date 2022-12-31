@@ -48,13 +48,13 @@ class BattleRoyaleProfile:
 
         self.xp = stats['xp']
         self.last_xp_interaction: datetime = from_iso(stats['last_xp_interaction'])
-        self.rested_xp: int = stats['rested_xp']
-        self.rested_xp_multiplier: float = stats['rested_xp_mult']
-        self.rested_xp_overflow: int = stats['rested_xp_overflow']
-        self.rested_xp_exchange: float = stats['rested_xp_exchange']
-        self.rested_xp_golden_path_granted: int = stats.get('rested_xp_golden_path_granted', 0)
-        self.rested_xp_cumulative: int = stats.get('rested_xp_cumulative', 0)
-        self.rested_xp_consumed_cumulative: int = stats.get('rested_xp_consumed_cumulative', 0)
+        self.supercharged_xp: int = stats.get('rested_xp', 0)
+        self.supercharged_xp_multiplier: float = stats['rested_xp_mult']
+        self.supercharged_xp_overflow: int = stats['rested_xp_overflow']
+        self.supercharged_xp_exchange: float = stats['rested_xp_exchange']
+        self.supercharged_xp_golden_path_granted: int = stats.get('rested_xp_golden_path_granted', 0)
+        self.supercharged_xp_cumulative: int = stats.get('rested_xp_cumulative', 0)
+        self.supercharged_xp_consumed_cumulative: int = stats.get('rested_xp_consumed_cumulative', 0)
 
         self.has_purchased_book: bool = stats.get('book_purchased', False)
         self.book_level: int = stats['book_level']
