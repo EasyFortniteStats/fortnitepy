@@ -2551,7 +2551,7 @@ class BasicClient:
             f'GiftBox:GB_GiftWrap{gift_wrap}' if gift_wrap else None
         )
 
-    async def refund_item(self, purchase_id: str):
+    async def refund_item(self, purchase_id: str, quick_return: bool):
         await self.http.refund_mtx_purchase(purchase_id, quick_return)
 
 
