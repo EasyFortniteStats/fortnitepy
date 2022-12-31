@@ -65,37 +65,58 @@ class BattleRoyaleProfile:
 
         self.raw_data = data
 
-    def get_legacies(self) -> List["ItemProfile"]:
-        return [item for item in self.items if item.type == 'Accolades']
-
-    def get_backpacks(self) -> List["ItemProfile"]:
-        return [item for item in self.items if item.type == 'AthenaBackpack']
+    def get_all_cosmetics(self) -> List["ItemProfile"]:
+        return [
+            item for item in self.items if item.type in (
+                'AthenaCharacter', 'AthenaBackpack', 'AthenaPickaxe', 'AthenaGlider', 'AthenaSkyDiveContrail',
+                'AthenaDance', 'AthenaEmoji', 'AthenaSpray', 'AthenaToy', 'AthenaItemWrap', 'AthenaMusicPack',
+                'AthenaLoadingScreen'
+            )
+        ]
 
     def get_outfits(self) -> List["ItemProfile"]:
         return [item for item in self.items if item.type == 'AthenaCharacter']
 
-    def get_emotes(self) -> List["ItemProfile"]:
-        return [item for item in self.items if item.type == 'AthenaDance']
-
-    def get_gliders(self) -> List["ItemProfile"]:
-        return [item for item in self.items if item.type == 'AthenaGlider']
-
-    def get_wraps(self) -> List["ItemProfile"]:
-        return [item for item in self.items if item.type == 'AthenaItemWrap']
-
-    def get_loading_screen(self) -> List["ItemProfile"]:
-        return [item for item in self.items if item.type == 'AthenaLoadingScreen']
-
-    def get_musics(self) -> List["ItemProfile"]:
-        return [item for item in self.items if item.type == 'AthenaMusicPack']
+    def get_backpacks(self) -> List["ItemProfile"]:
+        return [item for item in self.items if item.type == 'AthenaBackpack']
 
     def get_harvesting_tools(self) -> List["ItemProfile"]:
         return [item for item in self.items if item.type == 'AthenaPickaxe']
 
+    def get_gliders(self) -> List["ItemProfile"]:
+        return [item for item in self.items if item.type == 'AthenaGlider']
+
     def get_contrails(self) -> List["ItemProfile"]:
         return [item for item in self.items if item.type == 'AthenaSkyDiveContrail']
 
-    def get_locker(self) -> 'Locker':
+    def get_emotes(self) -> List["ItemProfile"]:
+        return [item for item in self.items if item.type == 'AthenaDance']
+
+    def get_emoji(self) -> List["ItemProfile"]:
+        return [item for item in self.items if item.type == 'AthenaEmoji']
+
+    def get_sprays(self) -> List["ItemProfile"]:
+        return [item for item in self.items if item.type == 'AthenaSpray']
+
+    def get_toys(self) -> List["ItemProfile"]:
+        return [item for item in self.items if item.type == 'AthenaToy']
+
+    def get_wraps(self) -> List["ItemProfile"]:
+        return [item for item in self.items if item.type == 'AthenaItemWrap']
+
+    def get_banners(self) -> List["ItemProfile"]:
+        return [item for item in self.items if item.type == 'BannerToken']
+
+    def get_musics(self) -> List["ItemProfile"]:
+        return [item for item in self.items if item.type == 'AthenaMusicPack']
+
+    def get_loading_screen(self) -> List["ItemProfile"]:
+        return [item for item in self.items if item.type == 'AthenaLoadingScreen']
+
+    def get_legacies(self) -> List["ItemProfile"]:
+        return [item for item in self.items if item.type == 'Accolades']
+
+    def get_locker(self) -> "Locker":
         item = [item for item in self.items if item.type == 'CosmeticLocker'][0]
         return Locker(item.attributes)
 
