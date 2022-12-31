@@ -30,7 +30,7 @@ import time
 from aioxmpp import JID
 from aiohttp import BaseConnector
 from typing import (Iterable, Union, Optional, Any, Awaitable, Callable, Dict,
-                    List, Tuple)
+                    List, Tuple, Literal)
 
 from .profile import BattleRoyaleProfile, CommonCoreProfile
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
@@ -2526,6 +2526,33 @@ class BasicClient:
 
     async def set_payment_platform(self, platform: PaymentPlatform):
         await self.http.set_mtx_platform(platform.value)
+
+    async def purchase_item(
+            self,
+            offer_id: str,
+            currency_type: str,
+            currency_sub_type: str,
+            expected_price: int,
+            quantity: int = 1
+    ):
+        await self.http.purchase_catalog_entry(offer_id, quantity, currency_type, currency_sub_type, expected_price)
+
+    async def gift_item(
+            self,
+            receiver_account_ids: List[str],
+            offer_id: str,
+            currency_type: str,
+            currency_sub_type: str,
+            expected_price: int,
+            gift_wrap: Optional[Literal[1, 2, 3, 4]]
+    ):
+        await self.http.gift_catalog_entry(
+            offer_id, currency_type, currency_sub_type, expected_price, receiver_account_ids,
+            f'GiftBox:GB_GiftWrap{gift_wrap}' if gift_wrap else None
+        )
+
+    async def refund_item(self, purchase_id: str):
+        await self.http.refund_mtx_purchase(purchase_id, quick_return)
 
 
 class Client(BasicClient):

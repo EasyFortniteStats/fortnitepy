@@ -1302,6 +1302,69 @@ class HTTPClient:
         }
         return await self.post(r, json=payload)
 
+    async def purchase_catalog_entry(
+            self,
+            offer_id: str,
+            purchase_quantity: int,
+            currency_type: str,
+            currency_sub_type: str,
+            expected_total_price: int,
+    ) -> dict:
+        r = FortnitePublicService(
+            '/fortnite/api/game/v2/profile/{client_id}/client/PurchaseCatalogEntry?profileId=common_core&rvn=-1',
+            client_id=self.client.user.id,
+        )
+        payload = {
+            'offerId': offer_id,
+            'purchaseQuantity': purchase_quantity,
+            'currency': currency_type,
+            'currencySubType': currency_sub_type,
+            'expectedTotalPrice': expected_total_price,
+            'gameContext': 'Frontend.CatabaScreen',
+        }
+        return await self.post(r, json=payload)
+
+    async def gift_catalog_entry(
+            self,
+            offer_id: str,
+            currency_type: str,
+            currency_sub_type: str,
+            expected_total_price: int,
+            receiver_account_ids: List[str],
+            gift_wrap_template_id: str,
+    ) -> dict:
+        r = FortnitePublicService(
+            '/fortnite/api/game/v2/profile/{client_id}/client/GiftCatalogEntry?profileId=common_core&rvn=-1',
+            client_id=self.client.user.id,
+        )
+        payload = {
+            'offerId': offer_id,
+            'currency': currency_type,
+            'currencySubType': currency_sub_type,
+            'expectedTotalPrice': expected_total_price,
+            'gameContext': 'Frontend.CatabaScreen',
+            'receiverAccountIds': receiver_account_ids,
+            'giftWrapTemplateId': gift_wrap_template_id,
+            'personalMessage': ''
+        }
+        return await self.post(r, json=payload)
+
+    async def refund_mtx_purchase(
+            self,
+            purchase_id: str,
+            quick_return: bool = True,
+    ) -> dict:
+        r = FortnitePublicService(
+            '/fortnite/api/game/v2/profile/{client_id}/client/RefundMtxPurchase?profileId=common_core&rvn=-1',
+            client_id=self.client.user.id,
+        )
+        payload = {
+            'purchaseId': purchase_id,
+            'quickReturn': quick_return,
+            'gameContext': 'Frontend.AthenaLobby',
+        }
+        return await self.post(r, json=payload)
+
     ###################################
     #        Fortnite Content         #
     ###################################
