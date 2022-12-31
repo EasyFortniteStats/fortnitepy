@@ -66,7 +66,9 @@ class BattleRoyaleProfile:
         self.raw_data = data
 
     def get_cosmetics(self, *cosmetic_types: CosmeticType) -> List["ItemProfile"]:
-        cosmetic_types = [c.value for c in cosmetic_types] if cosmetic_types else list(CosmeticType)
+        if not cosmetic_types:
+            cosmetic_types = list(CosmeticType)
+        cosmetic_types = [c.value for c in cosmetic_types]
         return [item for item in self.items if item.type in cosmetic_types]
 
     def get_legacies(self) -> List["ItemProfile"]:
