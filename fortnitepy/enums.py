@@ -97,13 +97,13 @@ class PartyPrivacy(Enum):
 
 
 class PartyDiscoverability(Enum):
-    ALL          = 'ALL'
+    ALL = 'ALL'
     INVITED_ONLY = 'INVITED_ONLY'
 
 
 class PartyJoinability(Enum):
-    OPEN              = 'OPEN'
-    INVITE_ONLY       = 'INVITE_ONLY'
+    OPEN = 'OPEN'
+    INVITE_ONLY = 'INVITE_ONLY'
     INVITE_AND_FORMER = 'INVITE_AND_FORMER'
 
 
@@ -130,57 +130,57 @@ class DefaultCharactersChapter2(Enum):
 
 
 class V1Gamemode(Enum):
-    SOLO  = 'p2'
-    DUO   = 'p10'
+    SOLO = 'p2'
+    DUO = 'p10'
     SQUAD = 'p9'
 
 
 class V1Platform(Enum):
-    PC   = 'pc'
+    PC = 'pc'
     XBOX = 'xb1'
-    PS4  = 'ps4'
+    PS4 = 'ps4'
 
 
 class V1Window(Enum):
     ALLTIME = 'alltime'
-    WEEKLY  = 'weekly'
+    WEEKLY = 'weekly'
 
 
 class V2Input(Enum):
     KEYBOARDANDMOUSE = 'keyboardmouse'
-    GAMEPAD          = 'gamepad'
-    TOUCH            = 'touch'
+    GAMEPAD = 'gamepad'
+    TOUCH = 'touch'
 
 
 class Region(Enum):
-    NAEAST     = 'NAE'
-    NAWEST     = 'NAW'
-    EUROPE     = 'EU'
-    BRAZIL     = 'BR'
-    OCEANIA    = 'OCE'
-    ASIA       = 'ASIA'
+    NAEAST = 'NAE'
+    NAWEST = 'NAW'
+    EUROPE = 'EU'
+    BRAZIL = 'BR'
+    OCEANIA = 'OCE'
+    ASIA = 'ASIA'
     MIDDLEEAST = 'ME'
 
 
 class Platform(Enum):
-    WINDOWS       = 'WIN'
-    MAC           = 'MAC'
-    PLAYSTATION   = 'PSN'
+    WINDOWS = 'WIN'
+    MAC = 'MAC'
+    PLAYSTATION = 'PSN'
     PLAYSTATION_4 = 'PSN'
     PLAYSTATION_5 = 'PS5'
-    XBOX          = 'XBL'
-    XBOX_ONE      = 'XBL'
-    XBOX_X        = 'XSX'
-    SWITCH        = 'SWT'
-    IOS           = 'IOS'
-    ANDROID       = 'AND'
+    XBOX = 'XBL'
+    XBOX_ONE = 'XBL'
+    XBOX_X = 'XSX'
+    SWITCH = 'SWT'
+    IOS = 'IOS'
+    ANDROID = 'AND'
 
 
 class UserSearchPlatform(Enum):
-    EPIC_GAMES  = 'epic'
+    EPIC_GAMES = 'epic'
     PLAYSTATION = 'psn'
-    XBOX        = 'xbl'
-    STEAM       = 'steam'
+    XBOX = 'xbl'
+    STEAM = 'steam'
 
 
 class UserSearchMatchType(Enum):
@@ -189,27 +189,27 @@ class UserSearchMatchType(Enum):
 
 
 class ReadyState(Enum):
-    READY       = 'Ready'
-    NOT_READY   = 'NotReady'
+    READY = 'Ready'
+    NOT_READY = 'NotReady'
     SITTING_OUT = 'SittingOut'
 
 
 class AwayStatus(Enum):
-    ONLINE        = None
-    AWAY          = 'away'
+    ONLINE = None
+    AWAY = 'away'
     EXTENDED_AWAY = 'xa'
 
 
 class SeasonStartTimestamp(Enum):
-    SEASON_1  = 1508889601
-    SEASON_2  = 1513209601
-    SEASON_3  = 1519257601
-    SEASON_4  = 1525132801
-    SEASON_5  = 1531353601
-    SEASON_6  = 1538006401
-    SEASON_7  = 1544054401
-    SEASON_8  = 1551312001
-    SEASON_9  = 1557360001
+    SEASON_1 = 1508889601
+    SEASON_2 = 1513209601
+    SEASON_3 = 1519257601
+    SEASON_4 = 1525132801
+    SEASON_5 = 1531353601
+    SEASON_6 = 1538006401
+    SEASON_7 = 1544054401
+    SEASON_8 = 1551312001
+    SEASON_9 = 1557360001
     SEASON_10 = 1564617601
     SEASON_11 = 1571097601
     SEASON_12 = 1582156801
@@ -222,15 +222,15 @@ class SeasonStartTimestamp(Enum):
 
 
 class SeasonEndTimestamp(Enum):
-    SEASON_1  = 1513123200
-    SEASON_2  = 1519171200
-    SEASON_3  = 1525046400
-    SEASON_4  = 1531353600
-    SEASON_5  = 1538006400
-    SEASON_6  = 1544054400
-    SEASON_7  = 1551312000
-    SEASON_8  = 1557360000
-    SEASON_9  = 1564617600
+    SEASON_1 = 1513123200
+    SEASON_2 = 1519171200
+    SEASON_3 = 1525046400
+    SEASON_4 = 1531353600
+    SEASON_5 = 1538006400
+    SEASON_6 = 1544054400
+    SEASON_7 = 1551312000
+    SEASON_8 = 1557360000
+    SEASON_9 = 1564617600
     SEASON_10 = 1570924800
     SEASON_11 = 1582156800
     SEASON_12 = 1592352000
@@ -276,3 +276,18 @@ class PaymentPlatform(Enum):
     PC_KOREA = 'EpicPCKorea'
     GOOGLE_PLAY = 'GooglePlay'
     SHARED = 'Shared'
+
+
+class CosmeticType(Enum):
+    OUTFIT = 'AthenaCharacter'
+    BACKPACK = 'AthenaBackpack'
+    PICKAXE = 'AthenaPickaxe'
+    GLIDER = 'AthenaGlider'
+    CONTRAIL = 'AthenaSkyDiveContrail'
+    EMOTE = 'AthenaDance'
+    EMOJI = 'AthenaEmoji'
+    SPRAY = 'AthenaSpray'
+    TOY = 'AthenaToy'
+    WRAP = 'AthenaItemWrap'
+    MUSIC = 'AthenaMusicPack'
+    LOADING_SCREEN = 'AthenaLoadingScreen'
