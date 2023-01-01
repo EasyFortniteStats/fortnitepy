@@ -67,7 +67,7 @@ class BattleRoyaleProfile:
 
     def get_cosmetics(self, *cosmetic_types: ProfileCosmeticType) -> List["ItemProfile"]:
         if not cosmetic_types:
-            cosmetic_types = list(cosmetic_types)
+            cosmetic_types = list(ProfileCosmeticType)
         items = []
         for item in self.items:
             for cosmetic_type in cosmetic_types:
