@@ -2,7 +2,7 @@ import datetime
 from datetime import timedelta
 from typing import Optional, List, Dict
 
-from .enums import CosmeticType, PaymentPlatform
+from .enums import ProfileCosmeticType, PaymentPlatform
 from .utils import from_iso
 
 
@@ -65,20 +65,22 @@ class BattleRoyaleProfile:
 
         self.raw_data = data
 
-    def get_cosmetics(self, *cosmetic_types: CosmeticType) -> List["ItemProfile"]:
+    def get_cosmetics(self, *cosmetic_types: ProfileCosmeticType) -> List["ItemProfile"]:
         if not cosmetic_types:
-            cosmetic_types = list(CosmeticType)
-        cosmetic_types = [c.value for c in cosmetic_types]
-        return [item for item in self.items if item.type in cosmetic_types]
-
-    def count_cosmetics(self) -> Dict[CosmeticType, int]:
-        cosmetics = {c: 0 for c in CosmeticType}
+            cosmetic_types = list(cosmetic_types)
+        items = []
         for item in self.items:
-            try:
-                cosmetic_type = CosmeticType(item.type)
-            except ValueError:
-                continue
-            cosmetics[cosmetic_type] += 1
+            for cosmetic_type in cosmetic_types:
+                if item.type == cosmetic_type.backend_type and item.id.startswith(cosmetic_type.id_prefix):
+                    items.append(item)
+        return items
+
+    def count_cosmetics(self) -> Dict[ProfileCosmeticType, int]:
+        cosmetics = {c: 0 for c in ProfileCosmeticType}
+        for item in self.items:
+            for cosmetic_type in ProfileCosmeticType:
+                if item.type == cosmetic_type.backend_type and item.id.startswith(cosmetic_type.id_prefix):
+                    cosmetics[cosmetic_type] += 1
         return cosmetics
 
     def get_legacies(self) -> List["ItemProfile"]:

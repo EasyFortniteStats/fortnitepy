@@ -278,16 +278,25 @@ class PaymentPlatform(Enum):
     SHARED = 'Shared'
 
 
-class CosmeticType(Enum):
-    OUTFIT = 'AthenaCharacter'
-    BACKPACK = 'AthenaBackpack'
-    PICKAXE = 'AthenaPickaxe'
-    GLIDER = 'AthenaGlider'
-    CONTRAIL = 'AthenaSkyDiveContrail'
-    EMOTE = 'AthenaDance'
-    EMOJI = 'AthenaEmoji'
-    SPRAY = 'AthenaSpray'
-    TOY = 'AthenaToy'
-    WRAP = 'AthenaItemWrap'
-    MUSIC = 'AthenaMusicPack'
-    LOADING_SCREEN = 'AthenaLoadingScreen'
+class ProfileCosmeticType(Enum):
+    OUTFIT = 'AthenaCharacter', 'cid'
+    BACKPACK = 'AthenaBackpack', 'bid'
+    PET_CARRIER = 'AthenaBackpack', 'petcarrier'
+    PICKAXE = 'AthenaPickaxe', 'pickaxe'
+    GLIDER = 'AthenaGlider', 'glider_id'
+    CONTRAIL = 'AthenaSkyDiveContrail', 'trails_id'
+    EMOTE = 'AthenaDance', 'eid'
+    EMOJI = 'AthenaDance', 'emoji'
+    SPRAY = 'AthenaDance', 'spray'
+    TOY = 'AthenaDance', 'toy'
+    WRAP = 'AthenaItemWrap', 'wrap'
+    MUSIC = 'AthenaMusicPack', 'musicpack'
+    LOADING_SCREEN = 'AthenaLoadingScreen', 'lsid'
+
+    @property
+    def backend_type(self):
+        return self.value[0]
+
+    @property
+    def id_prefix(self):
+        return self.value[1]
