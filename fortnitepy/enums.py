@@ -300,3 +300,10 @@ class ProfileCosmeticType(Enum):
     @property
     def id_prefix(self):
         return self.value[1]
+
+    @classmethod
+    def from_backend_type(cls, backend_type: str):
+        for cosmetic_type in cls:
+            if cosmetic_type.backend_type == backend_type:
+                return cosmetic_type
+        raise ValueError(f'No cosmetic type with backend type {backend_type}')
