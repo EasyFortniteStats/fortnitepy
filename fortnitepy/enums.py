@@ -278,32 +278,13 @@ class PaymentPlatform(Enum):
     SHARED = 'Shared'
 
 
-class ProfileCosmeticType(Enum):
-    OUTFIT = 'AthenaCharacter', 'cid'
-    BACKPACK = 'AthenaBackpack', 'bid'
-    PET_CARRIER = 'AthenaBackpack', 'petcarrier'
-    PICKAXE = 'AthenaPickaxe', 'pickaxe'
-    GLIDER = 'AthenaGlider', 'glider_id'
-    CONTRAIL = 'AthenaSkyDiveContrail', 'trails_id'
-    EMOTE = 'AthenaDance', 'eid'
-    EMOJI = 'AthenaDance', 'emoji'
-    SPRAY = 'AthenaDance', 'spray'
-    TOY = 'AthenaDance', 'toy'
-    WRAP = 'AthenaItemWrap', 'wrap'
-    MUSIC = 'AthenaMusicPack', 'musicpack'
-    LOADING_SCREEN = 'AthenaLoadingScreen', 'lsid'
-
-    @property
-    def backend_type(self):
-        return self.value[0]
-
-    @property
-    def id_prefix(self):
-        return self.value[1]
-
-    @classmethod
-    def from_backend_type(cls, backend_type: str):
-        for cosmetic_type in cls:
-            if cosmetic_type.backend_type == backend_type:
-                return cosmetic_type
-        raise ValueError(f'No cosmetic type with backend type {backend_type}')
+class CosmeticType(Enum):
+    OUTFIT = 'AthenaCharacter'
+    BACKPACK = 'AthenaBackpack'
+    PICKAXE = 'AthenaPickaxe'
+    GLIDER = 'AthenaGlider'
+    CONTRAIL = 'AthenaSkyDiveContrail'
+    DANCE = 'AthenaDance'
+    WRAP = 'AthenaItemWrap'
+    MUSIC = 'AthenaMusicPack'
+    LOADING_SCREEN = 'AthenaLoadingScreen'
