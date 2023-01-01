@@ -74,7 +74,10 @@ class BattleRoyaleProfile:
     def count_cosmetics(self) -> Dict[CosmeticType, int]:
         cosmetics = {}
         for item in self.items:
-            cosmetic_type = CosmeticType(item.type)
+            try:
+                cosmetic_type = CosmeticType(item.type)
+            except ValueError:
+                continue
             if item.type not in cosmetics:
                 cosmetics[cosmetic_type] = 0
             cosmetics[cosmetic_type] += 1
