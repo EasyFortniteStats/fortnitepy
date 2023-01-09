@@ -123,7 +123,8 @@ class Item:
 class ItemProfile:
 
     def __init__(self, data: dict):
-        item_type_split = data['templateId'].split(':')
+        self.template_id: str = data['templateId']
+        item_type_split = self.template_id.split(':')
         self.type: str = item_type_split[0]
         self.id: str = item_type_split[1]
         self.attributes: dict = data['attributes']
