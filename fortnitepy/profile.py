@@ -259,7 +259,7 @@ class GiftUser:
 class Gift:
 
     def __init__(self, data: dict):
-        self.date: datetime = from_iso(data['date'])
+        self.sent_at: datetime = from_iso(data['date'])
         self.offer_id: str = data['offerId']
         self.recipient_user_id: str = data['toAccountId']
 
