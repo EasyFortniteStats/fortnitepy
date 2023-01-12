@@ -32,7 +32,7 @@ from aiohttp import BaseConnector
 from typing import (Iterable, Union, Optional, Any, Awaitable, Callable, Dict,
                     List, Tuple, Literal)
 
-from .profile import BattleRoyaleProfile, CommonCoreProfile
+from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, DailyRewardNotification
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
                      DuplicateFriendship, FriendshipRequestAlreadySent,
                      MaxFriendshipsExceeded, InviteeMaxFriendshipsExceeded,
@@ -2518,11 +2518,20 @@ class BasicClient:
         profile_change = profile_data['profileChanges'][0]
         return CommonCoreProfile(profile_change['profile'])
 
+    async def fetch_save_the_world_profile(self) -> Optional[BattleRoyaleProfile]:
+        profile_data = await self.http.query_profile('campaign')
+        if not profile_data or not profile_data['profileChanges']:
+            return None
+        profile_change = profile_data['profileChanges'][0]
+        return SaveTheWorldProfile(profile_change['profile'])
+
     async def set_creator_code(self, creator_code: str):
         await self.http.set_affiliate_name(creator_code)
 
-    async def claim_login_rewards(self):
-        await self.http.claim_login_reward('campaign')
+    async def claim_login_rewards(self) -> DailyRewardNotification:
+        profile_data = await self.http.claim_login_reward('campaign')
+        notifications = [n for n in profile_data['notifications'] if n['type'] == 'daily_rewards']
+        return DailyRewardNotification(notifications[0])
 
     async def set_payment_platform(self, platform: PaymentPlatform):
         await self.http.set_mtx_platform(platform.value)

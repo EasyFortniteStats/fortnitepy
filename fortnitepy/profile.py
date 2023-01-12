@@ -300,3 +300,61 @@ class UndoCooldown:
     def __init__(self, data: dict):
         self.offer_id: str = data['offerId']
         self.expires_at: datetime = from_iso(data['cooldownExpires'])
+
+
+class SaveTheWorldProfile:
+
+    def __init__(self, data: dict):
+        self.items = [ItemProfile(item) for item in data['items'].values()]
+
+        stats = data['stats']['attributes']
+
+        self.xp: int = stats['xp']
+        self.level: int = stats['level']
+
+        self.mfa_reward_claimed: bool = stats['mfa_reward_claimed']
+
+        self.daily_rewards: DailyRewards = DailyRewards(data['dailyRewards'])
+
+        self.raw_data = data
+
+    def get_cosmetics(self, *cosmetic_types: CosmeticType) -> List["ItemProfile"]:
+        if not cosmetic_types:
+            cosmetic_types = list(CosmeticType)
+        cosmetic_types = [cosmetic_type.value for cosmetic_type in cosmetic_types]
+        return [i for i in self.items if i.type in cosmetic_types]
+
+    def get_legacies(self) -> List["ItemProfile"]:
+        return [item for item in self.items if item.type == 'Accolades']
+
+    def get_locker(self) -> "Locker":
+        item = [item for item in self.items if item.type == 'CosmeticLocker'][0]
+        return Locker(item.attributes)
+
+
+class DailyRewards:
+
+    def __init__(self, data: dict):
+        self.next_default_reward: int = data['nextDefaultReward']
+        self.total_days_logged_in: int = data['totalDaysLoggedIn']
+        self.last_claimed_at: datetime = from_iso(data['lastClaimDate'])
+
+
+class DailyRewardNotification:
+
+    def __init__(self, data: dict):
+        self.days_logged_in: int = data['daysLoggedIn']
+        self.items: List[ItemProfile] = [ItemProfile(reward) for reward in data['dailyRewards']]
+
+
+class NotificationItem:
+
+    def __init__(self, data: dict):
+        self.type: str = data['itemType']
+        item_type_split = self.type.split(':')
+        self.type: str = item_type_split[0]
+        self.id: str = item_type_split[1]
+        self.guid: str = data['itemGuid']
+        self.profile: str = data['itemProfile']
+        self.attributes: dict = data['attributes']
+        self.quantity: int = data['quantity']
