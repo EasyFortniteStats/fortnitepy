@@ -314,7 +314,7 @@ class SaveTheWorldProfile:
 
         self.mfa_reward_claimed: bool = stats['mfa_reward_claimed']
 
-        self.daily_rewards: DailyRewards = DailyRewards(stats['dailyRewards'])
+        self.daily_rewards: DailyRewards = DailyRewards(stats['daily_rewards'])
 
         self.raw_data = data
 
