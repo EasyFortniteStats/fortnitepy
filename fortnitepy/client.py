@@ -2518,7 +2518,7 @@ class BasicClient:
         profile_change = profile_data['profileChanges'][0]
         return CommonCoreProfile(profile_change['profile'])
 
-    async def fetch_save_the_world_profile(self) -> Optional[BattleRoyaleProfile]:
+    async def fetch_save_the_world_profile(self) -> Optional[SaveTheWorldProfile]:
         profile_data = await self.http.query_profile('campaign')
         if not profile_data or not profile_data['profileChanges']:
             return None
