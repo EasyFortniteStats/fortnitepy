@@ -344,7 +344,7 @@ class DailyRewardNotification:
 
     def __init__(self, data: dict):
         self.days_logged_in: int = data['daysLoggedIn']
-        self.items: List[ItemProfile] = [ItemProfile(reward) for reward in data['items']]
+        self.items: List[NotificationItem] = [NotificationItem(reward) for reward in data['items']]
 
 
 class NotificationItem:
