@@ -2,7 +2,7 @@ import datetime
 from datetime import timedelta
 from typing import Optional, List, Dict
 
-from .enums import CosmeticType, PaymentPlatform
+from .enums import CosmeticType, VbucksPlatform
 from .utils import from_iso
 
 
@@ -178,7 +178,7 @@ class CommonCoreProfile:
         self.creator_code_owner_id: Optional[str] = stats.get('mtx_affiliate_id')
         self.creator_code_set_on: Optional[datetime] = from_iso(stats.get('mtx_affiliate_set_time'))
 
-        self.current_vbucks_platform: PaymentPlatform = PaymentPlatform(stats['current_mtx_platform'])
+        self.current_vbucks_platform: VbucksPlatform = VbucksPlatform(stats['current_mtx_platform'])
         self.receipt_ids: List[str] = stats['in_app_purchases'].get('receipts', [])
 
         self.allowed_sending_gifts: bool = stats['allowed_to_send_gifts']
@@ -188,7 +188,7 @@ class CommonCoreProfile:
 
         self.raw_data: dict = data
 
-    def get_overall_vbucks_count(self, platform: Optional[PaymentPlatform] = None, strict: bool = False) -> int:
+    def get_overall_vbucks_count(self, platform: Optional[VbucksPlatform] = None, strict: bool = False) -> int:
         return sum((
             self.get_save_the_world_vbucks(),
             self.get_purchased_vbucks(platform, strict),
@@ -198,13 +198,13 @@ class CommonCoreProfile:
     def get_save_the_world_vbucks(self) -> int:
         return sum(item.quantity for item in self.items if item.type == 'Currency' and item.id == 'MtxComplimentary')
 
-    def get_purchased_vbucks(self, platform: Optional[PaymentPlatform] = None, strict: bool = False) -> int:
+    def get_purchased_vbucks(self, platform: Optional[VbucksPlatform] = None, strict: bool = False) -> int:
         platforms = {platform}
         if not strict:
-            if platform is not PaymentPlatform.NINTENDO:
-                platforms = set(PaymentPlatform) - {PaymentPlatform.NINTENDO}
+            if platform is not VbucksPlatform.NINTENDO:
+                platforms = set(VbucksPlatform) - {VbucksPlatform.NINTENDO}
             else:
-                platforms = {PaymentPlatform.NINTENDO}
+                platforms = {VbucksPlatform.NINTENDO}
         platforms = [platform.value for platform in platforms]
 
         return sum(

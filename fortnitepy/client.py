@@ -44,7 +44,7 @@ from .user import (ClientUser, User, BlockedUser, SacSearchEntryUser,
 from .friend import Friend, IncomingPendingFriend, OutgoingPendingFriend
 from .enums import (Platform, Region, UserSearchPlatform, AwayStatus,
                     SeasonStartTimestamp, SeasonEndTimestamp,
-                    BattlePassStat, StatsCollectionType, PaymentPlatform)
+                    BattlePassStat, StatsCollectionType, VbucksPlatform)
 from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty,
                     Party)
 from .stats import StatsV2, StatsCollection, _StatsBase
@@ -2533,7 +2533,7 @@ class BasicClient:
         notifications = [n for n in profile_data['notifications'] if n['type'] == 'daily_rewards']
         return DailyRewardNotification(notifications[0])
 
-    async def set_payment_platform(self, platform: PaymentPlatform):
+    async def set_vbucks_platform(self, platform: VbucksPlatform):
         await self.http.set_mtx_platform(platform.value)
 
     async def purchase_item(
