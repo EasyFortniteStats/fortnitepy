@@ -2,7 +2,7 @@ import datetime
 from datetime import timedelta
 from typing import Optional, List, Dict
 
-from .enums import CosmeticType, PaymentPlatform
+from .enums import CosmeticType, VBucksPlatform
 from .utils import from_iso
 
 
@@ -178,7 +178,7 @@ class CommonCoreProfile:
         self.creator_code_owner_id: Optional[str] = stats.get('mtx_affiliate_id')
         self.creator_code_set_on: Optional[datetime] = from_iso(stats.get('mtx_affiliate_set_time'))
 
-        self.current_vbucks_platform: PaymentPlatform = PaymentPlatform(stats['current_mtx_platform'])
+        self.current_vbucks_platform: VBucksPlatform = VBucksPlatform(stats['current_mtx_platform'])
         self.receipt_ids: List[str] = stats['in_app_purchases'].get('receipts', [])
 
         self.allowed_sending_gifts: bool = stats['allowed_to_send_gifts']
@@ -188,7 +188,7 @@ class CommonCoreProfile:
 
         self.raw_data: dict = data
 
-    def get_overall_vbucks_count(self, platform: Optional[PaymentPlatform] = None, strict: bool = False) -> int:
+    def get_overall_vbucks_count(self, platform: Optional[VBucksPlatform] = None, strict: bool = False) -> int:
         return sum((
             self.get_save_the_world_vbucks(),
             self.get_purchased_vbucks(platform, strict),
@@ -198,13 +198,13 @@ class CommonCoreProfile:
     def get_save_the_world_vbucks(self) -> int:
         return sum(item.quantity for item in self.items if item.type == 'Currency' and item.id == 'MtxComplimentary')
 
-    def get_purchased_vbucks(self, platform: Optional[PaymentPlatform] = None, strict: bool = False) -> int:
+    def get_purchased_vbucks(self, platform: Optional[VBucksPlatform] = None, strict: bool = False) -> int:
         platforms = {platform}
         if not strict:
-            if platform is not PaymentPlatform.NINTENDO:
-                platforms = set(PaymentPlatform) - {PaymentPlatform.NINTENDO}
+            if platform is not VBucksPlatform.NINTENDO:
+                platforms = set(VBucksPlatform) - {VBucksPlatform.NINTENDO}
             else:
-                platforms = {PaymentPlatform.NINTENDO}
+                platforms = {VBucksPlatform.NINTENDO}
         platforms = [platform.value for platform in platforms]
 
         return sum(
@@ -345,7 +345,7 @@ class DailyRewardNotification:
 
     def __init__(self, data: dict):
         self.days_logged_in: int = data['daysLoggedIn']
-        self.items: List[ItemProfile] = [ItemProfile(reward) for reward in data['items']]
+        self.items: List[NotificationItem] = [NotificationItem(reward) for reward in data['items']]
 
 
 class NotificationItem:

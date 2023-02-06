@@ -263,7 +263,7 @@ class Profile(Enum):
     COMMON_PUBLIC = 'common_public'
 
 
-class PaymentPlatform(Enum):
+class VBucksPlatform(Enum):
     PC = 'EpicPC'
     ANDROID = 'EpicAndroid'
     PLAYSTATION = 'PSN'
