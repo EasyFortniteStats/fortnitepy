@@ -279,6 +279,7 @@ class VBucksPurchase:
         self.id: str = data['purchaseId']
         self.offer_id: str = data['offerId']
         self.purchased_at: datetime = from_iso(data['purchaseDate'])
+        self.undoable_until: Optional[datetime] = from_iso(data['undoTimeout']) if 'undoTimeout' in data else None
         self.free_refund_eligible: bool = data['freeRefundEligible']
         self.fulfillments: list = data['fulfillments']
         self.price: int = data['totalMtxPaid']
