@@ -358,5 +358,4 @@ class NotificationItem:
         self.id: str = item_type_split[1]
         self.guid: str = data['itemGuid']
         self.profile: str = data['itemProfile']
-        self.attributes: dict = data['attributes']
         self.quantity: int = data['quantity']
