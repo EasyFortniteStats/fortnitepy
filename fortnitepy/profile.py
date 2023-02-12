@@ -1,6 +1,5 @@
-import datetime
-from datetime import timedelta
-from typing import Optional, List, Dict
+from datetime import timedelta, datetime
+from typing import Optional, List
 
 from .enums import CosmeticType, VBucksPlatform
 from .utils import from_iso
@@ -82,7 +81,7 @@ class BattleRoyaleProfile:
 class PastSeasonStats:
 
     def __init__(self, data: dict):
-        self.season = data['seasonNumber']
+        self.season: int = data['seasonNumber']
         self.wins: int = data['numWins']
         self.xp: int = data['seasonXp']
         self.level: int = data['seasonLevel']
