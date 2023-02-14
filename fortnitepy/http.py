@@ -112,6 +112,7 @@ class HTTPRetryConfig:
         unrealistically high wait times. Defaults to ``20``. *Only matters
         when ``handle_capacity_throttling`` is ``True``*
     """
+
     def __init__(self, **kwargs):
         self.max_retry_attempts = kwargs.get('max_retry_attempts', 5)
         self.max_wait_time = kwargs.get('max_wait_time', 65)
@@ -333,6 +334,11 @@ class AvatarService(Route):
     AUTH = 'FORTNITE_ACCESS_TOKEN'
 
 
+class CodeRedemptionService(Route):
+    BASE = 'https://coderedemption-public-service-prod.ol.epicgames.com'
+    AUTH = 'FORTNITE_ACCESS_TOKEN'
+
+
 def create_aiohttp_closed_event(session) -> asyncio.Event:
     """Work around aiohttp issue that doesn't properly close transports on exit.
 
@@ -407,7 +413,7 @@ class HTTPClient:
 
     @staticmethod
     async def json_or_text(response: aiohttp.ClientResponse) -> Union[str,
-                                                                      dict]:
+    dict]:
         text = await response.text(encoding='utf-8')
         if 'application/json' in response.headers.get('content-type', ''):
             return json.loads(text)
@@ -526,9 +532,9 @@ class HTTPClient:
             if isinstance(data, str):
                 m = GRAPHQL_HTML_ERROR_PATTERN.search(data)
                 error_data = ({
-                    'serviceResponse': '',
-                    'message': 'Unknown reason' if m is None else m.group(1)
-                },)
+                                  'serviceResponse': '',
+                                  'message': 'Unknown reason' if m is None else m.group(1)
+                              },)
                 if m is not None:
                     error_data[0]['serviceResponse'] = json.dumps({
                         'errorStatus': int(m.group(2))
@@ -538,11 +544,11 @@ class HTTPClient:
                 if data['status'] >= 400:
                     message = data['message']
                     error_data = ({
-                        'serviceResponse': json.dumps({
-                            'errorCode': message
-                        }),
-                        'message': message
-                    },)
+                                      'serviceResponse': json.dumps({
+                                          'errorCode': message
+                                      }),
+                                      'message': message
+                                  },)
             else:
                 error_data = None
                 for child_data in data:
@@ -756,8 +762,8 @@ class HTTPClient:
                                 sleep_time = backoff
 
                 elif (code == 'errors.com.epicgames.common.concurrent_modification_error'  # noqa
-                        or code == 'errors.com.epicgames.common.server_error'
-                        or gql_server_error):  # noqa
+                      or code == 'errors.com.epicgames.common.server_error'
+                      or gql_server_error):  # noqa
                     sleep_time = 0.5 + (tries - 1) * 2
 
                 if sleep_time > 0:
@@ -813,7 +819,7 @@ class HTTPClient:
         return await self.fn_request('PUT', route, auth, **kwargs)
 
     async def graphql_request(self, graphql: Union[GraphQLRequest,
-                                                   List[GraphQLRequest]],
+    List[GraphQLRequest]],
                               auth: Optional[str] = None,
                               **kwargs: Any) -> Any:
         return await self.fn_request('POST', EpicGamesGraphQL(), auth, graphql,
@@ -1202,6 +1208,17 @@ class HTTPClient:
             }
             """
         ), **kwargs)
+
+    ###################################
+    #         Code Redemption         #
+    ###################################
+
+    async def code_redemption_get_code_info(self, code: str) -> dict:
+        r = CodeRedemptionService(
+            '/coderedemption/api/shared/accounts/{client_id}/redeem/{code}/evaluate',
+            client_id=self.client.user.id, code=code
+        )
+        return await self.get(r)
 
     ###################################
     #          Eula Tracking          #

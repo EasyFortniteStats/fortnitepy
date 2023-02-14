@@ -32,6 +32,7 @@ from aiohttp import BaseConnector
 from typing import (Iterable, Union, Optional, Any, Awaitable, Callable, Dict,
                     List, Tuple, Literal)
 
+from .code import Code
 from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, DailyRewardNotification
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
                      DuplicateFriendship, FriendshipRequestAlreadySent,
@@ -2562,6 +2563,10 @@ class BasicClient:
 
     async def refund_item(self, purchase_id: str, quick_return: bool):
         await self.http.refund_mtx_purchase(purchase_id, quick_return)
+
+    async def fetch_code(self, code: str) -> Optional[Code]:
+        data = await self.http.code_redemption_get_code_info(code)
+        return Code(data)
 
 
 class Client(BasicClient):
