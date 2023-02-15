@@ -47,7 +47,7 @@ class BattleRoyaleProfile:
 
         self.xp = stats['xp']
         self.last_xp_interaction: Optional[datetime] = \
-            from_iso(stats['last_xp_interaction']) if stats['last_xp_interaction'] else None
+            from_iso(stats['last_xp_interaction']) if 'last_xp_interaction' in stats else None
         self.supercharged_xp: int = stats.get('rested_xp', 0)
         self.supercharged_xp_multiplier: float = stats['rested_xp_mult']
         self.supercharged_xp_overflow: int = stats['rested_xp_overflow']
