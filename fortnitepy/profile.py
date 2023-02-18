@@ -231,6 +231,12 @@ class CommonCoreProfile:
     def has_save_the_world_access(self):
         return any(item.id == 'campaignaccess' for item in self.items)
 
+    def has_valid_creator_code(self) -> bool:
+        return (
+                self.creator_code and self.creator_code_set_on
+                and (datetime.utcnow() - self.creator_code_set_on).days <= 14
+        )
+
 
 class VBucksPurchaseHistory:
 
