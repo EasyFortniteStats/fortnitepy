@@ -490,13 +490,17 @@ class HTTPClient:
                 kwargs['proxy_auth'] = self.proxy_auth
 
         pre_time = time.time()
+        async with aiohttp.ClientSession() as session:
+            async with session.request(method, url, **kwargs) as r:
+                r.
         async with self.__session.request(method, url, **kwargs) as r:
-            log.debug('{0} {1} has returned {2.status} in {3:.2f}s with response size {4}'.format(
+            log.debug('{0} {1} {5}has returned {2.status} in {3:.2f}s with response size {4}'.format(
                 method,
                 url,
                 r,
                 time.time() - pre_time,
-                r.headers.get('content-length', 'unknown')
+                r.headers.get('content-length', 'unknown'),
+                'via proxy ' if 'proxy' in kwargs else ''
             ))
 
             data = await self.json_or_text(r)
