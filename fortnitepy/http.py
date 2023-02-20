@@ -491,11 +491,12 @@ class HTTPClient:
 
         pre_time = time.time()
         async with self.__session.request(method, url, **kwargs) as r:
-            log.debug('{0} {1} has returned {2.status} in {3:.2f}s'.format(
+            log.debug('{0} {1} has returned {2.status} in {3:.2f}s with response size {4}'.format(
                 method,
                 url,
                 r,
-                time.time() - pre_time
+                time.time() - pre_time,
+                r.headers.get('content-length', 'unknown')
             ))
 
             data = await self.json_or_text(r)
