@@ -490,9 +490,6 @@ class HTTPClient:
                 kwargs['proxy_auth'] = self.proxy_auth
 
         pre_time = time.time()
-        async with aiohttp.ClientSession() as session:
-            async with session.request(method, url, **kwargs) as r:
-                r.
         async with self.__session.request(method, url, **kwargs) as r:
             log.debug('{0} {1} {5}has returned {2.status} in {3:.2f}s with response size {4}'.format(
                 method,
