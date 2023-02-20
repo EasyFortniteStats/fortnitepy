@@ -482,7 +482,7 @@ class HTTPClient:
         except KeyError:
             pass
 
-        if not self.proxied_endpoints or not any(url == e for e in self.proxied_endpoints):
+        if not self.proxied_endpoints or not any(url.startswith(e) for e in self.proxied_endpoints):
             # Proxy support
             if self.proxy is not None:
                 kwargs['proxy'] = self.proxy
