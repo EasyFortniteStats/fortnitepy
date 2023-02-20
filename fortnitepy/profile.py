@@ -56,9 +56,9 @@ class BattleRoyaleProfile:
         self.supercharged_xp_cumulative: int = stats.get('rested_xp_cumulative', 0)
         self.supercharged_xp_consumed_cumulative: int = stats.get('rested_xp_consumed_cumulative', 0)
 
-        self.has_purchased_book: bool = stats.get('book_purchased', False)
-        self.book_level: int = stats['book_level']
-        self.book_xp: Optional[int] = stats.get('book_xp')
+        self.has_purchased_battlepass: bool = stats.get('book_purchased', False)
+        self.battlepass_level: int = stats['book_level']
+        self.battlepass_xp: Optional[int] = stats.get('book_xp')
 
         self.creative_dynamic_xp: Optional[dict] = stats.get('creative_dynamic_xp')
         self.vote_data: Optional[dict] = stats.get('vote_data')
@@ -86,6 +86,8 @@ class PastSeasonStats:
         self.wins: int = data['numWins']
         self.xp: int = data['seasonXp']
         self.level: int = data['seasonLevel']
+        self.battlepass_xp: int = data['bookXp']
+        self.battlepass_level: int = data['bookLevel']
         self.has_purchased_battle_pass: bool = data['purchasedVIP']
         self.crown_wins: int = data['numRoyalRoyales']
 
