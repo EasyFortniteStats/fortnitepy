@@ -281,6 +281,10 @@ class GiftHistory:
         self.received_from: List[GiftUser] = [GiftUser(uid, ts) for uid, ts in data['receivedFrom'].items()]
         self.gifts: List[Gift] = [Gift(gift) for gift in data['gifts']]
 
+    @property
+    def daily_remaining(self) -> int:
+        return 5 - len([g for g in self.gifts if g.sent_at > datetime.utcnow() - timedelta(days=1)])
+
 
 class VBucksPurchase:
     def __init__(self, data: dict):
