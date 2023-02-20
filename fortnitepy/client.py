@@ -27,6 +27,7 @@ import asyncio
 import logging
 import time
 
+import aiohttp
 from aioxmpp import JID
 from aiohttp import BaseConnector
 from typing import (Iterable, Union, Optional, Any, Awaitable, Callable, Dict,
@@ -496,10 +497,17 @@ class BasicClient:
         self.event_prefix = 'event_'
 
         self.auth = auth
+
+        proxy: Optional[str] = kwargs.pop('proxy', None)
+        proxy_auth: Optional[aiohttp.BasicAuth] = kwargs.pop('proxy_auth', None)
+        proxied_endpoints: List[str] = kwargs.pop('proxied_endpoints', None)
         self.http = HTTPClient(
             self,
             connector=kwargs.get('http_connector'),
-            retry_config=kwargs.get('http_retry_config')
+            retry_config=kwargs.get('http_retry_config'),
+            proxy=proxy,
+            proxy_auth=proxy_auth,
+            proxied_endpoints=proxied_endpoints
         )
         self.http.add_header('Accept-Language', 'en-EN')
 

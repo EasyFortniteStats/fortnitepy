@@ -394,9 +394,15 @@ def create_aiohttp_closed_event(session) -> asyncio.Event:
 
 class HTTPClient:
     def __init__(self, client: 'Client', *,
+                 proxy: Optional[str] = None,
+                 proxy_auth: Optional[aiohttp.BasicAuth] = None,
+                 proxied_endpoints: List[str] = None,
                  connector: aiohttp.BaseConnector = None,
                  retry_config: Optional[HTTPRetryConfig] = None) -> None:
         self.client = client
+        self.proxy: Optional[str] = proxy
+        self.proxy_auth: Optional[aiohttp.BasicAuth] = proxy_auth
+        self.proxied_endpoints: List[str] = proxied_endpoints
         self.connector = connector
         self.retry_config = retry_config or HTTPRetryConfig()
 
@@ -475,6 +481,13 @@ class HTTPClient:
                                          else v)) for k, v in params]
         except KeyError:
             pass
+
+        if not self.proxied_endpoints or not any(url == e for e in self.proxied_endpoints):
+            # Proxy support
+            if self.proxy is not None:
+                kwargs['proxy'] = self.proxy
+            if self.proxy_auth is not None:
+                kwargs['proxy_auth'] = self.proxy_auth
 
         pre_time = time.time()
         async with self.__session.request(method, url, **kwargs) as r:
