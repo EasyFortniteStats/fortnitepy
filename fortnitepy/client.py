@@ -2562,7 +2562,7 @@ class BasicClient:
             currency_type: str,
             currency_sub_type: str,
             expected_price: int,
-            gift_wrap: Optional[Literal[1, 2, 3, 4]]
+            gift_wrap: Optional[int]
     ):
         await self.http.gift_catalog_entry(
             offer_id, currency_type, currency_sub_type, expected_price, receiver_account_ids,
