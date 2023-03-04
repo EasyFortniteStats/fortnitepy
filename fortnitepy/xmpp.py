@@ -237,10 +237,14 @@ class WebsocketTransport:
     def __init__(self, stream: 'WebsocketXMLStream',
                  client: 'Client',
                  logger: logging.Logger,
+                 proxy: Optional[str] = None,
+                 proxy_auth: Optional[aiohttp.BasicAuth] = None,
                  ws_connector: Optional[aiohttp.BaseConnector] = None) -> None:
         self.stream = stream
         self.client = client
         self.logger = logger
+        self.proxy: Optional[str] = None
+        self.proxy_auth: Optional[aiohttp.BasicAuth] = None
         self.ws_connector = ws_connector
 
         self.xml_processor = XMLProcessor()
@@ -447,8 +451,16 @@ class WebsocketXMLStream(aioxmpp.protocol.XMLStream):
 
 
 class XMPPOverWebsocketConnector(aioxmpp.connector.BaseConnector):
-    def __init__(self, client, ws_connector=None):
+    def __init__(
+            self,
+            client,
+            proxy: Optional[str] = None,
+            proxy_auth: Optional[aiohttp.BasicAuth] = None,
+            ws_connector=None
+    ):
         self.client = client
+        self.proxy: Optional[str] = proxy
+        self.proxy_auth: Optional[aiohttp.BasicAuth] = proxy_auth
         self.ws_connector = ws_connector
 
     @property
@@ -488,12 +500,16 @@ class XMPPOverWebsocketConnector(aioxmpp.connector.BaseConnector):
             stream,
             self.client,
             logger,
+            proxy=self.proxy,
+            proxy_auth=self.proxy_auth,
             ws_connector=self.ws_connector
         )
         await transport.create_connection(
             'wss://{host}'.format(host=host),
             protocols=('xmpp',),
             timeout=10,
+            proxy=self.proxy,
+            proxy_auth=self.proxy_auth,
         )
 
         return transport, stream, await features_future
@@ -573,8 +589,16 @@ aioxmpp.stream.StanzaStream._done_handler = _patched_done_handler
 
 
 class XMPPClient:
-    def __init__(self, client: 'Client', ws_connector=None) -> None:
+    def __init__(
+            self,
+            client: 'Client',
+            proxy: Optional[str] = None,
+            proxy_auth: Optional[aiohttp.BasicAuth] = None,
+            ws_connector=None
+    ) -> None:
         self.client = client
+        self.proxy: Optional[str] = proxy
+        self.proxy_auth: Optional[aiohttp.BasicAuth] = proxy_auth
         self.ws_connector = ws_connector
 
         self.xmpp_client = None
@@ -1579,6 +1603,8 @@ class XMPPClient:
                 self.client.service_port,
                 XMPPOverWebsocketConnector(
                     self.client,
+                    proxy=self.proxy,
+                    proxy_auth=self.proxy_auth,
                     ws_connector=self.ws_connector
                 )
             )],
