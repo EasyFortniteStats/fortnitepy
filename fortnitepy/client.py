@@ -30,11 +30,11 @@ import time
 import aiohttp
 from aioxmpp import JID
 from aiohttp import BaseConnector
-from typing import (Iterable, Union, Optional, Any, Awaitable, Callable, Dict,
-                    List, Tuple, Literal)
+from typing import Iterable, Union, Optional, Any, Awaitable, Callable, Dict, List, Tuple
 
 from .code import Code
-from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, DailyRewardNotification
+from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, DailyRewardNotification, \
+    BattleRoyaleInventory
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
                      DuplicateFriendship, FriendshipRequestAlreadySent,
                      MaxFriendshipsExceeded, InviteeMaxFriendshipsExceeded,
@@ -2576,8 +2576,8 @@ class BasicClient:
         data = await self.http.code_redemption_get_code_info(code)
         return Code(data)
 
-    async def fetch_br_inventory(self) -> Optional[BattleRoyaleInventory]:
-        data = await self.http.get_br_inventory()
+    async def fetch_br_inventory(self, user_id: str) -> Optional[BattleRoyaleInventory]:
+        data = await self.http.get_br_inventory(user_id)
         return BattleRoyaleInventory(data)
 
 
