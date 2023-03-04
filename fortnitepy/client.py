@@ -2580,6 +2580,31 @@ class BasicClient:
         data = await self.http.get_br_inventory(user_id)
         return BattleRoyaleInventory(data)
 
+    async def fetch_friends(
+            self,
+            include_pending: bool = False
+    ) -> List[Union[Friend, IncomingPendingFriend, OutgoingPendingFriend]]:
+        data = await self.http.friends_get_all(include_pending=include_pending)
+        ids = [f['accountId'] for f in data]
+        users = {u.id: u.get_raw() for u in await self.fetch_users(ids, cache=True)}
+        friends = []
+        for friend in data:
+            try:
+                user_data = users[friend['accountId']]
+            except KeyError:
+                continue
+
+            if friend['status'] == 'ACCEPTED':
+                friends.append(Friend(self, {**friend, **user_data}))
+
+            elif friend['status'] == 'PENDING':
+                if friend['direction'] == 'INBOUND':
+                    friends.append(IncomingPendingFriend(self, {**friend, **user_data}))
+                else:
+                    friends.append(OutgoingPendingFriend(self, {**friend, **user_data}))
+
+        return friends
+
 
 class Client(BasicClient):
     """Represents the client connected to Fortnite and EpicGames' services.
