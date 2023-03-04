@@ -78,6 +78,20 @@ class BattleRoyaleProfile:
         item = [item for item in self.items if item.type == 'CosmeticLocker'][0]
         return Locker(item.attributes)
 
+    def get_victory_crown_overview(self) -> Optional["VictoryCrownOverview"]:
+        item = [item for item in self.items if item.type == 'VictoryCrown' and item.id == 'defaultvictorycrown']
+        if not item:
+            return None
+        return VictoryCrownOverview(item[0].attributes)
+
+
+class VictoryCrownOverview:
+
+    def __init__(self, data: dict):
+        self.has_crown: bool = data['has_victory_crown']
+        self.crowns_bestowed: int = data['total_victory_crowns_bestowed_count']
+        self.crown_wins: int = data['total_royal_royales_achieved_count']
+
 
 class PastSeasonStats:
 
