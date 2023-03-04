@@ -2576,6 +2576,10 @@ class BasicClient:
         data = await self.http.code_redemption_get_code_info(code)
         return Code(data)
 
+    async def fetch_br_inventory(self) -> Optional[BattleRoyaleInventory]:
+        data = await self.http.get_br_inventory()
+        return BattleRoyaleInventory(data)
+
 
 class Client(BasicClient):
     """Represents the client connected to Fortnite and EpicGames' services.

@@ -1397,6 +1397,12 @@ class HTTPClient:
         }
         return await self.post(r, json=payload)
 
+    async def get_br_inventory(self, user_id: str) -> dict:
+        r = FortnitePublicService(
+            '/fortnite/api/game/v2/br-inventory/account/{user_id}', user_id=user_id
+        )
+        return await self.get(r, json={})
+
     ###################################
     #        Fortnite Content         #
     ###################################

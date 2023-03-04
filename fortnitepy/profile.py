@@ -385,3 +385,9 @@ class NotificationItem:
         self.guid: str = data['itemGuid']
         self.profile: str = data['itemProfile']
         self.quantity: int = data['quantity']
+
+
+class BattleRoyaleInventory:
+
+    def __init__(self, data: dict):
+        self.global_gold: int = data['stash']['globalcash']
