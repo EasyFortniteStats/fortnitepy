@@ -2583,11 +2583,11 @@ class BasicClient:
     async def fetch_friends(
             self,
             include_pending: bool = False
-    ) -> List[Union[Friend, IncomingPendingFriend, OutgoingPendingFriend]]:
+    ) -> Tuple[List[Friend], List[IncomingPendingFriend], List[OutgoingPendingFriend]]:
         data = await self.http.friends_get_all(include_pending=include_pending)
         ids = [f['accountId'] for f in data]
         users = {u.id: u.get_raw() for u in await self.fetch_users(ids, cache=True)}
-        friends = []
+        friends, incoming_friends, outgoing_friends = [], [], []
         for friend in data:
             try:
                 user_data = users[friend['accountId']]
@@ -2599,11 +2599,11 @@ class BasicClient:
 
             elif friend['status'] == 'PENDING':
                 if friend['direction'] == 'INBOUND':
-                    friends.append(IncomingPendingFriend(self, {**friend, **user_data}))
+                    incoming_friends.append(IncomingPendingFriend(self, {**friend, **user_data}))
                 else:
-                    friends.append(OutgoingPendingFriend(self, {**friend, **user_data}))
+                    outgoing_friends.append(OutgoingPendingFriend(self, {**friend, **user_data}))
 
-        return friends
+        return friends, incoming_friends, outgoing_friends
 
 
 class Client(BasicClient):
