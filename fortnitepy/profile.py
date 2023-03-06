@@ -215,6 +215,7 @@ class CommonCoreProfile:
     def has_save_the_world_access(self):
         return any(item.id == 'campaignaccess' for item in self.items)
 
+    @property
     def save_the_world_founder_pack(self) -> Optional[SaveTheWorldFounderPack]:
         owned_founder_packs = []
         for item in self.items:
