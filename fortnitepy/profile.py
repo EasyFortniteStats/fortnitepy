@@ -50,7 +50,7 @@ class BattleRoyaleProfile:
             from_iso(stats['last_xp_interaction']) if 'last_xp_interaction' in stats else None
         self.supercharged_xp: int = stats.get('rested_xp', 0)
         self.supercharged_xp_multiplier: float = stats['rested_xp_mult']
-        self.supercharged_xp_overflow: int = stats['rested_xp_overflow']
+        self.supercharged_xp_overflow: int = stats.get('rested_xp_overflow', 0)
         self.supercharged_xp_exchange: float = stats['rested_xp_exchange']
         self.supercharged_xp_golden_path_granted: int = stats.get('rested_xp_golden_path_granted', 0)
         self.supercharged_xp_cumulative: int = stats.get('rested_xp_cumulative', 0)
