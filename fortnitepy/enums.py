@@ -288,3 +288,11 @@ class CosmeticType(Enum):
     WRAP = 'AthenaItemWrap'
     MUSIC = 'AthenaMusicPack'
     LOADING_SCREEN = 'AthenaLoadingScreen'
+
+
+class SaveTheWorldFounderPack(Enum):
+    STANDARD = 1
+    DELUXE = 2
+    SUPER_DELUXE = 3
+    LIMITED = 4
+    ULTIMATE = 5

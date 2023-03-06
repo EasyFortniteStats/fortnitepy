@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 from typing import Optional, List
 
-from .enums import CosmeticType, VBucksPlatform
+from .enums import CosmeticType, VBucksPlatform, SaveTheWorldFounderPack
 from .utils import from_iso
 
 
@@ -204,6 +204,30 @@ class CommonCoreProfile:
 
         self.raw_data: dict = data
 
+    @property
+    def has_custom_games_access(self):
+        return any(item.id == 'athenacancreatecustomgames_token' for item in self.items)
+
+    @property
+    def has_save_the_world_access(self):
+        return any(item.id == 'campaignaccess' for item in self.items)
+
+    def save_the_world_founder_pack(self) -> Optional[SaveTheWorldFounderPack]:
+        owned_founder_packs = []
+        for item in self.items:
+            if item.type == 'Token' and item.id.startswith('founderspack_'):
+                owned_founder_packs.append(int(item.id.split('_')[1]))
+        if not owned_founder_packs:
+            return None
+        return SaveTheWorldFounderPack(max(owned_founder_packs))
+
+    @property
+    def has_valid_creator_code(self) -> bool:
+        return (
+                self.creator_code and self.creator_code_set_on
+                and (datetime.utcnow() - self.creator_code_set_on).days <= 14
+        )
+
     def get_overall_vbucks_count(self, platform: Optional[VBucksPlatform] = None, strict: bool = False) -> int:
         return sum((
             self.get_save_the_world_vbucks(),
@@ -240,18 +264,6 @@ class CommonCoreProfile:
 
     def get_banner_color(self):
         return [item for item in self.items if item.type == 'HomebaseBannerColor']
-
-    def has_custom_games_access(self):
-        return any(item.id == 'athenacancreatecustomgames_token' for item in self.items)
-
-    def has_save_the_world_access(self):
-        return any(item.id == 'campaignaccess' for item in self.items)
-
-    def has_valid_creator_code(self) -> bool:
-        return (
-                self.creator_code and self.creator_code_set_on
-                and (datetime.utcnow() - self.creator_code_set_on).days <= 14
-        )
 
 
 class VBucksPurchaseHistory:
