@@ -79,10 +79,13 @@ class BattleRoyaleProfile:
         return Locker(item.attributes)
 
     def get_victory_crown_overview(self) -> Optional["VictoryCrownOverview"]:
-        item = [item for item in self.items if item.type == 'VictoryCrown' and item.id == 'defaultvictorycrown']
-        if not item:
+        items = [item for item in self.items if item.type == 'VictoryCrown' and item.id == 'defaultvictorycrown']
+        if not items:
             return None
-        return VictoryCrownOverview(item[0].attributes)
+        item = items[0]
+        if 'victory_crown_account_data' not in item.attributes:
+            return None
+        return VictoryCrownOverview(item.attributes['victory_crown_account_data'])
 
 
 class VictoryCrownOverview:
