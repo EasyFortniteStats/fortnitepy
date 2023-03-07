@@ -1060,6 +1060,15 @@ class HTTPClient:
 
         return await self.put(r, json=payload, auth=auth)
 
+    async def account_create_device_code(self, auth: str):
+        r = AccountPublicService('/account/api/oauth/deviceAuthorization')
+
+        params = {
+            'prompt': 'login'
+        }
+
+        return await self.post(r, params=params, auth=auth)
+
     async def account_generate_device_auth(self, client_id: str) -> dict:
         r = AccountPublicService(
             '/account/api/public/account/{client_id}/deviceAuth',

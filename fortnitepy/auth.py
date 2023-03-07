@@ -631,6 +631,59 @@ class AuthorizationCodeAuth(ExchangeCodeAuth):
         return data
 
 
+class DeviceCodeAuth(Auth):
+    device_code: str
+    expires_at: datetime.datetime
+    interval: int
+
+    async def identifier(self) -> str:
+        return self.device_code
+
+    async def create_code(self) -> str:
+        client_credentials = await self.get_ios_client_credentials()
+        client_access_token = client_credentials.get('access_token')
+
+        device_code = self.client.http.account_create_device_code(auth='bearer {0}'.format(client_access_token))
+        self.device_code = device_code['device_code']
+        self.expires_at = datetime.datetime.now() + datetime.timedelta(seconds=device_code['expires_in'])
+        self.interval = device_code['interval']
+        return device_code['user_code']
+
+    async def ios_authenticate(self, priority: int = 0) -> dict:
+        payload = {
+            'grant_type': 'device_code',
+            'device_code': self.device_code,
+        }
+
+        while datetime.datetime.now() < self.expires_at:
+            try:
+                data = await self.client.http.account_oauth_grant(
+                    auth='basic {0}'.format(self.ios_token),
+                    data=payload,
+                    priority=priority
+                )
+                return data
+            except HTTPException as e:
+                if e.message_code == 'errors.com.epicgames.not_found':
+                    await asyncio.sleep(self.interval)
+                else:
+                    raise
+
+        raise TimeoutError('Device code hasn\'t been authorized in time.')
+
+    async def authenticate(self, priority: int = 0) -> None:
+        data = await self.ios_authenticate(priority=priority)
+        self._update_ios_data(data)
+
+        code = await self.get_exchange_code(priority=priority)
+        data = await self.exchange_code_for_session(
+            self.fortnite_token,
+            code,
+            priority=priority
+        )
+        self._update_data(data)
+
+
 class DeviceAuth(Auth):
     """Authenticate with device auth details.
 
