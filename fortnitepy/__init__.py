@@ -29,7 +29,7 @@ __version__ = '4.0.0a1'
 
 from .client import BasicClient, Client, run_multiple, start_multiple, close_multiple
 from .auth import (Auth, EmailAndPasswordAuth, ExchangeCodeAuth,
-                   AuthorizationCodeAuth, DeviceAuth, RefreshTokenAuth,
+                   AuthorizationCodeAuth, DeviceCodeAuth, DeviceAuth, RefreshTokenAuth,
                    AdvancedAuth)
 from .friend import Friend, IncomingPendingFriend, OutgoingPendingFriend
 from .message import FriendMessage, PartyMessage
