@@ -31,10 +31,13 @@ import uuid
 import time
 
 from random import randint
+
+import aiohttp
 from aioconsole import ainput
 from typing import TYPE_CHECKING, Optional, Any, List
 
 from .errors import AuthException, HTTPException
+from .http import AccountPublicService
 from .typedefs import StrOrMaybeCoro
 from .utils import from_iso
 
@@ -640,14 +643,32 @@ class DeviceCodeAuth(Auth):
         return self.device_code
 
     async def create_code(self) -> str:
-        client_credentials = await self.get_ios_client_credentials()
-        client_access_token = client_credentials.get('access_token')
+        async with aiohttp.ClientSession() as session:
+            payload = {
+                'grant_type': 'client_credentials'
+            }
+            headers = {
+                'Authorization': 'basic {0}'.format(self.ios_token)
+            }
+            url = AccountPublicService('/account/api/oauth/token').url
+            async with session.post(url, data=payload, headers=headers) as r:
+                client_credentials = await r.json()
+            client_access_token = client_credentials.get('access_token')
 
-        device_code = self.client.http.account_create_device_code(auth='bearer {0}'.format(client_access_token))
-        self.device_code = device_code['device_code']
-        self.expires_at = datetime.datetime.now() + datetime.timedelta(seconds=device_code['expires_in'])
-        self.interval = device_code['interval']
-        return device_code['user_code']
+            params = {
+                'prompt': 'login'
+            }
+            headers = {
+                'Authorization': 'bearer {0}'.format(client_access_token)
+            }
+            url = AccountPublicService('/account/api/oauth/deviceAuthorization').url
+            async with session.post(url, params=params, headers=headers) as r:
+                device_code = await r.json()
+
+            self.device_code = device_code['device_code']
+            self.expires_at = datetime.datetime.now() + datetime.timedelta(seconds=device_code['expires_in'])
+            self.interval = device_code['interval']
+            return device_code['user_code']
 
     async def ios_authenticate(self, priority: int = 0) -> dict:
         payload = {
