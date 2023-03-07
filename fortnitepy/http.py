@@ -1069,6 +1069,14 @@ class HTTPClient:
 
         return await self.post(r, params=params, auth=auth)
 
+    async def account_delete_device_code(self, user_code: str, auth: str):
+        r = AccountPublicService(
+            '/account/api/oauth/deviceAuthorization/{user_code}',
+            user_code=user_code
+        )
+
+        return await self.delete(r, auth=auth)
+
     async def account_generate_device_auth(self, client_id: str) -> dict:
         r = AccountPublicService(
             '/account/api/public/account/{client_id}/deviceAuth',
