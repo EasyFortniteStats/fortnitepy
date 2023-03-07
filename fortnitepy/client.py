@@ -530,7 +530,6 @@ class BasicClient:
         self._has_async_init = False
 
         self.setup_internal()
-        self.auth.initialize(self)
 
     async def _async_init(self) -> None:
         # We must deal with loop stuff after a loop has been
@@ -544,6 +543,8 @@ class BasicClient:
         self._closed_event = asyncio.Event()
         self._reauth_lock = LockEvent()
         self._reauth_lock.failed = False
+
+        self.auth.initialize(self)
 
     def register_connectors(self,
                             http_connector: Optional[BaseConnector] = None
@@ -2748,6 +2749,8 @@ class Client(BasicClient):
         self._internal_join_party_lock = LockEvent()
         self._reauth_lock = LockEvent()
         self._reauth_lock.failed = False
+
+        self.auth.initialize(self)
 
     def register_connectors(self,
                             http_connector: Optional[BaseConnector] = None,
