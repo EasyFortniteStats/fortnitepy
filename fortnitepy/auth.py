@@ -653,13 +653,14 @@ class DeviceCodeAuth(Auth):
             url = AccountPublicService('/account/api/oauth/token').url
             async with session.post(url, data=payload, headers=headers) as r:
                 client_credentials = await r.json()
-            client_access_token = client_credentials.get('access_token')
+            client_access_token = client_credentials['access_token']
 
             params = {
                 'prompt': 'login'
             }
             headers = {
-                'Authorization': 'bearer {0}'.format(client_access_token)
+                'Authorization': 'bearer {0}'.format(client_access_token),
+                'Content-Type': 'application/x-www-form-urlencoded'
             }
             url = AccountPublicService('/account/api/oauth/deviceAuthorization').url
             async with session.post(url, params=params, headers=headers) as r:
@@ -685,7 +686,7 @@ class DeviceCodeAuth(Auth):
                 )
                 return data
             except HTTPException as e:
-                if e.message_code == 'errors.com.epicgames.not_found':
+                if e.message_code == 'errors.com.epicgames.account.oauth.authorization_pending':
                     await asyncio.sleep(self.interval)
                 else:
                     raise
