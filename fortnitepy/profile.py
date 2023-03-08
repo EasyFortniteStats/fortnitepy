@@ -12,7 +12,7 @@ class BattleRoyaleProfile:
 
         stats = data['stats']['attributes']
 
-        self.account_level = stats['accountLevel']
+        self.account_level: int = stats['accountLevel']
 
         self.season: int = stats['season_num']
         self.season_level: int = stats['level']
@@ -41,7 +41,7 @@ class BattleRoyaleProfile:
         self.season_match_boost: int = stats.get('season_match_boost', 0)
         self.season_friend_match_boost: int = stats.get('season_friend_match_boost', 0)
 
-        self.has_claimed_2fa_reward: bool = stats['mfa_reward_claimed']
+        self.has_claimed_2fa_reward: bool = stats.get('mfa_reward_claimed', False)
 
         self.party_assist_quest: Optional[str] = stats.get('party_assist_quest')
 
@@ -49,9 +49,9 @@ class BattleRoyaleProfile:
         self.last_xp_interaction: Optional[datetime] = \
             from_iso(stats['last_xp_interaction']) if 'last_xp_interaction' in stats else None
         self.supercharged_xp: int = stats.get('rested_xp', 0)
-        self.supercharged_xp_multiplier: float = stats['rested_xp_mult']
+        self.supercharged_xp_multiplier: Optional[float] = stats.get('rested_xp_mult')
         self.supercharged_xp_overflow: int = stats.get('rested_xp_overflow', 0)
-        self.supercharged_xp_exchange: float = stats['rested_xp_exchange']
+        self.supercharged_xp_exchange: Optional[float] = stats.get('rested_xp_exchange')
         self.supercharged_xp_golden_path_granted: int = stats.get('rested_xp_golden_path_granted', 0)
         self.supercharged_xp_cumulative: int = stats.get('rested_xp_cumulative', 0)
         self.supercharged_xp_consumed_cumulative: int = stats.get('rested_xp_consumed_cumulative', 0)
@@ -182,28 +182,30 @@ class CommonCoreProfile:
         self.items = [ItemProfile(item) for item in data['items'].values()]
         stats = data['stats']['attributes']
 
-        self.survey_data: dict = stats['survey_data']
-        self.intro_game_played: bool = stats['intro_game_played']
+        self.survey_data: Optional[dict] = stats.get('survey_data')
+        self.intro_game_played: bool = stats.get('intro_game_played', False)
         self.vbucks_purchase_history: VBucksPurchaseHistory = VBucksPurchaseHistory(stats['mtx_purchase_history']) \
-            if stats.get('mtx_purchase_history') else None
+            if 'mtx_purchase_history' in stats else None
         self.money_purchase_history: MoneyPurchaseHistory = MoneyPurchaseHistory(stats['rmt_purchase_history']) \
-            if stats.get('rmt_purchase_history') else None
-        self.gift_history: GiftHistory = GiftHistory(stats['gift_history']) if stats.get('gift_history') else None
+            if 'rmt_purchase_history' in stats else None
+        self.gift_history: GiftHistory = GiftHistory(stats['gift_history']) if 'gift_history' in stats else None
 
-        self.undo_cooldowns: List[UndoCooldown] = [UndoCooldown(cooldown) for cooldown in
-                                                   stats.get('undo_cooldowns', [])]
+        self.undo_cooldowns: List[UndoCooldown] = [
+            UndoCooldown(cooldown) for cooldown in stats.get('undo_cooldowns', [])
+        ]
 
         self.creator_code: Optional[str] = stats.get('mtx_affiliate')
         self.creator_code_owner_id: Optional[str] = stats.get('mtx_affiliate_id')
-        self.creator_code_set_on: Optional[datetime] = from_iso(stats.get('mtx_affiliate_set_time'))
+        self.creator_code_set_on: Optional[datetime] = from_iso(stats['mtx_affiliate_set_time']) \
+            if 'mtx_affiliate_set_time' in stats else None
 
         self.current_vbucks_platform: VBucksPlatform = VBucksPlatform(stats['current_mtx_platform'])
-        self.receipt_ids: List[str] = stats['in_app_purchases'].get('receipts', [])
+        self.receipt_ids: List[str] = stats['in_app_purchases']['receipts']
 
         self.allowed_sending_gifts: bool = stats['allowed_to_send_gifts']
         self.allowed_receiving_gifts: bool = stats['allowed_to_receive_gifts']
 
-        self.enabled_2fa = stats['mfa_enabled']
+        self.enabled_2fa = stats.get('mfa_enabled', False)
 
         self.raw_data: dict = data
 
