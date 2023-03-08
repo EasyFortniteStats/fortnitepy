@@ -29,7 +29,7 @@ class BattleRoyaleProfile:
         self.total_season_style_points: int = stats.get('style_points_season_total', 0)
         self.style_points: int = stats.get('style_points', 0)
 
-        self.lifetime_wins: int = stats['lifetime_wins']
+        self.lifetime_wins: int = stats.get('lifetime_wins', 0)
         self.past_season_stats: List[PastSeasonStats] = [
             PastSeasonStats(ss) for ss in stats.get('past_seasons', [])
         ]
