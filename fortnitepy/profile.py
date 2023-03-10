@@ -45,7 +45,7 @@ class BattleRoyaleProfile:
 
         self.party_assist_quest: Optional[str] = stats.get('party_assist_quest')
 
-        self.xp = stats['xp']
+        self.xp = stats.get('xp', 0)
         self.last_xp_interaction: Optional[datetime] = \
             from_iso(stats['last_xp_interaction']) if 'last_xp_interaction' in stats else None
         self.supercharged_xp: int = stats.get('rested_xp', 0)
