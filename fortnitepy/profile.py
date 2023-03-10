@@ -20,7 +20,7 @@ class BattleRoyaleProfile:
         self.last_match_ended_at: Optional[datetime] = \
             from_iso(stats['last_match_end_datetime']) if stats['last_match_end_datetime'] else None
 
-        self.total_season_battlestars: int = stats['battlestars_season_total']
+        self.total_season_battlestars: int = stats.get('battlestars_season_total', 0)
         self.battle_stars: int = stats.get('battlestars', 0)
         self.purchased_battlepass_offers: List[PurchasedBattlePassOffer] = [
             PurchasedBattlePassOffer(offer) for offer in stats.get('purchased_bp_offers', [])
