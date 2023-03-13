@@ -691,7 +691,9 @@ class DeviceCodeAuth(Auth):
                 else:
                     raise
 
-        raise TimeoutError('Device code hasn\'t been authorized in time.')
+        raise AuthException(
+            'Device code hasn\'t been authorized in time.', asyncio.TimeoutError('Authorization timed out.')
+        )
 
     async def authenticate(self, priority: int = 0) -> None:
         data = await self.ios_authenticate(priority=priority)
