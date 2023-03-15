@@ -18,7 +18,7 @@ class BattleRoyaleProfile:
         self.season_level: int = stats['level']
         self.season_wins: int = stats.get('season', {}).get('numWins', 0)
         self.last_match_ended_at: Optional[datetime] = \
-            from_iso(stats['last_match_end_datetime']) if stats['last_match_end_datetime'] else None
+            from_iso(stats['last_match_end_datetime']) if 'last_match_end_datetime' in stats else None
 
         self.total_season_battlestars: int = stats.get('battlestars_season_total', 0)
         self.battle_stars: int = stats.get('battlestars', 0)
