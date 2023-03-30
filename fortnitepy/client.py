@@ -33,6 +33,7 @@ from aiohttp import BaseConnector
 from typing import Iterable, Union, Optional, Any, Awaitable, Callable, Dict, List, Tuple
 
 from .code import Code
+from .creative import CreativeDiscovery
 from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, DailyRewardNotification, \
     BattleRoyaleInventory
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
@@ -2604,6 +2605,10 @@ class BasicClient:
                     outgoing_friends.append(OutgoingPendingFriend(self, {**friend, **user_data}))
 
         return friends, incoming_friends, outgoing_friends
+
+    async def fetch_creative_discovery(self, region: Region) -> CreativeDiscovery:
+        data = await self.http.creative_discovery(region.value)
+        return CreativeDiscovery(data)
 
 
 class Client(BasicClient):

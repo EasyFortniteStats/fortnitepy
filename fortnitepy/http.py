@@ -339,6 +339,11 @@ class CodeRedemptionService(Route):
     AUTH = 'FORTNITE_ACCESS_TOKEN'
 
 
+class CreativeDiscoveryService(Route):
+    BASE = 'https://fn-service-discovery-live-public.ogs.live.on.epicgames.com'
+    AUTH = 'FORTNITE_ACCESS_TOKEN'
+
+
 def create_aiohttp_closed_event(session) -> asyncio.Event:
     """Work around aiohttp issue that doesn't properly close transports on exit.
 
@@ -1251,6 +1256,28 @@ class HTTPClient:
             client_id=self.client.user.id, code=code
         )
         return await self.get(r)
+
+    ###################################
+    #        Creative Discovery       #
+    ###################################
+
+    async def creative_discovery(self, region: str) -> dict:
+        payload = {
+            'surfaceName': 'CreativeDiscoverySurface_Frontend',
+            'revision': -1,
+            'partyMemberIds': [self.client.user.id],
+            'matchmakingRegion': region
+        }
+
+        params = {
+            'appId': 'Fortnite'
+        }
+
+        r = CreativeDiscoveryService(
+            '/api/v1/discovery/surface/{client_id}',
+            client_id=self.client.user.id,
+        )
+        return await self.post(r, json=payload, params=params)
 
     ###################################
     #          Eula Tracking          #
