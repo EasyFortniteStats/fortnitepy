@@ -11,7 +11,10 @@ class CreativeDiscoveryPanel:
 
     def __init__(self, data: dict) -> None:
         self.name: str = data['panelName']
-        self.pages: List[CreativeDiscoveryPage] = [CreativeDiscoveryPage(p) for p in data['pages']['results']]
+        self.pages: List[CreativeDiscoveryPage] = []
+        for page in data['pages']:
+            for result in page['results']:
+                self.pages.append(CreativeDiscoveryPage(result))
 
 
 class CreativeDiscoveryPage:
