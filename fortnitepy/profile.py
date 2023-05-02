@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from .enums import CosmeticType, VBucksPlatform, SaveTheWorldFounderPack
 from .utils import from_iso
@@ -16,6 +16,7 @@ class BattleRoyaleProfile:
 
         self.season: int = stats['season_num']
         self.season_level: int = stats['level']
+        self.season_levels_purchased: int = stats.get('season_levels_purchased', 0)
         self.season_wins: int = stats.get('season', {}).get('numWins', 0)
         self.last_match_ended_at: Optional[datetime] = \
             from_iso(stats['last_match_end_datetime']) if 'last_match_end_datetime' in stats else None
@@ -182,6 +183,8 @@ class CommonCoreProfile:
         self.items = [ItemProfile(item) for item in data['items'].values()]
         stats = data['stats']['attributes']
 
+        self.promotion_status: Optional[PromotionStatus] = PromotionStatus(stats['promotion']) \
+            if 'promotion' in stats else None
         self.survey_data: Optional[dict] = stats.get('survey_data')
         self.intro_game_played: bool = stats.get('intro_game_played', False)
         self.vbucks_purchase_history: VBucksPurchaseHistory = VBucksPurchaseHistory(stats['mtx_purchase_history']) \
@@ -206,6 +209,10 @@ class CommonCoreProfile:
         self.allowed_receiving_gifts: bool = stats['allowed_to_receive_gifts']
 
         self.enabled_2fa = stats.get('mfa_enabled', False)
+
+        self.ban_status: Optional[BanStatus] = BanStatus(stats['ban_status']) if 'ban_status' in stats else None
+        self.ban_history: Optional[BanHistory] = BanHistory(stats['ban_history']) \
+            if 'ban_history' in stats else None
 
         self.raw_data: dict = data
 
@@ -271,6 +278,15 @@ class CommonCoreProfile:
 
     def get_banner_color(self):
         return [item for item in self.items if item.type == 'HomebaseBannerColor']
+
+
+class PromotionStatus:
+
+    def __init__(self, data: dict):
+        self.name: str = data['promoName']
+        self.eligible: bool = data['eligible']
+        self.redeemed: bool = data['redeemed']
+        self.notified: bool = data['notified']
 
 
 class VBucksPurchaseHistory:
@@ -347,6 +363,26 @@ class UndoCooldown:
     def __init__(self, data: dict):
         self.offer_id: str = data['offerId']
         self.expires_at: datetime = from_iso(data['cooldownExpires'])
+
+
+class BanStatus:
+
+    def __init__(self, data: dict):
+        self.required_user_acknowledgement: bool = data['bRequiresUserAck']
+        self.reasons: List[str] = data['banReasons']
+        self.has_started: bool = data['bBanHasStarted']
+        self.started_at: datetime = from_iso(data['banStartTime'])
+        self.duration_days: int = data['banDuration']
+        self.exploit_program_name: str = data['exploitProgramName']
+        self.additional_info: str = data['additionalInfo']
+        self.competitive_ban_reason: str = data['competitiveBanReason']
+
+
+class BanHistory:
+
+    def __init__(self, data: dict):
+        self.ban_count: Dict[str, int] = data['banCount']
+        self.ban_tier: Dict = data['banTier']
 
 
 class SaveTheWorldProfile:
