@@ -344,6 +344,11 @@ class CreativeDiscoveryService(Route):
     AUTH = 'FORTNITE_ACCESS_TOKEN'
 
 
+class MCPService(Route):
+    BASE = 'https://fngw-mcp-gc-livefn.ol.epicgames.com'
+    AUTH = 'FORTNITE_ACCESS_TOKEN'
+
+
 def create_aiohttp_closed_event(session) -> asyncio.Event:
     """Work around aiohttp issue that doesn't properly close transports on exit.
 
@@ -1278,6 +1283,10 @@ class HTTPClient:
             client_id=self.client.user.id,
         )
         return await self.post(r, json=payload, params=params)
+
+    async def check_fortnite_access(self) -> dict:
+        r = MCPService('/fortnite/api/accesscontrol/status')
+        return await self.get(r)
 
     ###################################
     #          Eula Tracking          #
