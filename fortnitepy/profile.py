@@ -373,7 +373,7 @@ class BanStatus:
         self.reasons: List[str] = data['banReasons']
         self.has_started: bool = data['bBanHasStarted']
         self.started_at: datetime = from_iso(data['banStartTimeUtc'])
-        self.duration_days: int = data['banDuration']
+        self.duration_days: int = data['banDurationDays']
         self.exploit_program_name: str = data['exploitProgramName']
         self.additional_info: str = data['additionalInfo']
         self.competitive_ban_reason: str = data['competitiveBanReason']
