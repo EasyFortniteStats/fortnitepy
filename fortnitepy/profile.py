@@ -187,11 +187,12 @@ class CommonCoreProfile:
             if 'promotion' in stats else None
         self.survey_data: Optional[dict] = stats.get('survey_data')
         self.intro_game_played: bool = stats.get('intro_game_played', False)
-        self.vbucks_purchase_history: VBucksPurchaseHistory = VBucksPurchaseHistory(stats['mtx_purchase_history']) \
-            if 'mtx_purchase_history' in stats else None
-        self.money_purchase_history: MoneyPurchaseHistory = MoneyPurchaseHistory(stats['rmt_purchase_history']) \
-            if 'rmt_purchase_history' in stats else None
-        self.gift_history: GiftHistory = GiftHistory(stats['gift_history']) if 'gift_history' in stats else None
+        self.vbucks_purchase_history: Optional[VBucksPurchaseHistory] \
+            = VBucksPurchaseHistory(stats['mtx_purchase_history']) if 'mtx_purchase_history' in stats else None
+        self.money_purchase_history: Optional[MoneyPurchaseHistory] \
+            = MoneyPurchaseHistory(stats['rmt_purchase_history']) if 'rmt_purchase_history' in stats else None
+        self.gift_history: Optional[GiftHistory] = GiftHistory(stats['gift_history']) \
+            if 'gift_history' in stats else None
 
         self.undo_cooldowns: List[UndoCooldown] = [
             UndoCooldown(cooldown) for cooldown in stats.get('undo_cooldowns', [])
