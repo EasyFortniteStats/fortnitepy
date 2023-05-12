@@ -263,9 +263,12 @@ class CommonCoreProfile:
 
         return sum(
             item.quantity for item in self.items
-            if item.type == 'Currency' and item.id == 'MtxPurchased' or
-            item.type == 'Currency' and item.id == 'MtxPurchaseBonus' and
-            (platform is None or item.attributes['platform'] in platforms)
+            if (
+                    item.type == 'Currency' and item.id == 'MtxPurchased' or
+                    item.type == 'Currency' and item.id == 'MtxPurchaseBonus'
+            ) and (
+                    platform is None or item.attributes['platform'] in platforms
+            )
         )
 
     def get_free_obtained_vbucks(self) -> int:
