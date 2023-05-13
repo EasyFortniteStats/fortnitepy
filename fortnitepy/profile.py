@@ -238,7 +238,7 @@ class CommonCoreProfile:
     @property
     def has_valid_creator_code(self) -> bool:
         return (
-                self.creator_code and self.creator_code_set_on
+                (self.creator_code or self.creator_code_owner_id) and self.creator_code_set_on
                 and (datetime.utcnow() - self.creator_code_set_on).days <= 14
         )
 
