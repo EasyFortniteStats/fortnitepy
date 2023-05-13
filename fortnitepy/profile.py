@@ -399,7 +399,7 @@ class SaveTheWorldProfile:
         self.xp: int = stats.get('xp', 0)
         self.level: int = stats['level']
 
-        self.mfa_reward_claimed: bool = stats['mfa_reward_claimed']
+        self.mfa_reward_claimed: bool = stats.get('mfa_reward_claimed', False)
 
         self.daily_rewards: Optional[DailyRewards] = DailyRewards(stats['daily_rewards']) \
             if 'daily_rewards' in stats else None
