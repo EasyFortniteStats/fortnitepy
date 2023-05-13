@@ -349,8 +349,9 @@ class VBucksPurchase:
         self.free_refund_eligible: bool = data['freeRefundEligible']
         self.fulfillments: list = data['fulfillments']
         self.price: int = data['totalMtxPaid']
-        self.creator_code: Optional[str] = data['metadata'].get('mtx_affiliate')
-        self.creator_code_owner_id: Optional[str] = data['metadata'].get('mtx_affiliate_id')
+        metadata = data.get('metadata', {})
+        self.creator_code: Optional[str] = metadata.get('mtx_affiliate')
+        self.creator_code_owner_id: Optional[str] = metadata.get('mtx_affiliate_id')
         self.game_context: Optional[str] = data.get('gameContext')
         self.items: List[Item] = [Item(item) for item in data['lootResult']]
 
