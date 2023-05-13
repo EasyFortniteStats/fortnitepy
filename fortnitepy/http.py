@@ -737,8 +737,9 @@ class HTTPClient:
                                 except asyncio.CancelledError:
                                     lock.failed = True
                                     retry = False
-                                except Exception:
+                                except Exception as e:
                                     if self.client.can_restart():
+                                        log.info(f'Restarting client due to auth error: {e}.')  # noqa
                                         await self.client.restart()
                                     else:
                                         lock.failed = True
