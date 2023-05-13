@@ -135,7 +135,7 @@ class Item:
         item_type_split = data['itemType'].split(':')
         self.type: str = item_type_split[0]
         self.id: str = item_type_split[1]
-        self.guid: str = data['itemGuid']
+        self.guid: Optional[str] = data.get('itemGuid')
         self.profile: str = data['itemProfile']
         self.quantity: int = data['quantity']
 
