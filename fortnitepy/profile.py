@@ -17,7 +17,8 @@ class BattleRoyaleProfile:
         self.season: int = stats['season_num']
         self.season_level: int = stats['level']
         self.season_levels_purchased: int = stats.get('season_levels_purchased', 0)
-        self.season_wins: int = stats.get('season', {}).get('numWins', 0)
+        season_stats = stats.get('season') or {}
+        self.season_wins: int = season_stats.get('numWins', 0)
         self.last_match_ended_at: Optional[datetime] = \
             from_iso(stats['last_match_end_datetime']) if 'last_match_end_datetime' in stats else None
 
