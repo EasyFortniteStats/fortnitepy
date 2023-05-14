@@ -378,16 +378,16 @@ class BanStatus:
         self.has_started: bool = data['bBanHasStarted']
         self.started_at: datetime = from_iso(data['banStartTimeUtc'])
         self.duration_days: int = data['banDurationDays']
-        self.exploit_program_name: str = data['exploitProgramName']
-        self.additional_info: str = data['additionalInfo']
-        self.competitive_ban_reason: str = data['competitiveBanReason']
+        self.exploit_program_name: Optional[str] = data.get('exploitProgramName')
+        self.additional_info: Optional[str] = data.get('additionalInfo')
+        self.competitive_ban_reason: str = data.get('competitiveBanReason')
 
 
 class BanHistory:
 
     def __init__(self, data: dict):
         self.ban_count: Dict[str, int] = data['banCount']
-        self.ban_tier: Dict = data['banTier']
+        self.ban_tier: Dict[str, int] = data['banTier']
 
 
 class SaveTheWorldProfile:
