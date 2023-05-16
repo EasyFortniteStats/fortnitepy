@@ -447,7 +447,7 @@ class ClientUser(UserBase):
                 'jid={0.jid!r} email={0.email!r}>'.format(self))
 
     @property
-    def first_name(self) -> str:
+    def first_name(self) -> Optional[str]:
         return self.name
 
     @property
@@ -464,7 +464,7 @@ class ClientUser(UserBase):
     def _update(self, data: dict) -> None:
         super()._update(data)
         self.name = data.get('name')
-        self.email = data['email']
+        self.email = data.get('email')
         self.failed_login_attempts = data['failedLoginAttempts']
         self.last_failed_login = (from_iso(data['lastFailedLogin'])
                                   if 'lastFailedLogin' in data else None)
