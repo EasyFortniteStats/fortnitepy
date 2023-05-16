@@ -677,7 +677,7 @@ class DeviceCodeAuth(Auth):
             'device_code': self.device_code,
         }
 
-        while datetime.datetime.now() < self.expires_at:
+        while datetime.datetime.now() < (self.expires_at - datetime.timedelta(seconds=5)):
             try:
                 data = await self.client.http.account_oauth_grant(
                     auth='basic {0}'.format(self.ios_token),
@@ -688,6 +688,8 @@ class DeviceCodeAuth(Auth):
             except HTTPException as e:
                 if e.message_code == 'errors.com.epicgames.account.oauth.authorization_pending':
                     await asyncio.sleep(self.interval)
+                elif e.message_code == 'errors.com.epicgames.not_found':
+                    break
                 else:
                     raise
 
