@@ -205,7 +205,8 @@ class CommonCoreProfile:
             if 'mtx_affiliate_set_time' in stats else None
 
         self.current_vbucks_platform: VBucksPlatform = VBucksPlatform(stats['current_mtx_platform'])
-        self.receipt_ids: List[str] = stats['in_app_purchases']['receipts']
+        in_app_purchases = stats.get('in_app_purchases', {})
+        self.receipt_ids: List[str] = in_app_purchases.get('receipts', [])
 
         self.allowed_sending_gifts: bool = stats['allowed_to_send_gifts']
         self.allowed_receiving_gifts: bool = stats['allowed_to_receive_gifts']
