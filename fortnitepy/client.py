@@ -495,6 +495,7 @@ class BasicClient:
 
         self.kill_other_sessions = True
         self.accept_eula = True
+        self.correct_birthday = True
         self.event_prefix = 'event_'
 
         self.auth = auth

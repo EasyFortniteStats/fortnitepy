@@ -777,6 +777,11 @@ class DeviceAuth(Auth):
                 action = exc.raw.get('correctiveAction')
                 log.debug("Corrective action is required: " + action)
                 if action == 'DATE_OF_BIRTH':
+                    if not self.client.correct_birthday:
+                        raise AuthException(
+                            'Correct birthday is required to continue.',
+                            exc
+                        ) from exc
                     client_credentials = await self.get_ios_client_credentials()
                     client_access_token = client_credentials.get('access_token')
 
