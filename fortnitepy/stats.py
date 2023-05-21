@@ -23,6 +23,7 @@ SOFTWARE.
 """
 
 import datetime
+from typing import Optional, Dict
 
 from .user import User
 from .enums import Platform
@@ -326,3 +327,25 @@ class StatsCollection(_StatsBase):
             Mapping of the users collection.
         """
         return super().get_stats()
+
+
+class RankedStats:
+
+    def __init__(self, data: dict) -> None:
+        self.raw = data
+        self.stats: Dict[str, RankedStatsEntry] = {}
+
+        for entry in data:
+            self.stats[entry['rankingType']] = RankedStatsEntry(entry)
+
+
+class RankedStatsEntry:
+
+    def __init__(self, data: dict) -> None:
+        self.raw: dict = data
+        self.track_guid: str = data['trackguid']
+        self.last_update: datetime.datetime = datetime.datetime.utcfromtimestamp(data['lastupdate'])
+        self.current_division: int = data['currentDivision']
+        self.highest_division: int = data['highestDivision']
+        self.promotion_progress: float = data['promotionProgress']
+        self.current_player_ranking: Optional[int] = data['currentPlayerRanking']

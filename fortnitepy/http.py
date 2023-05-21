@@ -349,6 +349,11 @@ class MCPService(Route):
     AUTH = 'FORTNITE_ACCESS_TOKEN'
 
 
+class RankedService(Route):
+    BASE = 'https://fn-service-habanero-live-public.ogs.live.on.epicgames.com'
+    AUTH = 'FORTNITE_ACCESS_TOKEN'
+
+
 def create_aiohttp_closed_event(session) -> asyncio.Event:
     """Work around aiohttp issue that doesn't properly close transports on exit.
 
@@ -1617,6 +1622,26 @@ class HTTPClient:
             '/statsproxy/api/statsv2/leaderboards/{stat}',
             stat=stat
         )
+        return await self.get(r)
+
+    ###################################
+    #             Ranked              #
+    ###################################
+
+    async def get_ranked_season(self, *, ends_after: Optional[str] = None) -> dict:
+        params = {}
+        if ends_after:
+            params['endsAfter'] = ends_after
+
+        r = RankedService('/api/v1/games/fortnite/tracks/query')
+        return await self.get(r)
+
+    async def get_ranked_stats(self, user_id: str, *, ends_after: Optional[str] = None) -> dict:
+        params = {}
+        if ends_after:
+            params['endsAfter'] = ends_after
+
+        r = RankedService('/api/v1/games/fortnite/trackprogress/{user_id}', user_id=user_id)
         return await self.get(r)
 
     ###################################
