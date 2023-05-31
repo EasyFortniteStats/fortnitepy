@@ -208,6 +208,7 @@ class CommonCoreProfile:
         self.current_vbucks_platform: VBucksPlatform = VBucksPlatform(stats['current_mtx_platform'])
         in_app_purchases = stats.get('in_app_purchases', {})
         self.receipt_ids: List[str] = in_app_purchases.get('receipts', [])
+        self.fulfillment_counts: Dict[str, int] = in_app_purchases.get('fulfillmentCounts', {})
 
         self.allowed_sending_gifts: bool = stats['allowed_to_send_gifts']
         self.allowed_receiving_gifts: bool = stats['allowed_to_receive_gifts']
