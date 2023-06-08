@@ -2575,7 +2575,11 @@ class BasicClient:
         await self.http.refund_mtx_purchase(purchase_id, quick_return)
 
     async def fetch_code(self, code: str) -> Optional[Code]:
-        data = await self.http.code_redemption_get_code_info(code)
+        data = await self.http.get_code_info(code)
+        return Code(data)
+
+    async def redeem_code(self, code: str) -> Optional[Code]:
+        data = await self.http.redeem_code(code)
         return Code(data)
 
     async def fetch_br_inventory(self, user_id: str) -> Optional[BattleRoyaleInventory]:

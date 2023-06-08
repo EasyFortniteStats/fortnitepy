@@ -339,6 +339,11 @@ class CodeRedemptionService(Route):
     AUTH = 'FORTNITE_ACCESS_TOKEN'
 
 
+class FulfillmentService(Route):
+    BASE = 'https://fulfillment-public-service-prod.ol.epicgames.com'
+    AUTH = 'FORTNITE_ACCESS_TOKEN'
+
+
 class CreativeDiscoveryService(Route):
     BASE = 'https://fn-service-discovery-live-public.ogs.live.on.epicgames.com'
     AUTH = 'FORTNITE_ACCESS_TOKEN'
@@ -1261,12 +1266,19 @@ class HTTPClient:
     #         Code Redemption         #
     ###################################
 
-    async def code_redemption_get_code_info(self, code: str) -> dict:
+    async def get_code_info(self, code: str) -> dict:
         r = CodeRedemptionService(
             '/coderedemption/api/shared/accounts/{client_id}/redeem/{code}/evaluate',
             client_id=self.client.user.id, code=code
         )
         return await self.get(r)
+
+    async def redeem_code(self, code: str) -> dict:
+        r = FulfillmentService(
+            '/fulfillment/api/public/accounts/{client_id}/codes/{code}',
+            client_id=self.client.user.id, code=code
+        )
+        return await self.post(r)
 
     ###################################
     #        Creative Discovery       #
