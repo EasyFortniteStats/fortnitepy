@@ -2588,11 +2588,13 @@ class BasicClient:
 
     async def fetch_friends(
             self,
-            include_pending: bool = False
+            include_pending: bool = False,
+            *,
+            fetch_users_func: Optional[Callable] = None
     ) -> Tuple[List[Friend], List[IncomingPendingFriend], List[OutgoingPendingFriend]]:
         data = await self.http.friends_get_all(include_pending=include_pending)
         ids = [f['accountId'] for f in data]
-        users = {u.id: u.get_raw() for u in await self.fetch_users(ids, cache=True)}
+        users = {u.id: u.get_raw() for u in await (fetch_users_func or self.fetch_users)(ids, cache=True)}
         friends, incoming_friends, outgoing_friends = [], [], []
         for friend in data:
             try:
