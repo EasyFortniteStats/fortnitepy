@@ -125,7 +125,7 @@ class UserBase:
         return hash(self._id)
 
     def __str__(self) -> str:
-        return self.display_name
+        return self.display_name or str(self.id)
 
     def __eq__(self, other):
         return isinstance(other, UserBase) and other._id == self._id
