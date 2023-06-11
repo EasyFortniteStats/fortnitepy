@@ -2564,11 +2564,11 @@ class BasicClient:
             currency_type: str,
             currency_sub_type: str,
             expected_price: int,
-            gift_wrap: Optional[int]
+            gift_wrap: Optional[str]
     ):
         await self.http.gift_catalog_entry(
             offer_id, currency_type, currency_sub_type, expected_price, receiver_account_ids,
-            f'GiftBox:GB_GiftWrap{gift_wrap}' if gift_wrap else None
+            f'GiftBox:{gift_wrap}' if gift_wrap else None
         )
 
     async def refund_item(self, purchase_id: str, quick_return: bool):
