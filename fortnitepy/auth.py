@@ -967,14 +967,12 @@ class AdvancedAuth(Auth):
                  prompt_code_if_throttled: bool = False,
                  delete_existing_device_auths: bool = False,
                  **kwargs: Any) -> None:
-        super().__init__(**kwargs)
-
+        super().__init__(device_id=device_id, **kwargs)
         self.email = email
         self.password = password
         self.two_factor_code = two_factor_code
         self.exchange_code = exchange_code
         self.authorization_code = authorization_code
-        self.device_id = device_id
         self.account_id = account_id
         self.secret = secret
 
@@ -1015,6 +1013,9 @@ class AdvancedAuth(Auth):
     def device_auth_ready(self) -> bool:
         return self.device_id and self.account_id and self.secret
 
+    def device_code_auth_ready(self) -> bool:
+        return isinstance(self._used_auth, DeviceCodeAuth)
+
     def prompt_enabled(self) -> bool:
         return True in (self.prompt_exchange_code, self.prompt_authorization_code)  # noqa
 
@@ -1023,6 +1024,12 @@ class AdvancedAuth(Auth):
             return 'exchange'
         elif self.prompt_authorization_code:
             return 'authorization'
+
+    async def create_device_code(self) -> str:
+        auth = DeviceCodeAuth(**self.kwargs)
+        self._used_auth = auth
+
+        return await auth.create_code()
 
     async def run_email_and_password_authenticate(self) -> dict:
         auth = EmailAndPasswordAuth(
@@ -1080,6 +1087,10 @@ class AdvancedAuth(Auth):
             priority=priority
         )
 
+    async def run_device_code_auth(self, *, priority: int = 0):
+        self._used_auth.initialize(self.client)
+        return await self._used_auth.ios_authenticate(priority=priority)
+
     async def ios_authenticate(self) -> dict:
         data = None
         prompt_message = ''
@@ -1098,6 +1109,15 @@ class AdvancedAuth(Auth):
                         raise
 
                 prompt_message = 'Invalid device auth details passed. '
+
+        if self.device_code_auth_ready():
+            try:
+                data = await self.run_device_code_auth()
+            except AuthException:
+                if not self.prompt_enabled() or not self.prompt_code_if_invalid:
+                    raise
+
+                prompt_message = 'Invalid device code auth details passed. '
 
         elif self.email_and_password_ready():
             try:
