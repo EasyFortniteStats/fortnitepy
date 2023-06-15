@@ -50,8 +50,10 @@ _prompt_lock = asyncio.Lock()
 
 class Auth:
     def __init__(self, **kwargs: Any) -> None:
-        self.ios_token = kwargs.get('ios_token', 'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=')  # noqa
-        self.fortnite_token = kwargs.get('fortnite_token', 'ZWM2ODRiOGM2ODdmNDc5ZmFkZWEzY2IyYWQ4M2Y1YzY6ZTFmMzFjMjExZjI4NDEzMTg2MjYyZDM3YTEzZmM4NGQ=')  # noqa
+        self.ios_token = kwargs.get('ios_token',
+                                    'MzQ0NmNkNzI2OTRjNGE0NDg1ZDgxYjc3YWRiYjIxNDE6OTIwOWQ0YTVlMjVhNDU3ZmI5YjA3NDg5ZDMxM2I0MWE=')  # noqa
+        self.fortnite_token = kwargs.get('fortnite_token',
+                                         'ZWM2ODRiOGM2ODdmNDc5ZmFkZWEzY2IyYWQ4M2Y1YzY6ZTFmMzFjMjExZjI4NDEzMTg2MjYyZDM3YTEzZmM4NGQ=')  # noqa
         self.device_id = getattr(self, 'device_id', None) or uuid.uuid4().hex
 
     def initialize(self, client: 'BasicClient') -> None:
@@ -92,7 +94,7 @@ class Auth:
                      'expired_exchange_code_session'),
                 )
                 if exc.message_code in codes:
-                    if i != max_attempts-1:
+                    if i != max_attempts - 1:
                         continue
 
                 raise
@@ -379,6 +381,7 @@ class EmailAndPasswordAuth(Auth):
         The fortnite token to use with authentication. You should generally
         not need to set this manually.
     """
+
     def __init__(self, email: str, password: str, *,
                  two_factor_code: Optional[int] = None,
                  **kwargs: Any) -> None:
@@ -512,6 +515,7 @@ class ExchangeCodeAuth(Auth):
         The fortnite token to use with authentication. You should generally
         not need to set this manually.
     """
+
     def __init__(self, code: StrOrMaybeCoro,
                  **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -603,6 +607,7 @@ class AuthorizationCodeAuth(ExchangeCodeAuth):
         The fortnite token to use with authentication. You should generally
         not need to set this manually.
     """
+
     def __init__(self, code: StrOrMaybeCoro,
                  **kwargs: Any) -> None:
         super().__init__(code, **kwargs)
@@ -734,6 +739,7 @@ class DeviceAuth(Auth):
         The fortnite token to use with authentication. You should generally
         not need to set this manually.
     """
+
     def __init__(self, device_id: str,
                  account_id: str,
                  secret: str,
@@ -834,6 +840,7 @@ class RefreshTokenAuth(Auth):
     refresh_token: :class:`str`
         A valid launcher refresh token.
     """
+
     def __init__(self, refresh_token: str,
                  **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -953,20 +960,25 @@ class AdvancedAuth(Auth):
         The fortnite token to use with authentication. You should generally
         not need to set this manually.
     """
-    def __init__(self, email: Optional[str] = None,
-                 password: Optional[str] = None,
-                 two_factor_code: Optional[int] = None,
-                 exchange_code: Optional[StrOrMaybeCoro] = None,
-                 authorization_code: Optional[StrOrMaybeCoro] = None,
-                 device_id: Optional[str] = None,
-                 account_id: Optional[str] = None,
-                 secret: Optional[str] = None,
-                 prompt_exchange_code: bool = False,
-                 prompt_authorization_code: bool = False,
-                 prompt_code_if_invalid: bool = False,
-                 prompt_code_if_throttled: bool = False,
-                 delete_existing_device_auths: bool = False,
-                 **kwargs: Any) -> None:
+
+    def __init__(
+            self,
+            email: Optional[str] = None,
+            password: Optional[str] = None,
+            two_factor_code: Optional[int] = None,
+            exchange_code: Optional[StrOrMaybeCoro] = None,
+            authorization_code: Optional[StrOrMaybeCoro] = None,
+            device_id: Optional[str] = None,
+            account_id: Optional[str] = None,
+            secret: Optional[str] = None,
+            prompt_exchange_code: bool = False,
+            prompt_authorization_code: bool = False,
+            prompt_code_if_invalid: bool = False,
+            prompt_code_if_throttled: bool = False,
+            delete_existing_device_auths: bool = False,
+            generate_device_auth: bool = True,
+            **kwargs: Any
+    ) -> None:
         super().__init__(device_id=device_id, **kwargs)
         self.email = email
         self.password = password
@@ -977,6 +989,7 @@ class AdvancedAuth(Auth):
         self.secret = secret
 
         self.delete_existing_device_auths = delete_existing_device_auths
+        self.generate_device_auth_ = generate_device_auth
         self.prompt_exchange_code = prompt_exchange_code
         self.prompt_authorization_code = prompt_authorization_code
 
@@ -1153,10 +1166,10 @@ class AdvancedAuth(Auth):
                 if self.email is not None:
                     text = '{0}Please enter a valid {1} code ' \
                            'for {2}\n'.format(
-                                prompt_message,
-                                code_type,
-                                self.email
-                            )
+                        prompt_message,
+                        code_type,
+                        self.email
+                    )
                 else:
                     text = '{0}Please enter a valid {1} code.\n'.format(
                         prompt_message,
@@ -1190,24 +1203,23 @@ class AdvancedAuth(Auth):
             if tasks:
                 await asyncio.gather(*tasks)
 
-        data = await self.generate_device_auth()
-        details = {
-            'device_id': data['deviceId'],
-            'account_id': data['accountId'],
-            'secret': data['secret'],
-        }
-        self.__dict__.update(details)
+        if self.generate_device_auth_:
+            data = await self.generate_device_auth()
 
-        account_data = await self.client.http.account_get_by_user_id(
-            self.ios_account_id,
-            auth='IOS_ACCESS_TOKEN'
-        )
+            account_data = await self.client.http.account_get_by_user_id(
+                self.ios_account_id,
+                auth='IOS_ACCESS_TOKEN'
+            )
 
-        self.client.dispatch_event(
-            'device_auth_generate',
-            details,
-            account_data['email']
-        )
+            self.client.dispatch_event(
+                'device_auth_generate',
+                {
+                    'device_id': data['deviceId'],
+                    'account_id': data['accountId'],
+                    'secret': data['secret'],
+                },
+                account_data['email']
+            )
 
         return data
 
@@ -1245,3 +1257,13 @@ class AdvancedAuth(Auth):
         )
         self._update_data(data)
         log.debug('Successfully reauthenticated.')
+
+    async def generate_device_auth(self) -> dict:
+        data = await super().generate_device_auth()
+        details = {
+            'device_id': data['deviceId'],
+            'account_id': data['accountId'],
+            'secret': data['secret'],
+        }
+        self.__dict__.update(details)
+        return data
