@@ -955,6 +955,21 @@ class HTTPClient:
     async def epicgames_get_csrf(self) -> aiohttp.ClientResponse:
         return await self.get(EpicGames('/id/api/csrf'), raw=True)
 
+    async def epicgames_exchange(self, xsrf_token: str, exchange_code) -> Any:
+        headers = {
+            'x-xsrf-token': xsrf_token
+        }
+        payload = {
+            'exchangeCode': exchange_code
+        }
+        return await self.post(EpicGames('/id/api/exchange'), headers=headers, data=payload)
+
+    async def epicgames_refresh_crsf(self):
+        return await self.get(EpicGames('/account/v2/refresh-csrf'))
+
+    async def epicgames_get_purchase_token(self) -> Any:
+        return await self.get(EpicGames('/account/v2/payment/ajaxGetPurchaseToken'))
+
     async def epicgames_reputation(self, xsrf_token: str) -> Any:
         headers = {
             'x-xsrf-token': xsrf_token
@@ -1002,10 +1017,13 @@ class HTTPClient:
                                headers=headers,
                                data=payload)
 
-    async def epicgames_redirect(self, xsrf_token: str) -> Any:
+    async def epicgames_redirect(self, xsrf_token: str, redirect_url: Optional[str] = None) -> Any:
         headers = {
             'x-xsrf-token': xsrf_token
         }
+        params = {}
+        if redirect_url:
+            params['redirectUrl'] = quote(redirect_url)
 
         return await self.get(EpicGames('/id/api/redirect'), headers=headers)
 
@@ -1022,11 +1040,32 @@ class HTTPClient:
     ###################################
 
     async def payment_website_search_sac_by_slug(self, slug: str) -> Any:
-        params = {
-            'slug': slug
+        headers = {
+            'X-Requested-With': purchase_token,
+            'X-PURCHASE-XSRF-TOKEN': purchase_xsrf_token
+        }
+        payload = {
+            'lineOffers': [{}],
+            'slug': "Ninja"
         }
 
-        r = PaymentWebsite('/affiliate/search-by-slug', auth=None)
+        r = PaymentWebsite('/affiliate/search-by-slug', data=payload, auth=None)
+        return await self.get(r, params=params)
+
+    async def payment_website_purchase(self, purchase_token: str) -> Any:
+        params = {
+            'purchaseToken': slug
+        }
+
+        r = PaymentWebsite('/purchase', auth=None)
+        return await self.get(r, params=params)
+
+    async def payment_website_xrsf(self, purchase_token: str) -> Any:
+        params = {
+            'purchaseToken': slug
+        }
+
+        r = PaymentWebsite('/purchase/xsrf', auth=None)
         return await self.get(r, params=params)
 
     ###################################
