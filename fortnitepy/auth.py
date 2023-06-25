@@ -80,6 +80,23 @@ class Auth:
     async def authenticate(self, **kwargs) -> dict:
         raise NotImplementedError
 
+    async def fetch_xsrf_token(self) -> str:
+        response = await self.client.http.epicgames_get_csrf()
+        return response.cookies['XSRF-TOKEN'].value
+
+    async def authenticate_web(self) -> None:
+        xsrf_token = await self.fetch_xsrf_token()
+
+        exchange_code = await self.get_exchange_code()
+        await self.client.http.epicgames_exchange(xsrf_token, exchange_code)
+        await self.client.http.epicgames_redirect(xsrf_token, 'https://epicgames.com')
+        await self.client.http.refresh_crfs()
+        purchase_data = await self.client.http.epicgames_get_purchase_token()
+        purchase_token = purchase_data['purchaseToken']
+        await self.client.http.payment_website_purchase(purchase_token)
+        payment_xrsf_data = await self.client.http.payment_website_xrsf(purchase_token)
+        payment_xrsf_token = payment_xrsf_data['xsrfToken']
+
     async def _authenticate(self, priority: int = 0) -> None:
         max_attempts = 3
         for i in range(max_attempts):
@@ -393,10 +410,6 @@ class EmailAndPasswordAuth(Auth):
     @property
     def identifier(self) -> str:
         return self.email
-
-    async def fetch_xsrf_token(self) -> str:
-        response = await self.client.http.epicgames_get_csrf()
-        return response.cookies['XSRF-TOKEN'].value
 
     async def ios_authenticate(self) -> dict:
         log.info('Fetching valid xsrf token.')
