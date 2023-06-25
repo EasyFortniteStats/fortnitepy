@@ -23,10 +23,11 @@ SOFTWARE.
 """
 
 import datetime
-from typing import Optional, Dict
+from typing import Optional
 
 from .user import User
-from .enums import Platform
+from .enums import Platform, RankingType
+from .utils import from_iso
 
 replacers = {
     'placetop1': 'wins',
@@ -329,23 +330,28 @@ class StatsCollection(_StatsBase):
         return super().get_stats()
 
 
-class RankedStats:
+class RankedSeasonEntry:
 
-    def __init__(self, data: dict) -> None:
-        self.raw = data
-        self.stats: Dict[str, RankedStatsEntry] = {}
-
-        for entry in data:
-            self.stats[entry['rankingType']] = RankedStatsEntry(entry)
+    def __init__(self, data: dict):
+        self.raw: dict = data
+        self.game_id: str = data['gameId']
+        self.track_guid: str = data['trackguid']
+        self.ranking_type: RankingType = RankingType(data['rankingType'])
+        self.starts_at: datetime.datetime = from_iso(data['beginTime'])
+        self.ends_at: datetime.datetime = from_iso(data['endTime'])
+        self.division_count: int = data['divisionCount']
 
 
 class RankedStatsEntry:
 
-    def __init__(self, data: dict) -> None:
+    def __init__(self, data: dict):
         self.raw: dict = data
+        self.game_id: str = data['gameId']
         self.track_guid: str = data['trackguid']
-        self.last_update: datetime.datetime = datetime.datetime.utcfromtimestamp(data['lastupdate'])
+        self.account_id: str = data['accountId']
+        self.ranking_type: RankingType = RankingType(data['rankingType'])
+        self.last_update: datetime.datetime = from_iso(data['lastupdate'])
         self.current_division: int = data['currentDivision']
         self.highest_division: int = data['highestDivision']
-        self.promotion_progress: float = data['promotionProgress']
-        self.current_player_ranking: Optional[int] = data['currentPlayerRanking']
+        self.progress: float = data['promotionProgress']
+        self.ranking: Optional[int] = data['currentPlayerRanking']

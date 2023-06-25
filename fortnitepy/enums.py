@@ -252,6 +252,11 @@ class BattlePassStat(Enum):
     SEASON_18 = ('s18_social_bp_level', None)
 
 
+class RankingType(Enum):
+    BATTLE_ROYALE = 'ranked-br'
+    ZERO_BUILD = 'ranked-zb'
+
+
 class StatsCollectionType(Enum):
     FISH = 'collection_fish'
 

@@ -50,7 +50,7 @@ from .enums import (Platform, Region, UserSearchPlatform, AwayStatus,
                     BattlePassStat, StatsCollectionType, VBucksPlatform)
 from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty,
                     Party)
-from .stats import StatsV2, StatsCollection, _StatsBase
+from .stats import StatsV2, StatsCollection, _StatsBase, RankedSeasonEntry, RankedStatsEntry
 from .store import Store
 from .news import BattleRoyaleNewsPost
 from .playlist import Playlist
@@ -58,7 +58,7 @@ from .presence import Presence
 from .auth import Auth, RefreshTokenAuth
 from .avatar import Avatar
 from .typedefs import MaybeCoro, DatetimeOrTimestamp, StrOrInt
-from .utils import LockEvent, MaybeLock, from_iso, is_display_name
+from .utils import LockEvent, MaybeLock, from_iso, is_display_name, to_iso
 
 log = logging.getLogger(__name__)
 
@@ -2272,6 +2272,19 @@ class BasicClient:
             raise Forbidden('User has private career board.')
 
         return data[user_id]
+
+    async def fetch_ranked_season(self, *, ends_after: Optional[datetime.datetime]) -> List[RankedSeasonEntry]:
+        data = await self.http.get_ranked_season(ends_after=to_iso(ends_after) if ends_after else None)
+        return [RankedSeasonEntry(entry) for entry in data]
+
+    async def fetch_ranked_stats(
+            self,
+            user_id: str,
+            *,
+            ends_after: Optional[datetime.datetime] = None
+    ) -> List[RankedStatsEntry]:
+        data = await self.http.get_ranked_stats(user_id, ends_after=to_iso(ends_after) if ends_after else None)
+        return [RankedStatsEntry(entry) for entry in data]
 
     async def fetch_leaderboard(self, stat: str) -> List[Dict[str, StrOrInt]]:
         """|coro|
