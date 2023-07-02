@@ -1693,7 +1693,7 @@ class HTTPClient:
             params['endsAfter'] = ends_after
 
         r = RankedService('/api/v1/games/fortnite/trackprogress/{user_id}', user_id=user_id)
-        return await self.get(r)
+        return await self.get(r, params=params)
 
     ###################################
     #             Avatar              #
