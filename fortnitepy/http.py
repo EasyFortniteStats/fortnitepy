@@ -1685,7 +1685,7 @@ class HTTPClient:
             params['endsAfter'] = ends_after
 
         r = RankedService('/api/v1/games/fortnite/tracks/query')
-        return await self.get(r)
+        return await self.get(r, params=params)
 
     async def get_ranked_stats(self, user_id: str, *, ends_after: Optional[str] = None) -> dict:
         params = {}
