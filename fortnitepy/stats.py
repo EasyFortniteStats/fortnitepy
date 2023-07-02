@@ -350,7 +350,7 @@ class RankedStatsEntry:
         self.track_guid: str = data['trackguid']
         self.account_id: str = data['accountId']
         self.ranking_type: RankingType = RankingType(data['rankingType'])
-        self.last_update: datetime.datetime = from_iso(data['lastupdate'])
+        self.last_update: datetime.datetime = from_iso(data['lastUpdated'])
         self.current_division: int = data['currentDivision']
         self.highest_division: int = data['highestDivision']
         self.progress: float = data['promotionProgress']
