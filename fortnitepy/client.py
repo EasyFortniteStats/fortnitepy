@@ -2626,8 +2626,12 @@ class BasicClient:
 
         return friends, incoming_friends, outgoing_friends
 
-    async def fetch_creative_discovery(self, region: Region) -> CreativeDiscovery:
-        data = await self.http.creative_discovery(region.value)
+    async def fetch_discovery(self, region: Region) -> CreativeDiscovery:
+        data = await self.http.get_discovery(region.value)
+        return CreativeDiscovery(data)
+
+    async def fetch_creative_island(self, code: str) -> CreativeIsland:
+        data = await self.http.get_creative_island(code)
         return CreativeDiscovery(data)
 
 

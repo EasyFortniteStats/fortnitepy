@@ -344,7 +344,7 @@ class FulfillmentService(Route):
     AUTH = 'FORTNITE_ACCESS_TOKEN'
 
 
-class CreativeDiscoveryService(Route):
+class DiscoveryService(Route):
     BASE = 'https://fn-service-discovery-live-public.ogs.live.on.epicgames.com'
     AUTH = 'FORTNITE_ACCESS_TOKEN'
 
@@ -356,6 +356,11 @@ class MCPService(Route):
 
 class RankedService(Route):
     BASE = 'https://fn-service-habanero-live-public.ogs.live.on.epicgames.com'
+    AUTH = 'FORTNITE_ACCESS_TOKEN'
+
+
+class LinkService(Route):
+    BASE = 'https://links-public-service-live.ol.epicgames.com'
     AUTH = 'FORTNITE_ACCESS_TOKEN'
 
 
@@ -1320,10 +1325,10 @@ class HTTPClient:
         return await self.post(r)
 
     ###################################
-    #        Creative Discovery       #
+    #            Discovery            #
     ###################################
 
-    async def creative_discovery(self, region: str) -> dict:
+    async def get_discovery(self, region: str) -> dict:
         payload = {
             'surfaceName': 'CreativeDiscoverySurface_Frontend',
             'revision': -1,
@@ -1335,11 +1340,15 @@ class HTTPClient:
             'appId': 'Fortnite'
         }
 
-        r = CreativeDiscoveryService(
+        r = DiscoveryService(
             '/api/v1/discovery/surface/{client_id}',
             client_id=self.client.user.id,
         )
         return await self.post(r, json=payload, params=params)
+
+    async def get_creative_island(self, mnemonic: str) -> dict:
+        r = LinkService('/links/api/fn/mnemonic/{mnemonic}', mnemonic=mnemonic)
+        return await self.get(r)
 
     async def check_fortnite_access(self) -> dict:
         r = MCPService('/fortnite/api/accesscontrol/status')
