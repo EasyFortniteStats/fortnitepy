@@ -19,8 +19,9 @@ class CreativeDiscoveryPanel:
 
 class CreativeDiscoveryPage:
     def __init__(self, data: dict) -> None:
-        self.last_visited: Optional[datetime] \
-            = datetime.fromisoformat(data['lastVisited']) if data['lastVisited'] else None
+        self.last_visited: Optional[datetime] = (
+            datetime.fromisoformat(data['lastVisited']) if data.get('lastVisited') else None
+        )
         self.link_code: str = data['linkCode']
         self.is_favorite: bool = data['isFavorite']
         self.global_player_count: int = data['globalCCU']
