@@ -33,7 +33,7 @@ from aiohttp import BaseConnector
 from typing import Iterable, Union, Optional, Any, Awaitable, Callable, Dict, List, Tuple
 
 from .code import Code
-from .creative import CreativeDiscovery
+from .creative import CreativeDiscovery, CreativeIsland
 from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, DailyRewardNotification, \
     BattleRoyaleInventory
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
@@ -2632,7 +2632,7 @@ class BasicClient:
 
     async def fetch_creative_island(self, code: str) -> CreativeIsland:
         data = await self.http.get_creative_island(code)
-        return CreativeDiscovery(data)
+        return CreativeIsland(data)
 
 
 class Client(BasicClient):
