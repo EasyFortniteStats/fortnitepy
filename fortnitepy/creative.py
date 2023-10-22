@@ -49,13 +49,20 @@ class CreativeIsland:
 
 class CreativeIslandMetadata:
     def __init__(self, data: dict):
+        self.lobby_background_image_url: Optional[str] = data.get('lobbyBackgroundImageUrl', {}).get('url')
         self.quicksilver_id: str = data['quicksilver_id']
         self.image_url: str = data['image_url']
         self.public_modules: dict = data['publicModules']
+        image_urls = data['image_urls']
+        self.image_url: str = image_urls['image_url']
+        self.image_url_m: str = image_urls['image_url_m']
+        self.image_url_s: str = image_urls['image_url_s']
         self.locale: str = data['locale']
         self.title: str = data['title']
         self.matchmaking_v2: CreativeIslandMatchmakingV2 = CreativeIslandMatchmakingV2(data['matchmakingV2'])
         self.mode: str = data['mode']
+        self.ratings: Optional[CreativeIslandRatings] = CreativeIslandRatings(data['ratings']) if data.get(
+            'ratings') else None
         self.tagline: str = data['tagline']
         self.support_code: str = data['supportCode']
         self.project_id: str = data['projectId']
@@ -71,3 +78,22 @@ class CreativeIslandMatchmakingV2:
         self.max_party_size: int = data['maxSocialPartySize']
         self.max_team_count: int = data['maxTeamCount']
         self.max_team_size: int = data['maxTeamSize']
+        self.raw_data: dict = data
+
+
+class CreativeIslandRatings:
+    def __init__(self, data: dict):
+        self.cert_id: str = data['cert_id']
+        self.boards: List[CreativeIslandRatingBoard] = [CreativeIslandRatingBoard(b) for b in data['boards']]
+        self.raw_data: dict = data
+
+
+class CreativeIslandRatingBoard:
+    def __init__(self, name: str, data: dict):
+        self.name: str = name
+        self.descriptors: List[str] = data['descriptors']
+        self.rating_overwritten: bool = data['rating_overridden']
+        self.rating: int = data['rating']
+        self.initial_rating: int = data['initial_rating']
+        self.interactive_elements: List[str] = data['interactive_elements']
+        self.raw_data: dict = data
