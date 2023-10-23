@@ -54,9 +54,9 @@ class CreativeIslandMetadata:
         self.image_url: str = data['image_url']
         self.public_modules: dict = data['public_modules']
         image_urls = data['image_urls']
-        self.image_url: str = image_urls['image_url']
-        self.image_url_m: str = image_urls['image_url_m']
-        self.image_url_s: str = image_urls['image_url_s']
+        self.image_url: str = image_urls['url']
+        self.image_url_m: str = image_urls['url_m']
+        self.image_url_s: str = image_urls['url_s']
         self.locale: str = data['locale']
         self.title: str = data['title']
         self.matchmaking_v2: CreativeIslandMatchmakingV2 = CreativeIslandMatchmakingV2(data['matchmakingV2'])
