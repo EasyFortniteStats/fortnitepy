@@ -73,7 +73,7 @@ class CreativeIslandMetadata:
         self.support_code: str = data['supportCode']
         self.project_id: str = data['projectId']
         self.introduction: str = data['introduction']
-        self.alt_introduction: Dict[str, str] = data['alt_introduction']
+        self.alt_introduction: Dict[str, str] = data.get('alt_introduction', {})
         self.attributions: List[CreativeIslandAttribution] = [
             CreativeIslandAttribution(a) for a in data['attributions']
         ]
