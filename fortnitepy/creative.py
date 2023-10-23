@@ -75,7 +75,7 @@ class CreativeIslandMetadata:
         self.introduction: str = data['introduction']
         self.alt_introduction: Dict[str, str] = data.get('alt_introduction', {})
         self.attributions: List[CreativeIslandAttribution] = [
-            CreativeIslandAttribution(a) for a in data['attributions']
+            CreativeIslandAttribution(a) for a in data.get('attributions', [])
         ]
         self.raw_data: dict = data
 
