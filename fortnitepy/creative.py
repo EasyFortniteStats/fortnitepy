@@ -58,10 +58,10 @@ class CreativeIslandMetadata:
         self.image_url: str = image_urls['url']
         self.image_url_m: str = image_urls['url_m']
         self.image_url_s: str = image_urls['url_s']
-        square_image_urls = data['square_image_urls']
-        self.square_image_url: str = square_image_urls['url']
-        self.square_image_url_m: str = square_image_urls['url_m']
-        self.square_image_url_s: str = square_image_urls['url_s']
+        square_image_urls = data.get('square_image_urls', {})
+        self.square_image_url: Optional[str] = square_image_urls.get('url')
+        self.square_image_url_m: Optional[str] = square_image_urls.get('url_m')
+        self.square_image_url_s: Optional[str] = square_image_urls.get('url_s')
         self.locale: str = data['locale']
         self.title: str = data['title']
         self.matchmaking_v2: CreativeIslandMatchmakingV2 = CreativeIslandMatchmakingV2(data['matchmakingV2'])
