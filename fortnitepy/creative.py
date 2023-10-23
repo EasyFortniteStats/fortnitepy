@@ -89,7 +89,9 @@ class CreativeIslandMatchmakingV2:
 class CreativeIslandRatings:
     def __init__(self, data: dict):
         self.cert_id: str = data['cert_id']
-        self.boards: List[CreativeIslandRatingBoard] = [CreativeIslandRatingBoard(b) for b in data['boards']]
+        self.boards: List[CreativeIslandRatingBoard] = [
+            CreativeIslandRatingBoard(n, b) for n, b in data['boards'].items()
+        ]
         self.raw_data: dict = data
 
 
