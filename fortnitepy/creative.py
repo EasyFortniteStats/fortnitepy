@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 
 class CreativeDiscovery:
@@ -52,7 +52,7 @@ class CreativeIslandMetadata:
         self.lobby_background_image_url: Optional[str] = data.get('lobbyBackgroundImageUrl', {}).get('url')
         self.quicksilver_id: str = data['quicksilver_id']
         self.image_url: str = data['image_url']
-        self.public_modules: dict = data['publicModules']
+        self.public_modules: dict = data['public_modules']
         image_urls = data['image_urls']
         self.image_url: str = image_urls['image_url']
         self.image_url_m: str = image_urls['image_url_m']
@@ -64,10 +64,15 @@ class CreativeIslandMetadata:
         self.ratings: Optional[CreativeIslandRatings] = CreativeIslandRatings(data['ratings']) if data.get(
             'ratings') else None
         self.tagline: str = data['tagline']
+        self.alt_tagline: Dict[str, str] = data.get('alt_tagline', {})
         self.support_code: str = data['supportCode']
         self.project_id: str = data['projectId']
         self.introduction: str = data['introduction']
-        self.attributions: List = data['attributions']
+        self.alt_introduction: Dict[str, str] = data['alt_introduction']
+        self.attributions: List[CreativeIslandAttribution] = [
+            CreativeIslandAttribution(a) for a in data['attributions']
+        ]
+        self.raw_data: dict = data
 
 
 class CreativeIslandMatchmakingV2:
@@ -96,4 +101,13 @@ class CreativeIslandRatingBoard:
         self.rating: int = data['rating']
         self.initial_rating: int = data['initial_rating']
         self.interactive_elements: List[str] = data['interactive_elements']
+        self.raw_data: dict = data
+
+
+class CreativeIslandAttribution:
+    def __init__(self, data: dict):
+        self.license: str = data['license']
+        self.author: str = data['author']
+        self.title: str = data['title']
+        self.source_url: str = data['source_url']
         self.raw_data: dict = data
