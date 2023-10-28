@@ -264,6 +264,11 @@ class EpicGames(Route):
     AUTH = None
 
 
+class SacEpicGames(Route):
+    BASE = 'https://sac.epicgames.com'
+    AUTH = None
+
+
 class PaymentWebsite(Route):
     BASE = 'https://payment-website-pci.ol.epicgames.com'
     AUTH = None
@@ -1718,6 +1723,23 @@ class HTTPClient:
 
         r = AvatarService('/v1/avatar/fortnite/ids')
         return await self.get(r, params=params)
+
+    ###################################
+    #               SAC               #
+    ###################################
+
+    async def get_earned_products(self, date: str, locale: str) -> dict:
+        params = {
+            'date': date,
+            'locale': locale
+        }
+
+        r = SacEpicGames('/api/get-earned-products')
+        return await self.get(r, params=params)
+
+    async def get_earnings_data(self) -> dict:
+        r = SacEpicGames('/api/get-earned-products')
+        return await self.get(r)
 
     ###################################
     #             Party               #
