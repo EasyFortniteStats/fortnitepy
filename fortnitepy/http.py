@@ -1328,12 +1328,14 @@ class HTTPClient:
     #            Discovery            #
     ###################################
 
-    async def get_discovery(self, region: str) -> dict:
+    async def get_discovery(self, surface_name: str, region: str, is_cabined: bool, platform: str) -> dict:
         payload = {
-            'surfaceName': 'CreativeDiscoverySurface_Frontend',
+            'surfaceName': surface_name,
             'revision': -1,
             'partyMemberIds': [self.client.user.id],
-            'matchmakingRegion': region
+            'matchmakingRegion': region,
+            'isCabined': is_cabined,
+            'platform': platform,
         }
 
         params = {

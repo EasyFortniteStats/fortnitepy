@@ -301,3 +301,9 @@ class SaveTheWorldFounderPack(Enum):
     SUPER_DELUXE = 3
     LIMITED = 4
     ULTIMATE = 5
+
+
+class DiscoverySurface(Enum):
+    MAIN = 'CreativeDiscoverySurface_Frontend'
+    BROWSE = 'CreativeDiscoverySurface_Browse'
+    LIBRARY = 'CreativeDiscoverySurface_Library'

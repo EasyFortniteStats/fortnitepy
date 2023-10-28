@@ -47,7 +47,7 @@ from .user import (ClientUser, User, BlockedUser, SacSearchEntryUser,
 from .friend import Friend, IncomingPendingFriend, OutgoingPendingFriend
 from .enums import (Platform, Region, UserSearchPlatform, AwayStatus,
                     SeasonStartTimestamp, SeasonEndTimestamp,
-                    BattlePassStat, StatsCollectionType, VBucksPlatform)
+                    BattlePassStat, StatsCollectionType, VBucksPlatform, DiscoverySurface)
 from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty,
                     Party)
 from .stats import StatsV2, StatsCollection, _StatsBase, RankedSeasonEntry, RankedStatsEntry
@@ -2626,8 +2626,8 @@ class BasicClient:
 
         return friends, incoming_friends, outgoing_friends
 
-    async def fetch_discovery(self, region: Region) -> CreativeDiscovery:
-        data = await self.http.get_discovery(region.value)
+    async def fetch_discovery(self, surface: DiscoverySurface, region: Region, platform: Platform) -> CreativeDiscovery:
+        data = await self.http.get_discovery(surface.value, region.value, platform.value)
         return CreativeDiscovery(data)
 
     async def fetch_creative_island(self, code: str) -> CreativeIsland:
