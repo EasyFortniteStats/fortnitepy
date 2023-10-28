@@ -86,16 +86,9 @@ class Auth:
 
     async def authenticate_web(self) -> None:
         xsrf_token = await self.fetch_xsrf_token()
-
         exchange_code = await self.get_exchange_code()
         await self.client.http.epicgames_exchange(xsrf_token, exchange_code)
-        await self.client.http.epicgames_redirect(xsrf_token, 'https://epicgames.com')
-        await self.client.http.refresh_crfs()
-        purchase_data = await self.client.http.epicgames_get_purchase_token()
-        purchase_token = purchase_data['purchaseToken']
-        await self.client.http.payment_website_purchase(purchase_token)
-        payment_xrsf_data = await self.client.http.payment_website_xrsf(purchase_token)
-        payment_xrsf_token = payment_xrsf_data['xsrfToken']
+        await self.client.http.epicgames_redirect(xsrf_token, 'https://sac.epicgames.com')
 
     async def _authenticate(self, priority: int = 0) -> None:
         max_attempts = 3

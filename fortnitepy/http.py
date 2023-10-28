@@ -974,10 +974,10 @@ class HTTPClient:
         }
         return await self.post(EpicGames('/id/api/exchange'), headers=headers, data=payload)
 
-    async def epicgames_refresh_crsf(self):
-        return await self.get(EpicGames('/account/v2/refresh-csrf'))
+    async def epicgames_refresh_crsf(self) -> None:
+        await self.get(EpicGames('/account/v2/refresh-csrf'))
 
-    async def epicgames_get_purchase_token(self) -> Any:
+    async def epicgames_get_purchase_token(self) -> dict:
         return await self.get(EpicGames('/account/v2/payment/ajaxGetPurchaseToken'))
 
     async def epicgames_reputation(self, xsrf_token: str) -> Any:
@@ -1049,7 +1049,7 @@ class HTTPClient:
     #        Payment Website          #
     ###################################
 
-    async def payment_website_search_sac_by_slug(self, slug: str) -> Any:
+    async def payment_website_search_sac_by_slug(self, purchase_token: str, purchase_xsrf_token: str) -> Any:
         headers = {
             'X-Requested-With': purchase_token,
             'X-PURCHASE-XSRF-TOKEN': purchase_xsrf_token
@@ -1060,20 +1060,16 @@ class HTTPClient:
         }
 
         r = PaymentWebsite('/affiliate/search-by-slug', data=payload, auth=None)
-        return await self.get(r, params=params)
+        return await self.post(r, json=payload, headers=headers)
 
     async def payment_website_purchase(self, purchase_token: str) -> Any:
-        params = {
-            'purchaseToken': slug
-        }
+        params = {'purchaseToken': purchase_token}
 
         r = PaymentWebsite('/purchase', auth=None)
         return await self.get(r, params=params)
 
     async def payment_website_xrsf(self, purchase_token: str) -> Any:
-        params = {
-            'purchaseToken': slug
-        }
+        params = {'purchaseToken': purchase_token}
 
         r = PaymentWebsite('/purchase/xsrf', auth=None)
         return await self.get(r, params=params)
