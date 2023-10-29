@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Optional, List
 
-from . import from_iso
+from .utils import from_iso
 
 
 class SACEarnedProduct:
