@@ -53,7 +53,7 @@ class CreativeIslandMetadata:
         self.lobby_background_image_url: Optional[str] = lobby_background_image_urls.get('url')
         self.quicksilver_id: str = data['quicksilver_id']
         self.image_url: str = data['image_url']
-        self.public_modules: dict = data['public_modules']
+        self.public_modules: dict = data.get('public_modules', {})
         image_urls = data['image_urls']
         self.image_url: str = image_urls['url']
         self.image_url_m: str = image_urls['url_m']
@@ -62,9 +62,18 @@ class CreativeIslandMetadata:
         self.square_image_url: Optional[str] = square_image_urls.get('url')
         self.square_image_url_m: Optional[str] = square_image_urls.get('url_m')
         self.square_image_url_s: Optional[str] = square_image_urls.get('url_s')
+        generated_image_urls = data.get('generated_image_urls', {})
+        self.generated_image_url: Optional[str] = generated_image_urls.get('url')
+        self.generated_image_url_m: Optional[str] = generated_image_urls.get('url_m')
+        self.generated_image_url_s: Optional[str] = generated_image_urls.get('url_s')
+        compressed_generated_image_urls = generated_image_urls.get('compressed', {})
+        self.compressed_generated_image_url: Optional[str] = compressed_generated_image_urls.get('url')
+        self.compressed_generated_image_url_m: Optional[str] = compressed_generated_image_urls.get('url_m')
+        self.compressed_generated_image_url_s: Optional[str] = compressed_generated_image_urls.get('url_s')
         self.locale: str = data['locale']
         self.title: str = data['title']
         self.matchmaking_v2: CreativeIslandMatchmakingV2 = CreativeIslandMatchmakingV2(data['matchmakingV2'])
+        self.video_url: Optional[str] = data.get('video_url')
         self.mode: str = data['mode']
         self.ratings: Optional[CreativeIslandRatings] = CreativeIslandRatings(data['ratings']) if data.get(
             'ratings') else None
@@ -74,6 +83,8 @@ class CreativeIslandMetadata:
         self.project_id: str = data['projectId']
         self.introduction: str = data['introduction']
         self.alt_introduction: Dict[str, str] = data.get('alt_introduction', {})
+        self.island_type: Optional[str] = data.get('islandType')
+        self.dynamic_xp = CreativeIslandDynamicXP(data['dynamicXp']) if data.get('dynamicXp') else None
         self.attributions: List[CreativeIslandAttribution] = [
             CreativeIslandAttribution(a) for a in data.get('attributions', [])
         ]
@@ -108,6 +119,14 @@ class CreativeIslandRatingBoard:
         self.rating: int = data['rating']
         self.initial_rating: int = data['initial_rating']
         self.interactive_elements: List[str] = data['interactive_elements']
+        self.raw_data: dict = data
+
+
+class CreativeIslandDynamicXP:
+
+    def __init__(self, data: dict):
+        self.unique_game_version: str = data['uniqueGameVersion']
+        self.calibration_phase: str = data['calibrationPhase']
         self.raw_data: dict = data
 
 
