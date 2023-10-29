@@ -52,6 +52,7 @@ from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty,
                     Party)
 from .stats import StatsV2, StatsCollection, _StatsBase, RankedSeasonEntry, RankedStatsEntry
 from .store import Store
+from .sac import SACEarnings, SACEarnedProduct
 from .news import BattleRoyaleNewsPost
 from .playlist import Playlist
 from .presence import Presence
@@ -2633,6 +2634,12 @@ class BasicClient:
     async def fetch_creative_island(self, code: str) -> CreativeIsland:
         data = await self.http.get_creative_island(code)
         return CreativeIsland(data)
+
+    async def add_favorite_creative_island(self, code: str):
+        await self.http.add_favorite_island(code)
+
+    async def remove_favorite_creative_island(self, code: str):
+        await self.http.remove_favorite_island(code)
 
 
 class Client(BasicClient):

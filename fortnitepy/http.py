@@ -459,6 +459,11 @@ class HTTPClient:
     def user_agent(self) -> str:
         return 'Fortnite/{0.client.build} {0.client.os}'.format(self)
 
+    def is_web_auth_expired(self) -> bool:
+        return bool([
+            c for c in self.__session.cookie_jar if c['domain'] == 'epicgames.com' and c.key == 'epic_bearer_token'
+        ])
+
     def get_auth(self, auth: str) -> str:
         u_auth = auth.upper()
 
@@ -1740,7 +1745,7 @@ class HTTPClient:
     #               SAC               #
     ###################################
 
-    async def get_earned_products(self, date: str, locale: str) -> dict:
+    async def get_sac_earned_products(self, date: str, locale: str) -> dict:
         params = {
             'date': date,
             'locale': locale
@@ -1749,8 +1754,8 @@ class HTTPClient:
         r = SacEpicGames('/api/get-earned-products')
         return await self.get(r, params=params)
 
-    async def get_earnings_data(self) -> dict:
-        r = SacEpicGames('/api/get-earned-products')
+    async def get_sac_earnings_data(self) -> dict:
+        r = SacEpicGames('/api/get-earnings-data')
         return await self.get(r)
 
     ###################################

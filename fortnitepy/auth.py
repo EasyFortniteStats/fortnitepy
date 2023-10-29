@@ -85,10 +85,12 @@ class Auth:
         return response.cookies['XSRF-TOKEN'].value
 
     async def authenticate_web(self) -> None:
+        if self.client.http.is_web_auth_expired():
+            return
         xsrf_token = await self.fetch_xsrf_token()
         exchange_code = await self.get_exchange_code()
         await self.client.http.epicgames_exchange(xsrf_token, exchange_code)
-        await self.client.http.epicgames_redirect(xsrf_token, 'https://sac.epicgames.com')
+        await self.client.http.epicgames_redirect(xsrf_token, 'https://epicgames.com')
 
     async def _authenticate(self, priority: int = 0) -> None:
         max_attempts = 3

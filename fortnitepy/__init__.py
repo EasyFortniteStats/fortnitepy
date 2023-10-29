@@ -50,3 +50,4 @@ from .avatar import Avatar
 from .http import HTTPRetryConfig, Route
 from .utils import *
 from .profile import *
+from .sac import SACEarnings, SACEarnedProduct, SACEarnedProductDataEntry
