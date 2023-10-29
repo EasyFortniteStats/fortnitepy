@@ -1354,21 +1354,21 @@ class HTTPClient:
         )
         return await self.post(r, json=payload, params=params)
 
-    async def add_favorite_island(self, island_code: str) -> dict:
+    async def add_favorite_island(self, link_code: str) -> dict:
         r = DiscoveryService(
             '/api/v1/links/favorites/{client_id}/{link_code}',
             client_id=self.client.user.id,
-            island_code=island_code,
+            link_code=link_code,
         )
-        return await self.post(r, json={})
+        return await self.post(r)
 
-    async def remove_favorite_island(self, island_code: str) -> dict:
+    async def remove_favorite_island(self, link_code: str) -> dict:
         r = DiscoveryService(
             '/api/v1/links/favorites/{client_id}/{link_code}',
             client_id=self.client.user.id,
-            island_code=island_code,
+            link_code=link_code,
         )
-        return await self.delete(r, json={})
+        return await self.delete(r)
 
     async def get_creative_island(self, mnemonic: str) -> dict:
         r = LinkService('/links/api/fn/mnemonic/{mnemonic}', mnemonic=mnemonic)
