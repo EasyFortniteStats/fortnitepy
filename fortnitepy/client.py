@@ -2627,8 +2627,8 @@ class BasicClient:
 
         return friends, incoming_friends, outgoing_friends
 
-    async def fetch_discovery(self, surface: DiscoverySurface, region: Region, platform: Platform) -> CreativeDiscovery:
-        data = await self.http.get_discovery(surface.value, region.value, platform.value)
+    async def fetch_discovery(self, surface: DiscoverySurface, region: Region, is_cabined: bool = False, platform: Platform = Platform.WINDOWS) -> CreativeDiscovery:
+        data = await self.http.get_discovery(surface.value, region.value, is_cabined, platform.value)
         return CreativeDiscovery(data)
 
     async def fetch_creative_island(self, code: str) -> CreativeIsland:
