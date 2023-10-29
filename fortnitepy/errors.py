@@ -236,8 +236,9 @@ class HTTPException(FortniteException):
         else:
             fmt = '{0} - {1}'.format(self.status, self.message)
 
-        self.text = 'Code: "{0}" - {1}'.format(
+        self.text = 'Code: "{0}" ({1}) - {2}'.format(
             self.message_code,
+            self.code,
             fmt
         )
 
