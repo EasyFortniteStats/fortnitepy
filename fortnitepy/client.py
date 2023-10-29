@@ -2641,6 +2641,16 @@ class BasicClient:
     async def remove_favorite_creative_island(self, code: str):
         await self.http.remove_favorite_island(code)
 
+    async def fetch_sac_earned_products(self, date: datetime.date) -> List[SACEarnedProduct]:
+        await self.auth.authenticate_web()
+        data = await self.http.get_sac_earned_products(date.strftime('%Y-%m'), 'en-US')
+        return [SACEarnedProduct(i, d) for i, d in data['data'].items()]
+
+    async def fetch_sac_earnings(self) -> SACEarnings:
+        await self.auth.authenticate_web()
+        data = await self.http.get_sac_earnings_data()
+        return SACEarnings(data['data'])
+
 
 class Client(BasicClient):
     """Represents the client connected to Fortnite and EpicGames' services.
