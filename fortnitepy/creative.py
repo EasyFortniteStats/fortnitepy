@@ -54,10 +54,10 @@ class CreativeIslandMetadata:
         self.quicksilver_id: str = data['quicksilver_id']
         self.image_url: str = data['image_url']
         self.public_modules: dict = data.get('public_modules', {})
-        image_urls = data['image_urls']
-        self.image_url: str = image_urls['url']
-        self.image_url_m: str = image_urls['url_m']
-        self.image_url_s: str = image_urls['url_s']
+        self.image_url: str = data['image_url']
+        image_urls = data.get('image_urls', {})
+        self.image_url_m: Optional[str] = image_urls.get('url_m')
+        self.image_url_s: Optional[str] = image_urls.get('url_s')
         square_image_urls = data.get('square_image_urls', {})
         self.square_image_url: Optional[str] = square_image_urls.get('url')
         self.square_image_url_m: Optional[str] = square_image_urls.get('url_m')
