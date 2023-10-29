@@ -2632,7 +2632,13 @@ class BasicClient:
         return CreativeDiscovery(data)
 
     async def fetch_creative_island(self, code: str) -> CreativeIsland:
-        data = await self.http.get_creative_island(code)
+        try:
+            data = await self.http.get_creative_island(code)
+        except HTTPException as exc:
+            m = 'errors.com.epicgames.links.no_active_version'
+            if exc.message_code == m:
+                raise NotFound('Island not found.')
+            raise
         return CreativeIsland(data)
 
     async def add_favorite_creative_island(self, code: str):
