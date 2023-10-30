@@ -52,8 +52,9 @@ class CreativeIslandMetadata:
         lobby_background_image_urls = data.get('lobby_background_image_urls', {})
         self.lobby_background_image_url: Optional[str] = lobby_background_image_urls.get('url')
         self.quicksilver_id: str = data['quicksilver_id']
+        # max_source_ver: {patch: 0, major: "", minor: 0}
         self.image_url: str = data['image_url']
-        self.public_modules: dict = data.get('public_modules', {})
+        self.public_modules: Dict[str, int] = data.get('public_modules', {})
         self.image_url: str = data['image_url']
         image_urls = data.get('image_urls', {})
         self.image_url_m: Optional[str] = image_urls.get('url_m')
@@ -72,8 +73,11 @@ class CreativeIslandMetadata:
         self.compressed_generated_image_url_s: Optional[str] = compressed_generated_image_urls.get('url_s')
         self.locale: str = data['locale']
         self.title: str = data['title']
+        self.matchmaking = CreativeIslandMatchmaking(data['matchmaking']) if data.get('matchmaking') else None
         self.matchmaking_v2: CreativeIslandMatchmakingV2 = CreativeIslandMatchmakingV2(data['matchmakingV2'])
+        self.disable_discovery_features: List = data.get('disableDiscoveryFeatures', [])
         self.video_url: Optional[str] = data.get('video_url')
+        self.video_vuid: Optional[str] = data.get('video_vuid')
         self.mode: str = data['mode']
         self.ratings: Optional[CreativeIslandRatings] = CreativeIslandRatings(data['ratings']) if data.get(
             'ratings') else None
@@ -88,6 +92,15 @@ class CreativeIslandMetadata:
         self.attributions: List[CreativeIslandAttribution] = [
             CreativeIslandAttribution(a) for a in data.get('attributions', [])
         ]
+        self.raw_data: dict = data
+
+
+class CreativeIslandMatchmaking:
+
+    def __init__(self, data: dict):
+        self.player_count: int = data['playerCount']
+        self.name: str = data['name']
+        self.playlists: List[str] = data['playlists']
         self.raw_data: dict = data
 
 
