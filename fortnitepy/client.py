@@ -2649,12 +2649,26 @@ class BasicClient:
 
     async def fetch_sac_earned_products(self, date: datetime.date) -> List[SACEarnedProduct]:
         await self.auth.authenticate_web()
-        data = await self.http.get_sac_earned_products(date.strftime('%Y-%m'), 'en-US')
+
+        try:
+            data = await self.http.get_sac_earned_products(date.strftime('%Y-%m'), 'en-US')
+        except HTTPException as exc:
+            m = 'errors.com.epicgames.forbidden'
+            if exc.message_code == m:
+                raise Forbidden('You don\'t own a Creator Code.')
+            raise
         return [SACEarnedProduct(i, d) for i, d in data['data'].items()]
 
     async def fetch_sac_earnings(self) -> SACEarnings:
         await self.auth.authenticate_web()
-        data = await self.http.get_sac_earnings_data()
+
+        try:
+            data = await self.http.get_sac_earnings_data()
+        except HTTPException as exc:
+            m = 'errors.com.epicgames.forbidden'
+            if exc.message_code == m:
+                raise Forbidden('You don\'t own a Creator Code.')
+            raise
         return SACEarnings(data['data'])
 
 
