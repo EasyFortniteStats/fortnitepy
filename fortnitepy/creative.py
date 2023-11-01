@@ -128,7 +128,7 @@ class CreativeIslandRatingBoard:
     def __init__(self, name: str, data: dict):
         self.name: str = name
         self.descriptors: List[str] = data['descriptors']
-        self.rating_overwritten: bool = data['rating_overridden']
+        self.rating_overwritten: bool = data.get('rating_overridden', False)
         self.rating: int = data['rating']
         self.initial_rating: int = data['initial_rating']
         self.interactive_elements: List[str] = data['interactive_elements']
