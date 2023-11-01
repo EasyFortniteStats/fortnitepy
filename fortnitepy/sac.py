@@ -17,7 +17,7 @@ class SACEarnedProduct:
         self.data_entries: List[SACEarnedProductDataEntry] = [
             SACEarnedProductDataEntry(entry) for entry in data['data']
         ]
-        self.total_unique_supports: int = data['totalUniqueSupports']
+        self.total_unique_supporters: int = data['totalUniqueSupporters']
         self.total_estimated_earnings: int = data['totalEstimatedEarnings']
         self.raw_data: dict = data
 
