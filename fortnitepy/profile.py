@@ -351,7 +351,7 @@ class VBucksPurchase:
         self.undoable_until: Optional[datetime] = from_iso(data['undoTimeout']) if 'undoTimeout' in data else None
         self.refunded_at: Optional[datetime] = from_iso(data['refundDate']) if 'refundDate' in data else None
         self.free_refund_eligible: bool = data.get('freeRefundEligible', False)
-        self.fulfillments: list = data['fulfillments']
+        self.fulfillments: list = data.get('fulfillments', [])
         self.price: int = data['totalMtxPaid']
         metadata = data.get('metadata', {})
         self.creator_code: Optional[str] = metadata.get('mtx_affiliate')
