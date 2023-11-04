@@ -2550,8 +2550,14 @@ class BasicClient:
         profile_change = profile_data['profileChanges'][0]
         return SaveTheWorldProfile(profile_change['profile'])
 
-    async def set_creator_code(self, creator_code: str):
-        await self.http.set_affiliate_name(creator_code)
+    async def set_creator_code(self, creator_code: str) -> None:
+        try:
+            await self.http.set_affiliate_name(creator_code)
+        except HTTPException as exc:
+            m = 'errors.com.epicgames.ecommerce.affiliate.not_found'
+            if exc.message_code == m:
+                raise NotFound('Creator code not found.')
+            raise
 
     async def claim_login_rewards(self) -> DailyRewardNotification:
         profile_data = await self.http.claim_login_reward('campaign')
