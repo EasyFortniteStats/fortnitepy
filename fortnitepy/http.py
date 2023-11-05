@@ -1495,7 +1495,23 @@ class HTTPClient:
             'currency': currency_type,
             'currencySubType': currency_sub_type,
             'expectedTotalPrice': expected_total_price,
-            'gameContext': 'Frontend.CatabaScreen',
+            'gameContext': 'GameContext: Frontend.CatabaScreen',
+        }
+        return await self.post(r, json=payload)
+
+    async def purchase_multiple_catalog_entries(
+            self,
+            purchase_entries: List[dict],
+    ) -> dict:
+        r = FortnitePublicService(
+            '/fortnite/api/game/v2/profile/{client_id}/client/PurchaseMultipleCatalogEntries'
+            '?profileId=common_core&rvn=-1',
+            client_id=self.client.user.id,
+        )
+        payload = {
+            'purchaseInfoList': [
+                {**e, **{'gameContext': 'GameContext: Frontend.CatabaScreen'}} for e in purchase_entries
+            ],
         }
         return await self.post(r, json=payload)
 

@@ -23,9 +23,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-
+import dataclasses
 import re
 import datetime
+from dataclasses import dataclass
 
 from typing import TYPE_CHECKING, Optional, List
 
@@ -328,3 +329,15 @@ class Store:
         for item in storefront['catalogEntries']:
             res.append(DailyStoreItem(item))
         return res
+
+
+@dataclass
+class ItemPurchase:
+    offer_id: str
+    currency_type: str
+    currency_sub_type: str
+    expected_price: int
+    quantity: int = 1
+
+    def to_dict(self) -> dict:
+        return dataclasses.asdict(self)

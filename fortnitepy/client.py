@@ -51,7 +51,7 @@ from .enums import (Platform, Region, UserSearchPlatform, AwayStatus,
 from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty,
                     Party)
 from .stats import StatsV2, StatsCollection, _StatsBase, RankedSeasonEntry, RankedStatsEntry
-from .store import Store
+from .store import Store, ItemPurchase
 from .sac import SACEarnings, SACEarnedProduct
 from .news import BattleRoyaleNewsPost
 from .playlist import Playlist
@@ -2570,6 +2570,9 @@ class BasicClient:
             quantity: int = 1
     ):
         await self.http.purchase_catalog_entry(offer_id, quantity, currency_type, currency_sub_type, expected_price)
+
+    async def purchase_items(self, items: List[ItemPurchase]):
+        await self.http.purchase_multiple_catalog_entries([item.to_dict() for item in items])
 
     async def gift_item(
             self,
