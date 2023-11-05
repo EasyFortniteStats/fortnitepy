@@ -1415,13 +1415,12 @@ class HTTPClient:
         )
         return await self.post(r, json={}, **kwargs)
 
-    async def fortnite_get_store_catalog(self) -> dict:
+    async def fortnite_get_store_catalog(self, locale: str = 'en') -> dict:
+        headers = {'X-EpicGames-Language': locale}
         r = FortnitePublicService('/fortnite/api/storefront/v2/catalog')
-        return await self.get(r)
+        return await self.get(r, headers=headers)
 
-    async def fortnite_check_gift_eligibility(self,
-                                              user_id: str,
-                                              offer_id: str) -> Any:
+    async def fortnite_check_gift_eligibility(self, user_id: str, offer_id: str) -> Any:
         r = FortnitePublicService(
             '/fortnite/api/storefront/v2/gift/check_eligibility/recipient/{user_id}/offer/{offer_id}',  # noqa
             user_id=user_id,
