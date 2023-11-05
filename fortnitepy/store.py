@@ -339,5 +339,12 @@ class ItemPurchase:
     expected_price: int
     quantity: int = 1
 
-    def to_dict(self) -> dict:
-        return dataclasses.asdict(self)
+    def to_payload(self) -> dict:
+        return {
+            'offerId': self.offer_id,
+            'purchaseQuantity': self.quantity,
+            'currency': self.currency_type,
+            'currencySubType': self.currency_sub_type,
+            'expectedTotalPrice': self.expected_price,
+            'gameContext': 'GameContext: Frontend.CatabaScreen'
+        }

@@ -1508,11 +1508,7 @@ class HTTPClient:
             '?profileId=common_core&rvn=-1',
             client_id=self.client.user.id,
         )
-        payload = {
-            'purchaseInfoList': [
-                {**e, **{'gameContext': 'GameContext: Frontend.CatabaScreen'}} for e in purchase_entries
-            ],
-        }
+        payload = {'purchaseInfoList': purchase_entries}
         return await self.post(r, json=payload)
 
     async def gift_catalog_entry(
