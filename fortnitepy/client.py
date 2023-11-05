@@ -39,7 +39,7 @@ from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
                      DuplicateFriendship, FriendshipRequestAlreadySent,
                      MaxFriendshipsExceeded, InviteeMaxFriendshipsExceeded,
-                     InviteeMaxFriendshipRequestsExceeded, PartyIsFull)
+                     InviteeMaxFriendshipRequestsExceeded, PartyIsFull, InvalidCreatorCode)
 from .xmpp import XMPPClient
 from .http import HTTPClient
 from .user import (ClientUser, User, BlockedUser, SacSearchEntryUser,
@@ -2550,8 +2550,17 @@ class BasicClient:
         profile_change = profile_data['profileChanges'][0]
         return SaveTheWorldProfile(profile_change['profile'])
 
-    async def set_creator_code(self, creator_code: str):
-        await self.http.set_affiliate_name(creator_code)
+    async def set_creator_code(self, creator_code: str) -> None:
+        try:
+            await self.http.set_affiliate_name(creator_code)
+        except HTTPException as exc:
+            m = 'errors.com.epicgames.ecommerce.affiliate.not_found'
+            if exc.message_code == m:
+                raise NotFound('Creator code not found.')
+            m = 'errors.com.epicgames.fortnite.invalid_parameter'
+            if exc.message_code == m:
+                raise InvalidCreatorCode('Creator code is invalid.')
+            raise
 
     async def claim_login_rewards(self) -> DailyRewardNotification:
         profile_data = await self.http.claim_login_reward('campaign')
