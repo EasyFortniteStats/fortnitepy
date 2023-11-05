@@ -146,6 +146,12 @@ class InvalidOffer(FortniteException):
     pass
 
 
+class InvalidCreatorCode(FortniteException):
+    """This exception is raised when an creator code was passed that contains
+    invalid characters."""
+    pass
+
+
 class ValidationFailure(FortniteException):
     """Represents a validation failure returned.
 

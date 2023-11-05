@@ -39,7 +39,7 @@ from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
                      DuplicateFriendship, FriendshipRequestAlreadySent,
                      MaxFriendshipsExceeded, InviteeMaxFriendshipsExceeded,
-                     InviteeMaxFriendshipRequestsExceeded, PartyIsFull)
+                     InviteeMaxFriendshipRequestsExceeded, PartyIsFull, InvalidCreatorCode)
 from .xmpp import XMPPClient
 from .http import HTTPClient
 from .user import (ClientUser, User, BlockedUser, SacSearchEntryUser,
@@ -2557,6 +2557,9 @@ class BasicClient:
             m = 'errors.com.epicgames.ecommerce.affiliate.not_found'
             if exc.message_code == m:
                 raise NotFound('Creator code not found.')
+            m = 'errors.com.epicgames.fortnite.invalid_parameter'
+            if exc.message_code == m:
+                raise InvalidCreatorCode('Creator code is invalid.')
             raise
 
     async def claim_login_rewards(self) -> DailyRewardNotification:
