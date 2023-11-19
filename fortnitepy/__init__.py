@@ -42,6 +42,7 @@ from .user import (ClientUser, User, BlockedUser, ExternalAuth,
                    UserSearchEntry, SacSearchEntryUser)
 from .stats import StatsV2, StatsCollection, RankedStatsEntry, RankedSeasonEntry
 from .enums import *
+from .creative import *
 from .errors import *
 from .store import Store, FeaturedStoreItem, DailyStoreItem, ItemPurchase
 from .news import BattleRoyaleNewsPost

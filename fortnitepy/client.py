@@ -2655,7 +2655,7 @@ class BasicClient:
 
     async def fetch_discovery_v2(
             self,
-            release: str,
+            branch: str,
             creative_token: str,
             surface: DiscoverySurface,
             region: Region,
@@ -2666,7 +2666,7 @@ class BasicClient:
             is_cabined: bool = False,
     ) -> CreativeDiscoveryV2:
         data = await self.http.get_discovery_v2(
-            release,
+            branch,
             creative_token,
             surface.value,
             locale,
@@ -2678,8 +2678,8 @@ class BasicClient:
         )
         return CreativeDiscoveryV2(data)
 
-    async def fetch_discovery_token(self, version: str) -> str:
-        data = await self.http.get_discovery_token(version)
+    async def fetch_discovery_token(self, branch: str) -> str:
+        data = await self.http.get_discovery_token(branch)
         return data['token']
 
     async def search_discovery(
