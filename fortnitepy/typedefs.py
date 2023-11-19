@@ -27,7 +27,7 @@ SOFTWARE.
 from datetime import datetime
 from typing import Union, Awaitable, Callable
 
-from . import ACBRating, PEGIRating, GenericRating, ClassIndRating, USKRating, GRACRating, ESRBRating, \
+from .enums import ACBRating, PEGIRating, GenericRating, ClassIndRating, USKRating, GRACRating, ESRBRating, \
     RussiaRating
 
 MaybeCoro = Union[Awaitable, Callable]
