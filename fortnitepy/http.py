@@ -1362,7 +1362,7 @@ class HTTPClient:
 
     async def get_discovery_v2(
         self,
-        release: str,
+        branch: str,
         creative_token: str,
         surface_name: str,
         locale: str,
@@ -1385,7 +1385,7 @@ class HTTPClient:
 
         params = {
             'appId': 'Fortnite',
-            'stream': urllib.parse.quote_plus(release)
+            'stream': urllib.parse.quote_plus(branch)
         }
 
         headers = {
@@ -1422,6 +1422,10 @@ class HTTPClient:
         r = DiscoverySearchService('/api/v1/search')
         return await self.post(r, json=payload, params=params)
 
+    async def get_discovery_token(self, branch: str) -> dict:
+        r = MCPService('/fortnite/api/discovery/accessToken/{branch}', branch=branch)
+        return await self.get(r)
+
     async def add_favorite_island(self, link_code: str) -> None:
         r = DiscoveryService(
             '/api/v1/links/favorites/{client_id}/{link_code}',
@@ -1448,8 +1452,13 @@ class HTTPClient:
         r = LinkService('/links/api/fn/mnemonic/{mnemonic}', mnemonic=mnemonic)
         return await self.get(r, params=params)
 
-    async def get_multiple_creative_islands(self, mnemonics: List[str]) -> dict:
-        pass
+    async def get_multiple_creative_islands(self, islands: List[dict], ignore_failures: bool) -> dict:
+        params = {
+            'ignoreFailures': ignore_failures
+        }
+
+        r = LinkService('/links/api/fn/mnemonic')
+        return await self.post(r, json=islands, params=params)
 
     async def check_fortnite_access(self) -> dict:
         r = MCPService('/fortnite/api/accesscontrol/status')
@@ -1633,6 +1642,10 @@ class HTTPClient:
             '/fortnite/api/game/v2/br-inventory/account/{user_id}', user_id=user_id
         )
         return await self.get(r, json={})
+
+    async def get_api_version(self) -> dict:
+        r = FortnitePublicService('/fortnite/api/version')
+        return await self.get(r)
 
     ###################################
     #        Fortnite Content         #

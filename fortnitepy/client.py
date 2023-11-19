@@ -33,7 +33,7 @@ from aiohttp import BaseConnector
 from typing import Iterable, Union, Optional, Any, Awaitable, Callable, Dict, List, Tuple
 
 from .code import Code
-from .creative import CreativeDiscovery, CreativeIsland, CreativeDiscoverySearchEntry
+from .creative import CreativeDiscovery, CreativeIsland, CreativeDiscoverySearchEntry, IslandLookup, CreativeDiscoveryV2
 from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, DailyRewardNotification, \
     BattleRoyaleInventory
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
@@ -2612,6 +2612,10 @@ class BasicClient:
         data = await self.http.get_br_inventory(user_id)
         return BattleRoyaleInventory(data)
 
+    async def fetch_current_branch(self) -> str:
+        data = await self.http.get_api_version()
+        return data['branch']
+
     async def fetch_friends(
             self,
             include_pending: bool = False,
@@ -2639,9 +2643,44 @@ class BasicClient:
 
         return friends, incoming_friends, outgoing_friends
 
-    async def fetch_discovery(self, surface: DiscoverySurface, region: Region, is_cabined: bool = False, platform: Platform = Platform.WINDOWS) -> CreativeDiscovery:
+    async def fetch_discovery(
+            self,
+            surface: DiscoverySurface,
+            region: Region,
+            is_cabined: bool = False,
+            platform: Platform = Platform.WINDOWS
+    ) -> CreativeDiscovery:
         data = await self.http.get_discovery(surface.value, region.value, is_cabined, platform.value)
         return CreativeDiscovery(data)
+
+    async def fetch_discovery_v2(
+            self,
+            release: str,
+            creative_token: str,
+            surface: DiscoverySurface,
+            region: Region,
+            locale: str = 'en',
+            platform: Platform = Platform.WINDOWS,
+            account_level: int = 1000,
+            battlepass_level: int = 100,
+            is_cabined: bool = False,
+    ) -> CreativeDiscoveryV2:
+        data = await self.http.get_discovery_v2(
+            release,
+            creative_token,
+            surface.value,
+            locale,
+            region.value,
+            platform.value,
+            account_level,
+            battlepass_level,
+            is_cabined
+        )
+        return CreativeDiscoveryV2(data)
+
+    async def fetch_discovery_token(self, version: str) -> str:
+        data = await self.http.get_discovery_token(version)
+        return data['token']
 
     async def search_discovery(
             self,
@@ -2652,19 +2691,36 @@ class BasicClient:
             page: int = 0
     ) -> List[CreativeDiscoverySearchEntry]:
         rating_authority, rating \
-            = age_rating.authority if age_rating else None, age_rating.value if age_rating else None
+            = age_rating.get_authority() if age_rating else None, age_rating.value if age_rating else None
         data = await self.http.search_discovery(language, query, order_by.value, rating_authority, rating, page)
         return [CreativeDiscoverySearchEntry(entry) for entry in data['results']]
 
-    async def fetch_creative_island(self, code: str, type) -> CreativeIsland:
+    async def fetch_creative_island(
+            self,
+            code: str,
+            type_: Optional[str] = None,
+            version: Optional[int] = None
+    ) -> CreativeIsland:
         try:
-            data = await self.http.get_creative_island(code)
+            data = await self.http.get_creative_island(code, type_, version)
         except HTTPException as exc:
             m = 'errors.com.epicgames.links.no_active_version'
             if exc.message_code == m:
                 raise NotFound('Island not found.')
             raise
         return CreativeIsland(data)
+
+    async def fetch_multiple_creative_island(
+            self, islands: List[IslandLookup], ignore_failures: bool = True
+    ) -> List[CreativeIsland]:
+        try:
+            data = await self.http.get_multiple_creative_islands([i.to_payload() for i in islands], ignore_failures)
+        except HTTPException as exc:
+            m = 'errors.com.epicgames.links.no_active_version'
+            if exc.message_code == m:
+                raise NotFound('At least one island not found.')
+            raise
+        return [CreativeIsland(island) for island in data]
 
     async def add_favorite_creative_island(self, code: str):
         await self.http.add_favorite_island(code)

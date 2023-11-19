@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional, Dict
 
@@ -27,6 +28,52 @@ class CreativeDiscoveryPage:
         self.link_code: str = data['linkCode']
         self.is_favorite: bool = data['isFavorite']
         self.global_player_count: int = data['globalCCU']
+
+
+class CreativeDiscoveryV2:
+    def __init__(self, data: dict):
+        self.test_variant_name: str = data['testVariantName']
+        self.test_name: str = data['testName']
+        self.test_analytics_id: str = data['testAnalyticsId']
+        self.testVariantAnalyticsId: str = data['testVariantAnalyticsId']
+        self.panels: List[CreativeDiscoveryV2Panel] = [CreativeDiscoveryPanel(p) for p in data['panels']]
+        self.raw_data: dict = data
+
+
+class CreativeDiscoveryV2Panel:
+
+    def __init__(self, data: dict):
+        self.name: str = data['panelName']
+        self.display_name: str = data['panelDisplayName']
+        self.featured_tags: List[str] = data['featuredTags']
+        self.first_page: CreativeDiscoveryV2Page = CreativeDiscoveryV2Page(data['firstPage'])
+        self.type: str = data['panelType']
+        self.play_history_type: Optional[str] = data['playHistoryType']
+        self.raw_data: dict = data
+
+
+class CreativeDiscoveryV2Page:
+
+    def __init__(self, data: dict):
+        self.entries: List[CreativeDiscoveryV2PageEntry] = [CreativeDiscoveryV2PageEntry(e) for e in data['entries']]
+        self.has_more: bool = data['hasMore']
+        self.panel_target_name: Optional[str] = data['panelTargetName']
+        self.raw_data: dict = data
+
+
+class CreativeDiscoveryV2PageEntry:
+
+    def __init__(self, data: dict):
+        self.last_visited: Optional[datetime] = (
+            datetime.fromisoformat(data['lastVisited']) if data.get('lastVisited') else None
+        )
+        self.link_code: str = data['linkCode']
+        self.is_favorite: bool = data['isFavorite']
+        self.global_player_count: int = data['globalCCU']
+        self.lock_status: str = data['lockStatus']
+        self.lock_status_reason: str = data['lockStatusReason']
+        self.is_invisible: bool = data['isInvisible']
+        self.raw_data: dict = data
 
 
 class CreativeIsland:
@@ -177,3 +224,19 @@ class CreativeDiscoverySearchEntry:
         self.lock_status: str = data['lockStatus']
         self.lock_status_reason: str = data['lockStatusReason']
         self.is_invisible: bool = data['isInvisible']
+
+
+@dataclass
+class IslandLookup:
+    code: str
+    type: Optional[str] = None
+    version: Optional[int] = None
+    filter: bool = False
+
+    def to_payload(self) -> dict:
+        return {
+            'mnemonic': self.code,
+            'type': self.type,
+            'v': self.version,
+            'filter': self.filter,
+        }
