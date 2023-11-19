@@ -33,7 +33,7 @@ from aiohttp import BaseConnector
 from typing import Iterable, Union, Optional, Any, Awaitable, Callable, Dict, List, Tuple
 
 from .code import Code
-from .creative import CreativeDiscovery, CreativeIsland
+from .creative import CreativeDiscovery, CreativeIsland, CreativeDiscoverySearchEntry
 from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, DailyRewardNotification, \
     BattleRoyaleInventory
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
@@ -47,7 +47,7 @@ from .user import (ClientUser, User, BlockedUser, SacSearchEntryUser,
 from .friend import Friend, IncomingPendingFriend, OutgoingPendingFriend
 from .enums import (Platform, Region, UserSearchPlatform, AwayStatus,
                     SeasonStartTimestamp, SeasonEndTimestamp,
-                    BattlePassStat, StatsCollectionType, VBucksPlatform, DiscoverySurface)
+                    BattlePassStat, StatsCollectionType, VBucksPlatform, DiscoverySurface, DiscoverySearchOrderType)
 from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty,
                     Party)
 from .stats import StatsV2, StatsCollection, _StatsBase, RankedSeasonEntry, RankedStatsEntry
@@ -58,7 +58,7 @@ from .playlist import Playlist
 from .presence import Presence
 from .auth import Auth, RefreshTokenAuth
 from .avatar import Avatar
-from .typedefs import MaybeCoro, DatetimeOrTimestamp, StrOrInt
+from .typedefs import MaybeCoro, DatetimeOrTimestamp, StrOrInt, AgeRating
 from .utils import LockEvent, MaybeLock, from_iso, is_display_name, to_iso
 
 log = logging.getLogger(__name__)
@@ -2643,7 +2643,20 @@ class BasicClient:
         data = await self.http.get_discovery(surface.value, region.value, is_cabined, platform.value)
         return CreativeDiscovery(data)
 
-    async def fetch_creative_island(self, code: str) -> CreativeIsland:
+    async def search_discovery(
+            self,
+            query: str,
+            language: str,
+            order_by: DiscoverySearchOrderType = DiscoverySearchOrderType.PLAYER_COUNT,
+            age_rating: Optional[AgeRating] = None,
+            page: int = 0
+    ) -> List[CreativeDiscoverySearchEntry]:
+        rating_authority, rating \
+            = age_rating.authority if age_rating else None, age_rating.value if age_rating else None
+        data = await self.http.search_discovery(language, query, order_by.value, rating_authority, rating, page)
+        return [CreativeDiscoverySearchEntry(entry) for entry in data['results']]
+
+    async def fetch_creative_island(self, code: str, type) -> CreativeIsland:
         try:
             data = await self.http.get_creative_island(code)
         except HTTPException as exc:

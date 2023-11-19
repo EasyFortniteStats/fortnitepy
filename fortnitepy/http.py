@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+import urllib
 
 import aiohttp
 import asyncio
@@ -351,6 +352,11 @@ class FulfillmentService(Route):
 
 class DiscoveryService(Route):
     BASE = 'https://fn-service-discovery-live-public.ogs.live.on.epicgames.com'
+    AUTH = 'FORTNITE_ACCESS_TOKEN'
+
+
+class DiscoverySearchService(Route):
+    BASE = 'https://fn-service-discovery-search-live-public.ogs.live.on.epicgames.com'
     AUTH = 'FORTNITE_ACCESS_TOKEN'
 
 
@@ -1354,6 +1360,68 @@ class HTTPClient:
         )
         return await self.post(r, json=payload, params=params)
 
+    async def get_discovery_v2(
+        self,
+        release: str,
+        creative_token: str,
+        surface_name: str,
+        locale: str,
+        region: str,
+        platform: str,
+        account_level: int,
+        battlepass_level: int,
+        is_cabined: bool
+    ) -> dict:
+        payload = {
+            'playerId': self.client.user.id,
+            'partyMemberIds': [self.client.user.id],
+            'locale': locale,
+            'matchmakingRegion': region,
+            'platform': platform,
+            'accountLevel': account_level,
+            'battlepassLevel': battlepass_level,
+            'isCabined': is_cabined,
+        }
+
+        params = {
+            'appId': 'Fortnite',
+            'stream': urllib.parse.quote_plus(release)
+        }
+
+        headers = {
+            'X-Epic-Access-Token': creative_token
+        }
+
+        r = DiscoveryService('/api/v2/discovery/surface/{surface_name}', surface_name=surface_name)
+        return await self.post(r, json=payload, params=params, headers=headers)
+
+    async def search_discovery(
+            self,
+            locale: str,
+            query: str,
+            order_by: Optional[str],
+            rating_authority: Optional[str],
+            rating: Optional[str],
+            page: int
+    ) -> dict:
+        payload = {
+            'namespace': 'fortnite',
+            'context': [],
+            'locale': locale,
+            'search': query,
+            'orderBy': order_by,
+            'ratingAuthority': rating_authority,
+            'rating': rating,
+            'page': page
+        }
+
+        params = {
+            'accountId': self.client.user.id
+        }
+
+        r = DiscoverySearchService('/api/v1/search')
+        return await self.post(r, json=payload, params=params)
+
     async def add_favorite_island(self, link_code: str) -> None:
         r = DiscoveryService(
             '/api/v1/links/favorites/{client_id}/{link_code}',
@@ -1370,9 +1438,18 @@ class HTTPClient:
         )
         await self.delete(r)
 
-    async def get_creative_island(self, mnemonic: str) -> dict:
+    async def get_creative_island(self, mnemonic: str, type_: Optional[str], version: Optional[int]) -> dict:
+        params = {}
+        if type_ is not None:
+            params['type'] = type_
+        if version is not None:
+            params['v'] = version
+
         r = LinkService('/links/api/fn/mnemonic/{mnemonic}', mnemonic=mnemonic)
-        return await self.get(r)
+        return await self.get(r, params=params)
+
+    async def get_multiple_creative_islands(self, mnemonics: List[str]) -> dict:
+        pass
 
     async def check_fortnite_access(self) -> dict:
         r = MCPService('/fortnite/api/accesscontrol/status')

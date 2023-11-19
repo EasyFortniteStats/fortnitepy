@@ -27,9 +27,12 @@ SOFTWARE.
 from datetime import datetime
 from typing import Union, Awaitable, Callable
 
+from . import ACBRating, PEGIRating, GenericRating, ClassIndRating, USKRating, GRACRating, ESRBRating, \
+    RussiaRating
 
 MaybeCoro = Union[Awaitable, Callable]
 StrOrMaybeCoro = Union[str, MaybeCoro]
 ListOrTuple = Union[list, tuple]
 StrOrInt = Union[str, int]
 DatetimeOrTimestamp = Union[datetime, int]
+AgeRating = Union[ACBRating, PEGIRating, GenericRating, ClassIndRating, USKRating, GRACRating, ESRBRating, RussiaRating]

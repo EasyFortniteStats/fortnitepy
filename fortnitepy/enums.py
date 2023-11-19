@@ -307,3 +307,83 @@ class DiscoverySurface(Enum):
     MAIN = 'CreativeDiscoverySurface_Frontend'
     BROWSE = 'CreativeDiscoverySurface_Browse'
     LIBRARY = 'CreativeDiscoverySurface_Library'
+
+
+class DiscoverySearchOrderType(Enum):
+    PLAYER_COUNT = 'globalCCU'
+
+
+class _RatingAuthorityRating(Enum):
+    @staticmethod
+    def get_authority():
+        raise NotImplementedError
+
+
+class ACBRating(_RatingAuthorityRating):
+    AGE_M = 'ACB_AGE_M'
+    AGE_NA = 'ACB_AGE_NA'
+
+    @staticmethod
+    def get_authority():
+        return 'ACB'
+
+
+class PEGIRating(_RatingAuthorityRating):
+    AGE_12 = 'PEGI_AGE_12'
+    AGE_PG = 'PEGI_AGE_PG'
+
+    @staticmethod
+    def get_authority():
+        return 'PEGI'
+
+
+class GenericRating(_RatingAuthorityRating):
+    AGE_12 = 'GEN_AGE_12'
+
+    @staticmethod
+    def get_authority():
+        return 'Generic'
+
+
+class ClassIndRating(_RatingAuthorityRating):
+    AGE_12 = 'CLASSIND_AGE_12'
+    AGE_LIVRE = 'CLASSIND_AGE_LIVRE'
+
+    @staticmethod
+    def get_authority():
+        return 'ClassInd'
+
+
+class USKRating(_RatingAuthorityRating):
+    AGE_12 = 'USK_AGE_12'
+    AGE_6 = 'USK_AGE_6'
+
+    @staticmethod
+    def get_authority():
+        return 'USK'
+
+
+class GRACRating(_RatingAuthorityRating):
+    AGE_12 = 'GRAC_AGE_12'
+    AGE_NA = 'GRAC_AGE_NA'
+
+    @staticmethod
+    def get_authority():
+        return 'GRAC'
+
+
+class ESRBRating(_RatingAuthorityRating):
+    AGE_T = 'ESRB_AGE_T'
+    AGE_E10 = 'ESRB_AGE_E10'
+
+    @staticmethod
+    def get_authority():
+        return 'ESRB'
+
+
+class RussiaRating(_RatingAuthorityRating):
+    AGE_12 = 'RUSSIA_AGE_12'
+
+    @staticmethod
+    def get_authority():
+        return 'Russia'

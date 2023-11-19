@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import List, Optional, Dict
 
+from fortnitepy.typedefs import AgeRating
+
 
 class CreativeDiscovery:
     def __init__(self, data: dict) -> None:
@@ -78,9 +80,14 @@ class CreativeIslandMetadata:
         self.disable_discovery_features: List = data.get('disableDiscoveryFeatures', [])
         self.video_url: Optional[str] = data.get('video_url')
         self.video_vuid: Optional[str] = data.get('video_vuid')
+        self.sub_link_codes: List[str] = data.get('subLinkCodes', [])
         self.mode: str = data['mode']
         self.ratings: Optional[CreativeIslandRatings] = CreativeIslandRatings(data['ratings']) if data.get(
             'ratings') else None
+        self.product_tag: Optional[str] = data.get('productTag')
+        self.fallback_links: Dict[str, str] = data.get('fallbackLinks', {})
+        self.corresponding_sets: Dict[str, str] = data.get('correspondingSets', {})
+        self.default_sub_link_code: Optional[str] = data.get('defaultSubLinkCode')
         self.tagline: str = data['tagline']
         self.alt_tagline: Dict[str, str] = data.get('alt_tagline', {})
         self.support_code: str = data['supportCode']
@@ -117,6 +124,7 @@ class CreativeIslandMatchmakingV2:
 
 class CreativeIslandRatings:
     def __init__(self, data: dict):
+        self.rating_received_at: datetime = datetime.fromisoformat(data['ratingReceivedAt'])
         self.cert_id: str = data['cert_id']
         self.boards: List[CreativeIslandRatingBoard] = [
             CreativeIslandRatingBoard(n, b) for n, b in data['boards'].items()
@@ -129,8 +137,13 @@ class CreativeIslandRatingBoard:
         self.name: str = name
         self.descriptors: List[str] = data['descriptors']
         self.rating_overwritten: bool = data.get('rating_overridden', False)
-        self.rating: int = data['rating']
-        self.initial_rating: int = data['initial_rating']
+        rating = None
+        for rating_type in AgeRating.__args__:
+            if rating_type.get_authority() == name:
+                rating = rating_type(data['rating'])
+                break
+        self.rating: AgeRating = rating
+        self.initial_rating: AgeRating = rating.get_authority()
         self.interactive_elements: List[str] = data['interactive_elements']
         self.raw_data: dict = data
 
@@ -150,3 +163,17 @@ class CreativeIslandAttribution:
         self.title: str = data['title']
         self.source_url: str = data['source_url']
         self.raw_data: dict = data
+
+
+class CreativeDiscoverySearchEntry:
+    def __init__(self, data: dict):
+        self.link_code: str = data['linkCode']
+        self.is_favorite: bool = data['isFavorite']
+        self.last_visited: Optional[datetime] = (
+            datetime.fromisoformat(data['lastVisited']) if data.get('lastVisited') else None
+        )
+        self.player_count: int = data['playerCount']
+        self.score: int = data['score']
+        self.lock_status: str = data['lockStatus']
+        self.lock_status_reason: str = data['lockStatusReason']
+        self.is_invisible: bool = data['isInvisible']
