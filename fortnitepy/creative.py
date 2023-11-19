@@ -45,7 +45,7 @@ class CreativeDiscoveryV2Panel:
     def __init__(self, data: dict):
         self.name: str = data['panelName']
         self.display_name: str = data['panelDisplayName']
-        self.featured_tags: List[str] = data['featuredTags']
+        self.feature_tags: List[str] = data['featureTags']
         self.first_page: CreativeDiscoveryV2Page = CreativeDiscoveryV2Page(data['firstPage'])
         self.type: str = data['panelType']
         self.play_history_type: Optional[str] = data['playHistoryType']
