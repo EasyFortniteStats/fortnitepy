@@ -72,7 +72,7 @@ class CreativeDiscoveryV2PageEntry:
         self.global_player_count: int = data['globalCCU']
         self.lock_status: str = data['lockStatus']
         self.lock_status_reason: str = data['lockStatusReason']
-        self.is_invisible: bool = data['isInvisible']
+        self.is_visible: bool = data['isVisible']
         self.raw_data: dict = data
 
 
