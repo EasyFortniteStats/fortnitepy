@@ -55,7 +55,7 @@ class CreativeDiscoveryV2Panel:
 class CreativeDiscoveryV2Page:
 
     def __init__(self, data: dict):
-        self.entries: List[CreativeDiscoveryV2PageEntry] = [CreativeDiscoveryV2PageEntry(e) for e in data['entries']]
+        self.entries: List[CreativeDiscoveryV2PageEntry] = [CreativeDiscoveryV2PageEntry(e) for e in data['results']]
         self.has_more: bool = data['hasMore']
         self.panel_target_name: Optional[str] = data['panelTargetName']
         self.raw_data: dict = data
