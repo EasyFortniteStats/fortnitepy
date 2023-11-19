@@ -36,7 +36,7 @@ class CreativeDiscoveryV2:
         self.test_name: str = data['testName']
         self.test_analytics_id: str = data['testAnalyticsId']
         self.testVariantAnalyticsId: str = data['testVariantAnalyticsId']
-        self.panels: List[CreativeDiscoveryV2Panel] = [CreativeDiscoveryPanel(p) for p in data['panels']]
+        self.panels: List[CreativeDiscoveryV2Panel] = [CreativeDiscoveryV2Panel(p) for p in data['panels']]
         self.raw_data: dict = data
 
 
