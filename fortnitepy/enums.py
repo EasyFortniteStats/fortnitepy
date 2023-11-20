@@ -321,6 +321,7 @@ class _RatingAuthorityRating(Enum):
 
 class ACBRating(_RatingAuthorityRating):
     AGE_M = 'ACB_AGE_M'
+    AGE_G = 'ACB_AGE_G'
     AGE_NA = 'ACB_AGE_NA'
 
     @staticmethod
@@ -347,6 +348,7 @@ class GenericRating(_RatingAuthorityRating):
 
 class ClassIndRating(_RatingAuthorityRating):
     AGE_12 = 'CLASSIND_AGE_12'
+    AGE_10 = 'CLASSIND_AGE_10'
     AGE_LIVRE = 'CLASSIND_AGE_LIVRE'
 
     @staticmethod
@@ -365,6 +367,7 @@ class USKRating(_RatingAuthorityRating):
 
 class GRACRating(_RatingAuthorityRating):
     AGE_12 = 'GRAC_AGE_12'
+    AGE_RC = 'GRAC_AGE_RC'
     AGE_NA = 'GRAC_AGE_NA'
 
     @staticmethod
