@@ -32,9 +32,11 @@ from aioxmpp import JID
 from aiohttp import BaseConnector
 from typing import Iterable, Union, Optional, Any, Awaitable, Callable, Dict, List, Tuple
 
-from . import CreativeDiscoveryV2Page
 from .code import Code
-from .creative import CreativeDiscovery, CreativeIsland, CreativeDiscoverySearchEntry, IslandLookup, CreativeDiscoveryV2
+from .creative import (
+    CreativeDiscovery, CreativeIsland, CreativeDiscoverySearchEntry, IslandLookup, CreativeDiscoveryV2,
+    CreativeDiscoveryV2Page
+)
 from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, DailyRewardNotification, \
     BattleRoyaleInventory
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
