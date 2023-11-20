@@ -1359,16 +1359,16 @@ class HTTPClient:
         return await self.post(r, json=payload, params=params)
 
     async def get_discovery_v2(
-        self,
-        branch: str,
-        creative_token: str,
-        surface_name: str,
-        locale: str,
-        region: str,
-        platform: str,
-        account_level: int,
-        battlepass_level: int,
-        is_cabined: bool
+            self,
+            branch: str,
+            discovery_token: str,
+            surface_name: str,
+            locale: str,
+            region: str,
+            platform: str,
+            account_level: int,
+            battlepass_level: int,
+            is_cabined: bool
     ) -> dict:
         payload = {
             'playerId': self.client.user.id,
@@ -1387,10 +1387,49 @@ class HTTPClient:
         }
 
         headers = {
-            'X-Epic-Access-Token': creative_token
+            'X-Epic-Access-Token': discovery_token
         }
 
         r = DiscoveryService('/api/v2/discovery/surface/{surface_name}', surface_name=surface_name)
+        return await self.post(r, json=payload, params=params, headers=headers)
+
+    async def get_discovery_page_v2(
+            self,
+            branch: str,
+            discovery_token: str,
+            surface_name: str,
+            test_variant_name: str,
+            panel_name: str,
+            page_index: int,
+            region: str,
+            platform: str,
+            is_cabined: bool,
+            rating_authority: Optional[str],
+            rating: Optional[str]
+    ) -> dict:
+        payload = {
+            'testVariantName': test_variant_name,
+            'panelName': panel_name,
+            'pageIndex': page_index,
+            'playerId': self.client.user.id,
+            'partyMemberIds': [self.client.user.id],
+            'matchmakingRegion': region,
+            'platform': platform,
+            'isCabined': is_cabined,
+            'ratingAuthority': rating_authority,
+            'rating': rating
+        }
+
+        params = {
+            'appId': 'Fortnite',
+            'stream': branch
+        }
+
+        headers = {
+            'X-Epic-Access-Token': discovery_token
+        }
+
+        r = DiscoveryService('/api/v2/discovery/surface/{surface_name}/page', surface_name=surface_name)
         return await self.post(r, json=payload, params=params, headers=headers)
 
     async def search_discovery(

@@ -32,6 +32,7 @@ from aioxmpp import JID
 from aiohttp import BaseConnector
 from typing import Iterable, Union, Optional, Any, Awaitable, Callable, Dict, List, Tuple
 
+from . import CreativeDiscoveryV2Page
 from .code import Code
 from .creative import CreativeDiscovery, CreativeIsland, CreativeDiscoverySearchEntry, IslandLookup, CreativeDiscoveryV2
 from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, DailyRewardNotification, \
@@ -2656,7 +2657,7 @@ class BasicClient:
     async def fetch_discovery_v2(
             self,
             branch: str,
-            creative_token: str,
+            discovery_token: str,
             surface: DiscoverySurface,
             region: Region,
             locale: str = 'en',
@@ -2667,7 +2668,7 @@ class BasicClient:
     ) -> CreativeDiscoveryV2:
         data = await self.http.get_discovery_v2(
             branch,
-            creative_token,
+            discovery_token,
             surface.value,
             locale,
             region.value,
@@ -2677,6 +2678,36 @@ class BasicClient:
             is_cabined
         )
         return CreativeDiscoveryV2(data)
+
+    async def fetch_discovery_page_v2(
+            self,
+            branch: str,
+            discovery_token: str,
+            surface: DiscoverySurface,
+            test_variant_name: str,
+            page_name: str,
+            page_index: int,
+            region: Region,
+            platform: Platform = Platform.WINDOWS,
+            is_cabined: bool = False,
+            age_rating: Optional[AgeRating] = None,
+    ) -> CreativeDiscoveryV2Page:
+        rating_authority, rating \
+            = age_rating.get_authority() if age_rating else None, age_rating.value if age_rating else None
+        data = await self.http.get_discovery_page_v2(
+            branch,
+            discovery_token,
+            surface.value,
+            test_variant_name,
+            page_name,
+            page_index,
+            region.value,
+            platform.value,
+            is_cabined,
+            rating_authority,
+            rating
+        )
+        return CreativeDiscoveryV2Page(data)
 
     async def fetch_discovery_token(self, branch: str) -> str:
         data = await self.http.get_discovery_token(branch)
