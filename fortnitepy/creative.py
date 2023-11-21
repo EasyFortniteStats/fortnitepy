@@ -219,7 +219,7 @@ class CreativeDiscoverySearchEntry:
         self.last_visited: Optional[datetime] = (
             datetime.fromisoformat(data['lastVisited']) if data.get('lastVisited') else None
         )
-        self.player_count: int = data['playerCount']
+        self.global_player_count: int = data['globalCCU']
         self.score: int = data['score']
         self.lock_status: str = data['lockStatus']
         self.lock_status_reason: str = data['lockStatusReason']
