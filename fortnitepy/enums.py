@@ -321,6 +321,7 @@ class _RatingAuthorityRating(Enum):
 
 class ACBRating(_RatingAuthorityRating):
     AGE_M = 'ACB_AGE_M'
+    AGE_PG = 'ACB_AGE_PG'
     AGE_G = 'ACB_AGE_G'
     AGE_NA = 'ACB_AGE_NA'
 
@@ -331,6 +332,8 @@ class ACBRating(_RatingAuthorityRating):
 
 class PEGIRating(_RatingAuthorityRating):
     AGE_12 = 'PEGI_AGE_12'
+    AGE_7 = 'PEGI_AGE_7'
+    AGE_3 = 'PEGI_AGE_3'
     AGE_PG = 'PEGI_AGE_PG'
 
     @staticmethod
@@ -340,6 +343,8 @@ class PEGIRating(_RatingAuthorityRating):
 
 class GenericRating(_RatingAuthorityRating):
     AGE_12 = 'GEN_AGE_12'
+    AGE_7 = 'GEN_AGE_7'
+    AGE_3 = 'GEN_AGE_3'
 
     @staticmethod
     def get_authority():
@@ -357,8 +362,10 @@ class ClassIndRating(_RatingAuthorityRating):
 
 
 class USKRating(_RatingAuthorityRating):
+    AGE_16 = 'USK_AGE_16'
     AGE_12 = 'USK_AGE_12'
     AGE_6 = 'USK_AGE_6'
+    AGE_0 = 'USK_AGE_0'
 
     @staticmethod
     def get_authority():
@@ -366,8 +373,10 @@ class USKRating(_RatingAuthorityRating):
 
 
 class GRACRating(_RatingAuthorityRating):
+    AGE_15 = 'GRAC_AGE_15'
     AGE_12 = 'GRAC_AGE_12'
     AGE_RC = 'GRAC_AGE_RC'
+    AGE_ALL = 'GRAC_AGE_ALL'
     AGE_NA = 'GRAC_AGE_NA'
 
     @staticmethod
@@ -378,6 +387,7 @@ class GRACRating(_RatingAuthorityRating):
 class ESRBRating(_RatingAuthorityRating):
     AGE_T = 'ESRB_AGE_T'
     AGE_E10 = 'ESRB_AGE_E10'
+    AGE_E = 'ESRB_AGE_E'
 
     @staticmethod
     def get_authority():
@@ -385,7 +395,9 @@ class ESRBRating(_RatingAuthorityRating):
 
 
 class RussiaRating(_RatingAuthorityRating):
+    AGE_16 = 'RUSSIA_AGE_16'
     AGE_12 = 'RUSSIA_AGE_12'
+    AGE_0 = 'RUSSIA_AGE_0'
 
     @staticmethod
     def get_authority():
