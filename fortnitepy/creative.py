@@ -223,7 +223,7 @@ class CreativeDiscoverySearchEntry:
         self.score: int = data['score']
         self.lock_status: str = data['lockStatus']
         self.lock_status_reason: str = data['lockStatusReason']
-        self.is_invisible: bool = data['isInvisible']
+        self.is_visible: bool = data['isVisible']
 
 
 @dataclass
