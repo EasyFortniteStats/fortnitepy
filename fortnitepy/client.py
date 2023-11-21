@@ -2667,7 +2667,10 @@ class BasicClient:
             account_level: int = 1000,
             battlepass_level: int = 100,
             is_cabined: bool = False,
+            age_rating: Optional[AgeRating] = None,
     ) -> CreativeDiscoveryV2:
+        rating_authority, rating \
+            = age_rating.get_authority() if age_rating else None, age_rating.value if age_rating else None
         data = await self.http.get_discovery_v2(
             branch,
             discovery_token,
@@ -2677,7 +2680,9 @@ class BasicClient:
             platform.value,
             account_level,
             battlepass_level,
-            is_cabined
+            is_cabined,
+            rating_authority,
+            rating
         )
         return CreativeDiscoveryV2(data)
 

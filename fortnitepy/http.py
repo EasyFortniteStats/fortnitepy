@@ -1346,6 +1346,7 @@ class HTTPClient:
             'matchmakingRegion': region,
             'isCabined': is_cabined,
             'platform': platform,
+
         }
 
         params = {
@@ -1368,7 +1369,9 @@ class HTTPClient:
             platform: str,
             account_level: int,
             battlepass_level: int,
-            is_cabined: bool
+            is_cabined: bool,
+            rating_authority: Optional[str],
+            rating: Optional[str]
     ) -> dict:
         payload = {
             'playerId': self.client.user.id,
@@ -1379,6 +1382,8 @@ class HTTPClient:
             'accountLevel': account_level,
             'battlepassLevel': battlepass_level,
             'isCabined': is_cabined,
+            'ratingAuthority': rating_authority,
+            'rating': rating,
         }
 
         params = {
