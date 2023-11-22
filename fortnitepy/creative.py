@@ -207,9 +207,10 @@ class CreativeIslandDynamicXP:
 class CreativeIslandAttribution:
     def __init__(self, data: dict):
         self.license: str = data['license']
+        self.license_url: Optional[str] = data.get('license_url')
         self.author: str = data['author']
         self.title: str = data['title']
-        self.source_url: str = data['source_url']
+        self.source_url: Optional[str] = data.get('source_url')
         self.raw_data: dict = data
 
 
