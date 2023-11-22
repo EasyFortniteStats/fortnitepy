@@ -100,7 +100,7 @@ class CreativeIslandMetadata:
     def __init__(self, data: dict):
         lobby_background_image_urls = data.get('lobby_background_image_urls', {})
         self.lobby_background_image_url: Optional[str] = lobby_background_image_urls.get('url')
-        self.quicksilver_id: str = data['quicksilver_id']
+        self.quicksilver_id: Optional[str] = data.get('quicksilver_id')
         # max_source_ver: {patch: 0, major: "", minor: 0}
         self.image_url: str = data['image_url']
         self.public_modules: Dict[str, int] = data.get('public_modules', {})
