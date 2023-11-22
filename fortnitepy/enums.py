@@ -395,8 +395,10 @@ class ESRBRating(_RatingAuthorityRating):
 
 
 class RussiaRating(_RatingAuthorityRating):
+    AGE_18 = 'RUSSIA_AGE_18'
     AGE_16 = 'RUSSIA_AGE_16'
     AGE_12 = 'RUSSIA_AGE_12'
+    AGE_6 = 'RUSSIA_AGE_6'
     AGE_0 = 'RUSSIA_AGE_0'
 
     @staticmethod
