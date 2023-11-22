@@ -120,15 +120,17 @@ class CreativeIslandMetadata:
         self.compressed_generated_image_url: Optional[str] = compressed_generated_image_urls.get('url')
         self.compressed_generated_image_url_m: Optional[str] = compressed_generated_image_urls.get('url_m')
         self.compressed_generated_image_url_s: Optional[str] = compressed_generated_image_urls.get('url_s')
-        self.locale: str = data['locale']
+        self.locale: Optional[str] = data.get('locale')
         self.title: str = data['title']
         self.matchmaking = CreativeIslandMatchmaking(data['matchmaking']) if data.get('matchmaking') else None
-        self.matchmaking_v2: CreativeIslandMatchmakingV2 = CreativeIslandMatchmakingV2(data['matchmakingV2'])
+        self.matchmaking_v2: Optional[CreativeIslandMatchmakingV2] = (
+            CreativeIslandMatchmakingV2(data['matchmakingV2']) if data.get('matchmakingV2') else None
+        )
         self.disable_discovery_features: List = data.get('disableDiscoveryFeatures', [])
         self.video_url: Optional[str] = data.get('video_url')
         self.video_vuid: Optional[str] = data.get('video_vuid')
         self.sub_link_codes: List[str] = data.get('subLinkCodes', [])
-        self.mode: str = data['mode']
+        self.mode: Optional[str] = data.get('mode')
         self.ratings: Optional[CreativeIslandRatings] = CreativeIslandRatings(data['ratings']) if data.get(
             'ratings') else None
         self.product_tag: Optional[str] = data.get('productTag')
@@ -137,9 +139,9 @@ class CreativeIslandMetadata:
         self.default_sub_link_code: Optional[str] = data.get('defaultSubLinkCode')
         self.tagline: str = data['tagline']
         self.alt_tagline: Dict[str, str] = data.get('alt_tagline', {})
-        self.support_code: str = data['supportCode']
-        self.project_id: str = data['projectId']
-        self.introduction: str = data['introduction']
+        self.support_code: Optional[str] = data.get('supportCode')
+        self.project_id: Optional[str] = data.get('projectId')
+        self.introduction: Optional[str] = data.get('introduction')
         self.alt_introduction: Dict[str, str] = data.get('alt_introduction', {})
         self.island_type: Optional[str] = data.get('islandType')
         self.dynamic_xp = CreativeIslandDynamicXP(data['dynamicXp']) if data.get('dynamicXp') else None
@@ -160,12 +162,14 @@ class CreativeIslandMatchmaking:
 
 class CreativeIslandMatchmakingV2:
     def __init__(self, data: dict):
-        self.allow_join_in_progress: bool = data['allowJoinInProgress']
-        self.allow_squad_fill_option: bool = data['allowSquadFillOption']
-        self.max_players: int = data['maxPlayers']
-        self.max_party_size: int = data['maxSocialPartySize']
-        self.max_team_count: int = data['maxTeamCount']
-        self.max_team_size: int = data['maxTeamSize']
+        self.allow_join_in_progress: bool = data.get('allowJoinInProgress', False)
+        self.allow_squad_fill_option: bool = data.get('allowSquadFillOption', False)
+        self.max_players: Optional[int] = data.get('maxPlayers')
+        self.max_party_size: Optional[int] = data.get('maxPartySize')
+        self.max_team_count: Optional[int] = data.get('maxTeamCount')
+        self.max_team_size: Optional[int] = data.get('maxTeamSize')
+        self.rating_type: Optional[str] = data.get('ratingType')
+        self.is_ranked: bool = data.get('isRanked', False)
         self.raw_data: dict = data
 
 
