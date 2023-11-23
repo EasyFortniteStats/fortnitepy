@@ -154,9 +154,10 @@ class CreativeIslandMetadata:
 class CreativeIslandMatchmaking:
 
     def __init__(self, data: dict):
-        self.player_count: int = data['playerCount']
-        self.name: str = data['name']
-        self.playlists: List[str] = data['playlists']
+        self.player_count: Optional[int] = data.get('playerCount')
+        self.name: Optional[str] = data.get('name')
+        self.playlists: List[str] = data.get('playlists', [])
+        self.override_playlist: Optional[str] = data.get('override_playlist')
         self.raw_data: dict = data
 
 
