@@ -92,7 +92,7 @@ class CreativeIsland:
         self.description_tags: List[str] = data['descriptionTags']
         self.moderation_status: str = data['moderationStatus']
         self.last_activated_at: Optional[datetime] = datetime.fromisoformat(data['lastActivatedDate']) \
-            if 'lastActivatedDate' in data else None
+            if data.get('lastActivatedDate') else None
         self.discovery_intent: str = data['discoveryIntent']
         self.raw_data: dict = data
 
@@ -122,17 +122,17 @@ class CreativeIslandMetadata:
         self.compressed_generated_image_url_s: Optional[str] = compressed_generated_image_urls.get('url_s')
         self.locale: Optional[str] = data.get('locale')
         self.title: str = data['title']
-        self.matchmaking = CreativeIslandMatchmaking(data['matchmaking']) if 'matchmaking' in data else None
+        self.matchmaking = CreativeIslandMatchmaking(data['matchmaking']) if data.get('matchmaking') else None
         self.matchmaking_v2: Optional[CreativeIslandMatchmakingV2] = (
-            CreativeIslandMatchmakingV2(data['matchmakingV2']) if 'matchmakingV2' in data else None
+            CreativeIslandMatchmakingV2(data['matchmakingV2']) if data.get('matchmakingV2') else None
         )
         self.disable_discovery_features: List = data.get('disableDiscoveryFeatures', [])
         self.video_url: Optional[str] = data.get('video_url')
         self.video_vuid: Optional[str] = data.get('video_vuid')
         self.sub_link_codes: List[str] = data.get('subLinkCodes', [])
         self.mode: Optional[str] = data.get('mode')
-        self.ratings: Optional[CreativeIslandRatings] = CreativeIslandRatings(data['ratings']) \
-            if 'ratings' in data else None
+        self.ratings: Optional[CreativeIslandRatings] = CreativeIslandRatings(data['ratings']) if data.get(
+            'ratings') else None
         self.product_tag: Optional[str] = data.get('productTag')
         self.fallback_links: Dict[str, str] = data.get('fallbackLinks', {})
         self.corresponding_sets: Dict[str, str] = data.get('correspondingSets', {})
@@ -144,7 +144,7 @@ class CreativeIslandMetadata:
         self.introduction: Optional[str] = data.get('introduction')
         self.alt_introduction: Dict[str, str] = data.get('alt_introduction', {})
         self.island_type: Optional[str] = data.get('islandType')
-        self.dynamic_xp = CreativeIslandDynamicXP(data['dynamicXp']) if 'dynamicXp' in data else None
+        self.dynamic_xp = CreativeIslandDynamicXP(data['dynamicXp']) if data.get('dynamicXp') else None
         self.attributions: List[CreativeIslandAttribution] = [
             CreativeIslandAttribution(a) for a in data.get('attributions', [])
         ]
@@ -177,7 +177,7 @@ class CreativeIslandMatchmakingV2:
 class CreativeIslandRatings:
     def __init__(self, data: dict):
         self.rating_received_at: Optional[datetime] = datetime.fromisoformat(data['rating_received_time']) \
-            if 'rating_received_time' in data else None
+            if data.get('rating_received_time') else None
         self.cert_id: str = data['cert_id']
         self.boards: List[CreativeIslandRatingBoard] = [
             CreativeIslandRatingBoard(n, b) for n, b in data['boards'].items()
@@ -224,7 +224,7 @@ class CreativeDiscoverySearchEntry:
         self.link_code: str = data['linkCode']
         self.is_favorite: bool = data['isFavorite']
         self.last_visited: Optional[datetime] = (
-            datetime.fromisoformat(data['lastVisited']) if 'lastVisited' in data else None
+            datetime.fromisoformat(data['lastVisited']) if data.get('lastVisited') else None
         )
         self.global_player_count: int = data['globalCCU']
         self.score: int = data['score']
