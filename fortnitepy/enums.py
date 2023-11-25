@@ -320,6 +320,7 @@ class _RatingAuthorityRating(Enum):
 
 
 class ACBRating(_RatingAuthorityRating):
+    AGE_R18 = 'ACB_AGE_R18'
     AGE_MA15 = 'ACB_AGE_MA15'
     AGE_M = 'ACB_AGE_M'
     AGE_PG = 'ACB_AGE_PG'
@@ -387,6 +388,7 @@ class GRACRating(_RatingAuthorityRating):
 
 
 class ESRBRating(_RatingAuthorityRating):
+    AGE_M = 'ESRB_AGE_M'
     AGE_T = 'ESRB_AGE_T'
     AGE_E10 = 'ESRB_AGE_E10'
     AGE_E = 'ESRB_AGE_E'
