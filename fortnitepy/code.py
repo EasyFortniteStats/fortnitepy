@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from .utils import from_iso
 
@@ -23,16 +23,39 @@ class Code:
         self.allow_repeated_uses_by_same_user: bool = data['allowRepeatedUsesBySameUser']
         self.use_count: int = data['useCount']
         self.completed_count: int = data['completedCount']
-        self.consumption_metadata: ConsumptionMetadata = ConsumptionMetadata(data['consumptionMetadata'])
+        self.consumption_metadata: CodeConsumptionMetadata = CodeConsumptionMetadata(data['consumptionMetadata'])
         self.code_status: str = data['codeStatus']
         self.batch_id: str = data['batchId']
         self.batch_number: int = data['batchNumber']
         self.labels: List[str] = data['labels']
         self.blocked_countries: list = data['blockedCountries']
+        self.raw_data: dict = data
 
 
-class ConsumptionMetadata:
+class CodeConsumptionMetadata:
 
     def __init__(self, data: dict):
+        self.criteria: Optional[CodeConsumptionCriteria] = CodeConsumptionCriteria(data['criteria']) \
+            if data.get('criteria') else None
         self.namespace: str = data['namespace']
         self.offer_id: str = data['offerId']
+        self.raw_data: dict = data
+
+
+class CodeConsumptionCriteria:
+
+    def __init__(self, data: dict):
+        self.checks: List[CodeConsumptionCheck] = [CodeConsumptionCheck(check) for check in data['checks']]
+        self.else_action: str = data['elseAction']
+        self.reject_error_type: str = data['rejectErrorType']
+        self.action: str = data['action']
+        self.operator: str = data['operator']
+        self.raw_data: dict = data
+
+
+class CodeConsumptionCheck:
+
+    def __init__(self, data: dict):
+        self.data: str = data['data']
+        self.type: str = data['type']
+        self.raw_data: dict = data

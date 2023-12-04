@@ -333,6 +333,8 @@ class ACBRating(_RatingAuthorityRating):
 
 
 class PEGIRating(_RatingAuthorityRating):
+    # AGE_18 = 'PEGI_AGE_18'
+    # AGE_16 = 'PEGI_AGE_16'
     AGE_12 = 'PEGI_AGE_12'
     AGE_7 = 'PEGI_AGE_7'
     AGE_3 = 'PEGI_AGE_3'
@@ -344,6 +346,8 @@ class PEGIRating(_RatingAuthorityRating):
 
 
 class GenericRating(_RatingAuthorityRating):
+    # AGE_18 = 'GEN_AGE_18'
+    # AGE_16 = 'GEN_AGE_16'
     AGE_12 = 'GEN_AGE_12'
     AGE_7 = 'GEN_AGE_7'
     AGE_3 = 'GEN_AGE_3'
@@ -354,6 +358,8 @@ class GenericRating(_RatingAuthorityRating):
 
 
 class ClassIndRating(_RatingAuthorityRating):
+    # AGE_18 = 'CLASSIND_AGE_18'
+    # AGE_16 = 'CLASSIND_AGE_16'
     AGE_14 = 'CLASSIND_AGE_14'
     AGE_12 = 'CLASSIND_AGE_12'
     AGE_10 = 'CLASSIND_AGE_10'
@@ -365,6 +371,7 @@ class ClassIndRating(_RatingAuthorityRating):
 
 
 class USKRating(_RatingAuthorityRating):
+    # AGE_18 = 'USK_AGE_18'
     AGE_16 = 'USK_AGE_16'
     AGE_12 = 'USK_AGE_12'
     AGE_6 = 'USK_AGE_6'
@@ -376,6 +383,7 @@ class USKRating(_RatingAuthorityRating):
 
 
 class GRACRating(_RatingAuthorityRating):
+    # AGE_18 = 'GRAC_AGE_18'
     AGE_15 = 'GRAC_AGE_15'
     AGE_12 = 'GRAC_AGE_12'
     AGE_RC = 'GRAC_AGE_RC'
@@ -388,6 +396,7 @@ class GRACRating(_RatingAuthorityRating):
 
 
 class ESRBRating(_RatingAuthorityRating):
+    # Age 18 missing (A or AO)
     AGE_M = 'ESRB_AGE_M'
     AGE_T = 'ESRB_AGE_T'
     AGE_E10 = 'ESRB_AGE_E10'
