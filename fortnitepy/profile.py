@@ -43,7 +43,7 @@ class BattleRoyaleProfile:
         self.season_match_boost: int = stats.get('season_match_boost', 0)
         self.season_friend_match_boost: int = stats.get('season_friend_match_boost', 0)
 
-        self.has_claimed_2fa_reward: bool = stats.get('mfa_reward_claimed', False)
+        self.has_claimed_mfa_reward: bool = stats.get('mfa_reward_claimed', False)
         self.has_ranked_access: bool = stats.get('habanero_unlocked', False)
 
         self.party_assist_quest: Optional[str] = stats.get('party_assist_quest')
@@ -213,7 +213,7 @@ class CommonCoreProfile:
         self.allowed_sending_gifts: bool = stats['allowed_to_send_gifts']
         self.allowed_receiving_gifts: bool = stats['allowed_to_receive_gifts']
 
-        self.enabled_2fa = stats.get('mfa_enabled', False)
+        self.enabled_mfa = stats.get('mfa_enabled', False)
 
         self.ban_status: Optional[BanStatus] = BanStatus(stats['ban_status']) if 'ban_status' in stats else None
         self.ban_history: Optional[BanHistory] = BanHistory(stats['ban_history']) \
