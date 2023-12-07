@@ -255,6 +255,7 @@ class BattlePassStat(Enum):
 class RankingType(Enum):
     BATTLE_ROYALE = 'ranked-br'
     ZERO_BUILD = 'ranked-zb'
+    ROCKET_RACING = 'delmar-competitive'
 
 
 class StatsCollectionType(Enum):
