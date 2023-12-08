@@ -59,3 +59,24 @@ class CodeConsumptionCheck:
         self.data: str = data['data']
         self.type: str = data['type']
         self.raw_data: dict = data
+
+
+class CodeRedemption:
+
+    def __init__(self, data: dict):
+        self.offer_id: str = data['offerId']
+        self.account_id: str = data['accountId']
+        self.identity_id: str = data['identityId']
+        self.details: List[CodeRedemptionDetail] = [CodeRedemptionDetail(detail) for detail in data['details']]
+        self.raw_data: dict = data
+
+
+class CodeRedemptionDetail:
+
+    def __init__(self, data: dict):
+        self.entitlement_id: str = data['entitlementId']
+        self.entitlement_name: str = data['entitlementName']
+        self.item_id: str = data['itemId']
+        self.namespace: str = data['namespace']
+        self.country: str = data['country']
+        self.raw_data: dict = data

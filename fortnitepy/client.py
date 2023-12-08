@@ -32,7 +32,7 @@ from aioxmpp import JID
 from aiohttp import BaseConnector
 from typing import Iterable, Union, Optional, Any, Awaitable, Callable, Dict, List, Tuple
 
-from .code import Code
+from .code import Code, CodeRedemption
 from .creative import (
     CreativeDiscovery, CreativeIsland, CreativeDiscoverySearchEntry, IslandLookup, CreativeDiscoveryV2,
     CreativeDiscoveryV2Page
@@ -2603,13 +2603,25 @@ class BasicClient:
     async def refund_item(self, purchase_id: str, quick_return: bool):
         await self.http.refund_mtx_purchase(purchase_id, quick_return)
 
-    async def fetch_code(self, code: str) -> Optional[Code]:
-        data = await self.http.get_code_info(code)
+    async def fetch_code(self, code: str) -> Code:
+        try:
+            data = await self.http.get_code_info(code)
+        except HTTPException as exc:
+            m = 'errors.com.epicgames.coderedemption.code_not_found'
+            if exc.message_code == m:
+                raise NotFound('Code not found.')
+            raise
         return Code(data)
 
-    async def redeem_code(self, code: str) -> Optional[Code]:
-        data = await self.http.redeem_code(code)
-        return Code(data)
+    async def redeem_code(self, code: str) -> CodeRedemption:
+        try:
+            data = await self.http.redeem_code(code)
+        except HTTPException as exc:
+            m = 'errors.com.epicgames.coderedemption.code_not_found'
+            if exc.message_code == m:
+                raise NotFound('Code not found.')
+            raise
+        return CodeRedemption(data)
 
     async def fetch_br_inventory(self, user_id: str) -> Optional[BattleRoyaleInventory]:
         data = await self.http.get_br_inventory(user_id)
