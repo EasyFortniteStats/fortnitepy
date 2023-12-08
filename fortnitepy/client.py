@@ -54,7 +54,7 @@ from .enums import (Platform, Region, UserSearchPlatform, AwayStatus,
 from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty,
                     Party)
 from .stats import StatsV2, StatsCollection, _StatsBase, RankedSeasonEntry, RankedStatsEntry
-from .store import Store, ItemPurchase
+from .store import Store, ItemPurchase, CatalogEntry
 from .sac import SACEarnings, SACEarnedProduct
 from .news import BattleRoyaleNewsPost
 from .playlist import Playlist
@@ -2444,6 +2444,17 @@ class BasicClient:
         data = await self.http.fortnite_get_store_catalog()
         return Store(self, data)
 
+    async def fetch_store_offer(
+            self,
+            *offer_id: str,
+            country: str = None,
+            locale: str = 'en',
+            return_item_details: bool = True
+    ) -> List[CatalogEntry]:
+        data = await self.http.fortnite_get_catalog_offer(*offer_id, country=country, locale=locale,
+                                                          return_item_details=return_item_details)
+        return [CatalogEntry(entry) for entry in data]
+
     async def fetch_br_news(self) -> List[BattleRoyaleNewsPost]:
         """|coro|
 
@@ -3007,7 +3018,7 @@ class Client(BasicClient):
 
     @property
     def pending_friends(self) -> List[Union[IncomingPendingFriend,
-                                            OutgoingPendingFriend]]:
+    OutgoingPendingFriend]]:
         """List[Union[:class:`IncomingPendingFriend`,
         :class:`OutgoingPendingFriend`]]: A list of all of the clients
         pending friends.
@@ -3399,7 +3410,7 @@ class Client(BasicClient):
     def get_pending_friend(self,
                            user_id: str
                            ) -> Optional[Union[IncomingPendingFriend,
-                                               OutgoingPendingFriend]]:
+    OutgoingPendingFriend]]:
         """Tries to get a pending friend from the pending friend cache by the
         given user id.
 

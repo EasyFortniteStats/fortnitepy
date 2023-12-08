@@ -331,6 +331,119 @@ class Store:
         return res
 
 
+class CatalogEntry:
+
+    def __init__(self, data: dict) -> None:
+        self.id: str = data['id']
+        self.title: str = data['title']
+        self.description: str = data['description']
+        self.long_description: str = data['longDescription']
+        self.key_images: List[CatalogEntryKeyImage] = [
+            CatalogEntryKeyImage(image) for image in data.get('keyImages', [])
+        ]
+        self.categories: List = data['categories']
+        self.namespace: str = data['namespace']
+        self.status: str = data['status']
+        self.created_at: datetime.datetime = from_iso(data['creationDate'])
+        self.last_modified_at: datetime.datetime = from_iso(data['lastModifiedDate'])
+        self.custom_attributes: dict = data['customAttributes']
+        self.internal_name: str = data['internalName']
+        self.recurrence: str = data['recurrence']
+        self.items: List[CatalogEntryItem] = [CatalogEntryItem(item) for item in data['items']]
+        self.currency_code: str = data['currencyCode']
+        self.current_price: int = data['currentPrice']
+        self.price: int = data['price']
+        self.base_price: int = data['basePrice']
+        self.recurring_price: int = data['recurringPrice']
+        self.free_days: int = data['freeDays']
+        self.max_billing_cycles: int = data['maxBillingCycles']
+        self.seller: CatalogEntrySeller = CatalogEntrySeller(data['seller'])
+        self.effective_at: datetime.datetime = from_iso(data['effectiveDate'])
+        self.vat_included: bool = data['vatIncluded']
+        self.is_code_redemption_only: bool = data['isCodeRedemptionOnly']
+        self.is_featured: bool = data['isFeatured']
+        self.tax_sku_id: str = data['taxSkuId']
+        self.merchant_group: str = data['merchantGroup']
+        self.price_tier: str = data['priceTier']
+        self.url_slug: str = data['urlSlug']
+        self.role_names_to_grant: List = data['roleNamesToGrant']
+        self.tags: List = data['tags']
+        self.purchase_limit: int = data['purchaseLimit']
+        self.ignore_order: bool = data['ignoreOrder']
+        self.fullfill_to_group: bool = data['fulfillToGroup']
+        self.fraud_item_type: str = data['fraudItemType']
+        self.share_revenue: bool = data['shareRevenue']
+        self.unsearchable: bool = data['unsearchable']
+        self.release_offer: str = data['releaseOffer']
+        self.sort_title: str = data['title4Sort']
+        self.self_refundable: bool = data['selfRefundable']
+        self.refund_type: str = data['refundType']
+        self.price_calculation_mode: str = data['priceCalculationMode']
+        self.assemble_mode: str = data['assembleMode']
+        self.currency_decimals: int = data['currencyDecimals']
+        self.allow_purchase_for_partial_owned: bool = data['allowPurchaseForPartialOwned']
+        self.share_revenue_with_underage_affiliates: bool = data['shareRevenueWithUnderageAffiliates']
+        self.platform_whitelist: List = data['platformWhitelist']
+        self.platform_blacklist: List = data['platformBlacklist']
+        self.partial_item_prerequisite_check: bool = data['partialItemPrerequisiteCheck']
+        self.upgrade_mode: str = data['upgradeMode']
+        self.raw_data: dict = data
+
+
+class CatalogEntryKeyImage:
+
+    def __init__(self, data: dict) -> None:
+        self.type: str = data['type']
+        self.url: str = data['url']
+        self.md5: str = data['md5']
+        self.width: int = data['width']
+        self.height: int = data['height']
+        self.size: int = data['size']
+        self.uploaded_at: datetime.datetime = from_iso(data['uploadedDate'])
+        self.raw_data: dict = data
+
+
+class CatalogEntryItem:
+
+    def __init__(self, data: dict) -> None:
+        self.id: str = data['id']
+        self.title: Optional[str] = data.get('title')
+        self.description: Optional[str] = data.get('description')
+        self.categories: List = data['categories']
+        self.namespace: str = data['namespace']
+        self.status: Optional[str] = data.get('status')
+        self.created_at: Optional[datetime.datetime] = (
+            from_iso(data['creationDate']) if data.get('creationDate') else None
+        )
+        self.last_modified_at: Optional[datetime.datetime] = (
+            from_iso(data['lastModifiedDate']) if data.get('lastModifiedDate') else None
+        )
+        self.custom_attributes: Optional[dict] = data.get('customAttributes')
+        self.entitlement_name: Optional[str] = data.get('entitlementName')
+        self.entitlement_type: Optional[str] = data.get('entitlementType')
+        self.item_type: Optional[str] = data.get('itemType')
+        self.release_info: Optional[List] = data.get('releaseInfo')
+        self.developer: Optional[str] = data.get('developer')
+        self.developer_id: Optional[str] = data.get('developerId')
+        self.use_count: Optional[int] = data.get('useCount')
+        self.eula_ids: Optional[List] = data.get('eulaIds')
+        self.end_of_support: Optional[bool] = data.get('endOfSupport')
+        self.ns_major_items: Optional[List] = data.get('nsMajorItems')
+        self.ns_depends_on_dlc_items: Optional[List] = data.get('nsDependsOnDlcItems')
+        self.age_gatings: Optional[dict] = data.get('ageGatings')
+        self.application_id: Optional[str] = data.get('applicationId')
+        self.requires_secure_account: Optional[bool] = data.get('requiresSecureAccount')
+        self.unsearchable: bool = data['unsearchable']
+        self.raw_data: dict = data
+
+
+class CatalogEntrySeller:
+
+    def __init__(self, data: dict) -> None:
+        self.id: str = data['id']
+        self.name: str = data['name']
+
+
 @dataclass
 class ItemPurchase:
     offer_id: str

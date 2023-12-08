@@ -313,6 +313,11 @@ class FortnitePublicService(Route):
     AUTH = 'FORTNITE_ACCESS_TOKEN'
 
 
+class FortnitePublicCatalogService(Route):
+    BASE = 'https://catalog-public-service-prod06.ol.epicgames.com'
+    AUTH = 'FORTNITE_ACCESS_TOKEN'
+
+
 class FriendsPublicService(Route):
     BASE = 'https://friends-public-service-prod.ol.epicgames.com'
     AUTH = 'FORTNITE_ACCESS_TOKEN'
@@ -1547,6 +1552,24 @@ class HTTPClient:
         headers = {'X-EpicGames-Language': locale}
         r = FortnitePublicService('/fortnite/api/storefront/v2/catalog')
         return await self.get(r, headers=headers)
+
+    async def fortnite_get_catalog_offer(
+            self,
+            offer_ids: List[str],
+            country: Optional[str],
+            locale: Optional[str],
+            return_item_details: Optional[bool],
+    ) -> dict:
+        params = {'id': offer_ids}
+        if country is None:
+            params['country'] = country
+        if locale is None:
+            params['locale'] = locale
+        if return_item_details is not None:
+            params['returnItemDetails'] = return_item_details
+
+        r = FortnitePublicCatalogService('/catalog/api/shared/bulk/offerss')
+        return await self.get(r, params=params)
 
     async def fortnite_check_gift_eligibility(self, user_id: str, offer_id: str) -> Any:
         r = FortnitePublicService(
