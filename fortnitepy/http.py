@@ -1330,7 +1330,7 @@ class HTTPClient:
             '/coderedemption/api/shared/accounts/{client_id}/redeem/{code}/evaluate',
             client_id=self.client.user.id, code=code
         )
-        return await self.get(r)
+        return await self.post(r)
 
     async def redeem_code(self, code: str) -> dict:
         r = FulfillmentService(
