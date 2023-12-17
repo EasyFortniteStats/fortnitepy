@@ -2454,7 +2454,7 @@ class BasicClient:
     ) -> List[CatalogEntry]:
         data = await self.http.fortnite_get_catalog_offer(*offer_id, country=country, locale=locale,
                                                           return_item_details=return_item_details)
-        return [CatalogEntry(entry) for entry in data]
+        return [CatalogEntry(entry) for entry in data.values()]
 
     async def fetch_br_news(self) -> List[BattleRoyaleNewsPost]:
         """|coro|

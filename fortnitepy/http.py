@@ -1561,14 +1561,14 @@ class HTTPClient:
             return_item_details: Optional[bool],
     ) -> dict:
         params = {'id': offer_ids}
-        if country is None:
+        if country is not None:
             params['country'] = country
-        if locale is None:
+        if locale is not None:
             params['locale'] = locale
         if return_item_details is not None:
             params['returnItemDetails'] = return_item_details
 
-        r = FortnitePublicCatalogService('/catalog/api/shared/bulk/offerss')
+        r = FortnitePublicCatalogService('/catalog/api/shared/bulk/offers')
         return await self.get(r, params=params)
 
     async def fortnite_check_gift_eligibility(self, user_id: str, offer_id: str) -> Any:
