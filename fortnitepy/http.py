@@ -1702,6 +1702,27 @@ class HTTPClient:
         }
         return await self.post(r, json=payload)
 
+    async def redeem_real_money_purchases(
+            self,
+            auth_tokens: List[str],
+            receipt_ids: List[str],
+            refresh_type: str,
+            verifier_mode_override: str
+    ) -> dict:
+        r = FortnitePublicService(
+            '/fortnite/api/game/v2/profile/{client_id}/client/RedeemRealMoneyPurchases?profileId=common_core&rvn=-1',
+            client_id=self.client.user.id,
+        )
+        payload = {
+            'appStore': 'EpicPurchasingService',
+            'authTokens': auth_tokens,
+            'receiptIds': receipt_ids,
+            'refreshType': refresh_type,
+            'verifierModeOverride': verifier_mode_override,
+            'purchaseCorrelationId': ''
+        }
+        return await self.post(r, json=payload)
+
     async def get_br_inventory(self, user_id: str) -> dict:
         r = FortnitePublicService(
             '/fortnite/api/game/v2/br-inventory/account/{user_id}', user_id=user_id

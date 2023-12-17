@@ -50,7 +50,8 @@ from .user import (ClientUser, User, BlockedUser, SacSearchEntryUser,
 from .friend import Friend, IncomingPendingFriend, OutgoingPendingFriend
 from .enums import (Platform, Region, UserSearchPlatform, AwayStatus,
                     SeasonStartTimestamp, SeasonEndTimestamp,
-                    BattlePassStat, StatsCollectionType, VBucksPlatform, DiscoverySurface, DiscoverySearchOrderType)
+                    BattlePassStat, StatsCollectionType, VBucksPlatform, DiscoverySurface, DiscoverySearchOrderType,
+                    PurchaseRefreshType, VerifierModeOverride)
 from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty,
                     Party)
 from .stats import StatsV2, StatsCollection, _StatsBase, RankedSeasonEntry, RankedStatsEntry
@@ -2633,6 +2634,15 @@ class BasicClient:
                 raise NotFound('Code not found.')
             raise
         return CodeRedemption(data)
+
+    async def redeem_real_money_purchases(
+            self,
+            auth_tokens: List[str],
+            receipt_ids: List[str],
+            refresh_type: PurchaseRefreshType,
+            verifier_mode_override: VerifierModeOverride = VerifierModeOverride.DEFAULT_TO_CONFIG
+    ) -> None:
+        await self.http.redeem_real_money_purchases(auth_tokens, receipt_ids, refresh_type.value, verifier_mode_override.value)
 
     async def fetch_br_inventory(self, user_id: str) -> Optional[BattleRoyaleInventory]:
         data = await self.http.get_br_inventory(user_id)
