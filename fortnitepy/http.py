@@ -1337,7 +1337,7 @@ class HTTPClient:
             '/fulfillment/api/public/accounts/{client_id}/codes/{code}',
             client_id=self.client.user.id, code=code
         )
-        return await self.post(r)
+        return await self.post(r, json={})
 
     ###################################
     #            Discovery            #
