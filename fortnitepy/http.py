@@ -1330,14 +1330,14 @@ class HTTPClient:
             '/coderedemption/api/shared/accounts/{client_id}/redeem/{code}/evaluate',
             client_id=self.client.user.id, code=code
         )
-        return await self.post(r)
+        return await self.post(r, auth='IOS_ACCESS_TOKEN')
 
     async def redeem_code(self, code: str) -> dict:
         r = FulfillmentService(
             '/fulfillment/api/public/accounts/{client_id}/codes/{code}',
             client_id=self.client.user.id, code=code
         )
-        return await self.post(r)
+        return await self.post(r, json={})
 
     ###################################
     #            Discovery            #
@@ -1561,14 +1561,14 @@ class HTTPClient:
             return_item_details: Optional[bool],
     ) -> dict:
         params = {'id': offer_ids}
-        if country is None:
+        if country is not None:
             params['country'] = country
-        if locale is None:
+        if locale is not None:
             params['locale'] = locale
         if return_item_details is not None:
             params['returnItemDetails'] = return_item_details
 
-        r = FortnitePublicCatalogService('/catalog/api/shared/bulk/offerss')
+        r = FortnitePublicCatalogService('/catalog/api/shared/bulk/offers')
         return await self.get(r, params=params)
 
     async def fortnite_check_gift_eligibility(self, user_id: str, offer_id: str) -> Any:
@@ -1699,6 +1699,27 @@ class HTTPClient:
             'purchaseId': purchase_id,
             'quickReturn': quick_return,
             'gameContext': 'Frontend.AthenaLobby',
+        }
+        return await self.post(r, json=payload)
+
+    async def redeem_real_money_purchases(
+            self,
+            auth_tokens: List[str],
+            receipt_ids: List[str],
+            refresh_type: str,
+            verifier_mode_override: str
+    ) -> dict:
+        r = FortnitePublicService(
+            '/fortnite/api/game/v2/profile/{client_id}/client/RedeemRealMoneyPurchases?profileId=common_core&rvn=-1',
+            client_id=self.client.user.id,
+        )
+        payload = {
+            'appStore': 'EpicPurchasingService',
+            'authTokens': auth_tokens,
+            'receiptIds': receipt_ids,
+            'refreshType': refresh_type,
+            'verifierModeOverride': verifier_mode_override,
+            'purchaseCorrelationId': ''
         }
         return await self.post(r, json=payload)
 

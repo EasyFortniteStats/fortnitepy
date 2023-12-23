@@ -418,3 +418,20 @@ class RussiaRating(_RatingAuthorityRating):
     @staticmethod
     def get_authority():
         return 'Russia'
+
+
+class PurchaseRefreshType(Enum):
+    DEFAULT = 'Default'
+    UPDATE_OFFLINE_AUTH = 'UpdateOfflineAuth'
+    FORCE_ALL = 'ForceAll'
+    FORCE_CURRENT = 'ForceCurrent'
+
+
+class VerifierModeOverride(Enum):
+    OCCURRENCE_PRIMARY = 'OccurrencePrimary'
+    RECEIPT_ONLY = 'ReceiptOnly'
+    RECEIPT_PRIMARY = 'ReceiptPrimary'
+    DEFAULT_TOLAP_VERSION = 'DefaultToIapVersion'
+    OCCURRENCE_ONLY = 'OccurrenceOnly'
+    DEFAULT_TO_CONFIG = 'DefaultToConfig'
+    OCCURRENCE_ONLY_REMOVE_RECEIPTS = 'OccurrenceOnlyRemoveReceipts'
