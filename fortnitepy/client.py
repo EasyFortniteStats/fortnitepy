@@ -2663,22 +2663,22 @@ class BasicClient:
         ids = [f['accountId'] for f in data]
         users = {u.id: u.get_raw() for u in await (fetch_users_func or self.fetch_users)(ids, cache=True)}
         friends, incoming_friends, outgoing_friends = [], [], []
-        for friend in data:
+        for friend_data in data:
             try:
-                user_data = users[friend['accountId']]
+                user_data = users[friend_data['accountId']]
             except KeyError:
                 continue
 
-            if friend['status'] == 'ACCEPTED':
-                friend = Friend(self, {**friend, **user_data})
-                friend._update_summary(friend)
+            if friend_data['status'] == 'ACCEPTED':
+                friend = Friend(self, {**friend_data, **user_data})
+                friend._update_summary(friend_data)
                 friends.append(friend)
 
-            elif friend['status'] == 'PENDING':
-                if friend['direction'] == 'INBOUND':
-                    incoming_friends.append(IncomingPendingFriend(self, {**friend, **user_data}))
+            elif friend_data['status'] == 'PENDING':
+                if friend_data['direction'] == 'INBOUND':
+                    incoming_friends.append(IncomingPendingFriend(self, {**friend_data, **user_data}))
                 else:
-                    outgoing_friends.append(OutgoingPendingFriend(self, {**friend, **user_data}))
+                    outgoing_friends.append(OutgoingPendingFriend(self, {**friend_data, **user_data}))
 
         if include_last_online:
             raw_presences = await self.http.presence_get_last_online()
