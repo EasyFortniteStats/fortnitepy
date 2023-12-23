@@ -137,7 +137,7 @@ class Friend(FriendBase):
         _alias = data['alias']
         self._nickname = _alias if _alias != '' else None
 
-        _note = data['note']
+        _note = data.get('note', '')
         self._note = _note if _note != '' else None
 
     @property

@@ -2645,6 +2645,7 @@ class BasicClient:
     async def fetch_friends(
             self,
             include_pending: bool = False,
+            include_last_online: bool = False,
             *,
             fetch_users_func: Optional[Callable] = None
     ) -> Tuple[List[Friend], List[IncomingPendingFriend], List[OutgoingPendingFriend]]:
@@ -2659,13 +2660,30 @@ class BasicClient:
                 continue
 
             if friend['status'] == 'ACCEPTED':
-                friends.append(Friend(self, {**friend, **user_data}))
+                friend = Friend(self, {**friend, **user_data})
+                friend._update_summary(friend)
+                friends.append(friend)
 
             elif friend['status'] == 'PENDING':
                 if friend['direction'] == 'INBOUND':
                     incoming_friends.append(IncomingPendingFriend(self, {**friend, **user_data}))
                 else:
                     outgoing_friends.append(OutgoingPendingFriend(self, {**friend, **user_data}))
+
+        if include_last_online:
+            raw_presences = await self.http.presence_get_last_online()
+            for user_id, data in raw_presences.items():
+                friend_ = [f for f in friends if f.id == user_id]
+                if friend_ is None:
+                    continue
+                friend = friend_[0]
+                try:
+                    value = data[0]['last_online']
+                except (IndexError, KeyError):
+                    value = None
+                friend._update_last_logout(
+                    from_iso(value) if value is not None else None
+                )
 
         return friends, incoming_friends, outgoing_friends
 
