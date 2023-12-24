@@ -2684,7 +2684,7 @@ class BasicClient:
             raw_presences = await self.http.presence_get_last_online()
             for user_id, data in raw_presences.items():
                 friend_ = [f for f in friends if f.id == user_id]
-                if friend_ is None:
+                if not friend_:
                     continue
                 friend = friend_[0]
                 try:
