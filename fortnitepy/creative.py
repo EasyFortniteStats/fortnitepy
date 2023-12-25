@@ -190,13 +190,13 @@ class CreativeIslandRatingBoard:
         self.name: str = name
         self.descriptors: List[str] = data['descriptors']
         self.rating_overwritten: bool = data.get('rating_overridden', False)
-        rating = None
+        rating_type = None
         for rating_type in AgeRating.__args__:
             if rating_type.get_authority() == name:
-                rating = rating_type(data['rating'])
+                rating_type = rating_type
                 break
-        self.rating: AgeRating = rating
-        self.initial_rating: AgeRating = rating.get_authority()
+        self.rating: AgeRating = rating_type(data['rating'])
+        self.initial_rating: AgeRating = rating_type(data['initial_rating'])
         self.interactive_elements: List[str] = data['interactive_elements']
         self.raw_data: dict = data
 
