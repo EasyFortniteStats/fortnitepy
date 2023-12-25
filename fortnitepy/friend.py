@@ -134,10 +134,10 @@ class Friend(FriendBase):
         self._last_logout = dt
 
     def _update_summary(self, data: dict) -> None:
-        _alias = data['alias']
+        _alias = data.get('alias', '')
         self._nickname = _alias if _alias != '' else None
 
-        _note = data['note']
+        _note = data.get('note', '')
         self._note = _note if _note != '' else None
 
     @property

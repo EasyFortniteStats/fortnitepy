@@ -2655,6 +2655,7 @@ class BasicClient:
     async def fetch_friends(
             self,
             include_pending: bool = False,
+            include_last_online: bool = False,
             *,
             fetch_users_func: Optional[Callable] = None
     ) -> Tuple[List[Friend], List[IncomingPendingFriend], List[OutgoingPendingFriend]]:
@@ -2662,20 +2663,37 @@ class BasicClient:
         ids = [f['accountId'] for f in data]
         users = {u.id: u.get_raw() for u in await (fetch_users_func or self.fetch_users)(ids, cache=True)}
         friends, incoming_friends, outgoing_friends = [], [], []
-        for friend in data:
+        for friend_data in data:
             try:
-                user_data = users[friend['accountId']]
+                user_data = users[friend_data['accountId']]
             except KeyError:
                 continue
 
-            if friend['status'] == 'ACCEPTED':
-                friends.append(Friend(self, {**friend, **user_data}))
+            if friend_data['status'] == 'ACCEPTED':
+                friend = Friend(self, {**friend_data, **user_data})
+                friend._update_summary(friend_data)
+                friends.append(friend)
 
-            elif friend['status'] == 'PENDING':
-                if friend['direction'] == 'INBOUND':
-                    incoming_friends.append(IncomingPendingFriend(self, {**friend, **user_data}))
+            elif friend_data['status'] == 'PENDING':
+                if friend_data['direction'] == 'INBOUND':
+                    incoming_friends.append(IncomingPendingFriend(self, {**friend_data, **user_data}))
                 else:
-                    outgoing_friends.append(OutgoingPendingFriend(self, {**friend, **user_data}))
+                    outgoing_friends.append(OutgoingPendingFriend(self, {**friend_data, **user_data}))
+
+        if include_last_online:
+            raw_presences = await self.http.presence_get_last_online()
+            for user_id, data in raw_presences.items():
+                friend_ = [f for f in friends if f.id == user_id]
+                if not friend_:
+                    continue
+                friend = friend_[0]
+                try:
+                    value = data[0]['last_online']
+                except (IndexError, KeyError):
+                    value = None
+                friend._update_last_logout(
+                    from_iso(value) if value is not None else None
+                )
 
         return friends, incoming_friends, outgoing_friends
 
