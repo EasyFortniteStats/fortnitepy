@@ -373,7 +373,7 @@ class ClassIndRating(_RatingAuthorityRating):
 
 
 class USKRating(_RatingAuthorityRating):
-    # AGE_18 = 'USK_AGE_18'
+    AGE_18 = 'USK_AGE_18'
     AGE_16 = 'USK_AGE_16'
     AGE_12 = 'USK_AGE_12'
     AGE_6 = 'USK_AGE_6'
