@@ -421,6 +421,14 @@ class RussiaRating(_RatingAuthorityRating):
         return 'Russia'
 
 
+class CERORating(_RatingAuthorityRating):
+    AGE_0 = 'CERO_AGE_0'
+
+    @staticmethod
+    def get_authority():
+        return 'CERO'
+
+
 class PurchaseRefreshType(Enum):
     DEFAULT = 'Default'
     UPDATE_OFFLINE_AUTH = 'UpdateOfflineAuth'
