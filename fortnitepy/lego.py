@@ -84,32 +84,31 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
         self.hunger: Optional[bool] = hunger
 
     @classmethod
-    async def default_survival(cls):
-        return cls(
-            mode=LegoWorldMode.SURVIVAL,
-            friendly_creatures=True,
-            hostile_creatures=True,
-            npcs=True,
-            drop_inventory_on_death=True,
-            death=True,
-            temperature=True,
-            stamina_drain=True,
-            hunger=True
-        )
-
-    @classmethod
-    async def default_sandbox(cls):
-        return cls(
-            mode=LegoWorldMode.SANDBOX,
-            friendly_creatures=True,
-            hostile_creatures=False,
-            npcs=True,
-            drop_inventory_on_death=True,
-            death=True,
-            temperature=False,
-            stamina_drain=True,
-            hunger=False
-        )
+    def default_from_world_mode(cls, mode: LegoWorldMode):
+        if mode is LegoWorldMode.SURVIVAL:
+            return cls(
+                mode=LegoWorldMode.SURVIVAL,
+                friendly_creatures=True,
+                hostile_creatures=True,
+                npcs=True,
+                drop_inventory_on_death=True,
+                death=True,
+                temperature=True,
+                stamina_drain=True,
+                hunger=True
+            )
+        elif mode is LegoWorldMode.SANDBOX:
+            return cls(
+                mode=LegoWorldMode.SANDBOX,
+                friendly_creatures=True,
+                hostile_creatures=False,
+                npcs=True,
+                drop_inventory_on_death=True,
+                death=True,
+                temperature=False,
+                stamina_drain=True,
+                hunger=False
+            )
 
     @classmethod
     def from_data(cls, data: dict) -> 'DefaultLegoWorldMetadata':
