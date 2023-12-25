@@ -308,6 +308,7 @@ class DiscoverySurface(Enum):
     MAIN = 'CreativeDiscoverySurface_Frontend'
     BROWSE = 'CreativeDiscoverySurface_Browse'
     LIBRARY = 'CreativeDiscoverySurface_Library'
+    ROCKET_RACING = 'CreativeDiscoverySurface_DelMar_TrackAndExperience'
 
 
 class DiscoverySearchOrderType(Enum):
