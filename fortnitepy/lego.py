@@ -2,7 +2,7 @@ import datetime
 from typing import Optional, List
 
 from .enums import LegoWorldMode, LegoWorldMetadataConstraint, LegoWorldGrantType, LegoWorldGrantRole
-from .typedefs import LegoWorldMetadata
+
 from .utils import from_iso
 
 
@@ -19,6 +19,8 @@ class LegoWorld:
         self.updated_at: datetime.datetime = from_iso(data['updatedAt'])
         self.sanction: dict = data['sanction']
         self.session: LegoWorldSession = data['session']
+
+        from .typedefs import LegoWorldMetadata
         metadata_constraint = LegoWorldMetadataConstraint(data['metadataConstraint'])
         metadata = None
         for metadata_type in LegoWorldMetadata.__args__:
