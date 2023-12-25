@@ -378,6 +378,11 @@ class LinkService(Route):
     AUTH = 'FORTNITE_ACCESS_TOKEN'
 
 
+class LegoService(Route):
+    BASE = 'https://wasp-service-live-public.ogs.live.on.epicgames.com'
+    AUTH = 'FORTNITE_ACCESS_TOKEN'
+
+
 def create_aiohttp_closed_event(session) -> asyncio.Event:
     """Work around aiohttp issue that doesn't properly close transports on exit.
 
@@ -1944,6 +1949,79 @@ class HTTPClient:
     async def get_sac_earnings_data(self) -> dict:
         r = SacEpicGames('/api/get-earnings-data')
         return await self.get(r)
+
+    ###################################
+    #                                 LEGO                                #
+    ###################################
+
+    async def get_accessible_lego_worlds(self) -> list:
+        r = LegoService('/api/v1/namespace/fn/worlds/accessibleTo/{client_id}', client_id=self.client.user.id)
+        return await self.get(r)
+
+    async def get_owned_lego_worlds(self) -> list:
+        r = LegoService('/api/v1/namespace/fn/worlds/ownedBy/{client_id}', client_id=self.client.user.id)
+        return await self.get(r)
+
+    async def create_lego_world(self, metadata_constraint: str, metadata: dict) -> dict:
+        r = LegoService('/api/v1/namespace/fn/worlds/account/{client_id}', client_id=self.client.user.id)
+        payload = {
+            "namespaceId": "",
+            "worldId": "",
+            "ownerAccountId": "",
+            "name": "",
+            "sanction": {
+                "worldLocked": False,
+                "worldOwnerFix": False,
+                "multiplayerRestrictions": False,
+                "checkpointId": "",
+                "coordinates": ""
+            },
+            "version": 0,
+            "metadataConstraint": metadata_constraint,
+            "metadata": metadata
+        }
+        return await self.post(r, json=payload)
+
+    async def delete_lego_world(self, world_id: str) -> dict:
+        r = LegoService('/api/v1/namespace/fn/worlds/world/{world_id}', world_id=world_id)
+        return await self.delete(r)
+
+    async def update_lego_world(self, world_id: str, metadata: dict) -> dict:
+        r = LegoService('/api/v1/namespace/fn/worlds/world/{world_id}', world_id=world_id)
+        payload = {
+            "metadata": metadata
+        }
+        return await self.put(r, json=payload)
+
+    async def get_lego_world(self, world_id: str) -> dict:
+        r = LegoService('/api/v1/namespace/fn/worlds/world/{world_id}', world_id=world_id)
+        return await self.get(r)
+
+    async def get_lego_world_session(self, world_id: str) -> dict:
+        r = LegoService('/api/v1/namespace/fn/worlds/world/{world_id}/session', world_id=world_id)
+        return await self.get(r)
+
+    async def invite_player_to_lego_world(self, world_id: str, account_id: str, role_id: str, type_: str) -> None:
+        r = LegoService('/api/v1/namespace/fn/invites/world/:worldId', world_id=world_id, account_id=account_id)
+        payload = {
+            "namespaceId": "fn",
+            "worldId": world_id,
+            "accountId": account_id,
+            "roleId": role_id,
+            "type": type_
+        }
+        await self.post(r, json=payload)
+
+    async def get_lego_world_grants(self, world_id: str) -> list:
+        r = LegoService('/api/v1/namespace/fn/grants/world/{world_id}', world_id=world_id)
+        return await self.get(r)
+
+    async def delete_lego_world_account_grant(self, world_id: str, account_id: str) -> None:
+        r = LegoService(
+            '/api/v1/namespace/fn/grants/world/{world_id}/account/{account_id}',
+            world_id=world_id, account_id=account_id
+        )
+        await self.delete(r)
 
     ###################################
     #             Party               #

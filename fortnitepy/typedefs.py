@@ -29,6 +29,7 @@ from typing import Union, Awaitable, Callable
 
 from .enums import ACBRating, PEGIRating, GenericRating, ClassIndRating, USKRating, GRACRating, ESRBRating, \
     RussiaRating
+from .lego import DefaultLegoWorldMetadata
 
 MaybeCoro = Union[Awaitable, Callable]
 StrOrMaybeCoro = Union[str, MaybeCoro]
@@ -36,3 +37,4 @@ ListOrTuple = Union[list, tuple]
 StrOrInt = Union[str, int]
 DatetimeOrTimestamp = Union[datetime, int]
 AgeRating = Union[ACBRating, PEGIRating, GenericRating, ClassIndRating, USKRating, GRACRating, ESRBRating, RussiaRating]
+LegoWorldMetadata = Union[DefaultLegoWorldMetadata]

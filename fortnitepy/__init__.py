@@ -52,3 +52,4 @@ from .http import HTTPRetryConfig, Route
 from .utils import *
 from .profile import *
 from .sac import SACEarnings, SACEarnedProduct, SACEarnedProductDataEntry
+from .lego import LegoWorld, DefaultLegoWorldMetadata, LegoWorldSession, LegoWorldGrant

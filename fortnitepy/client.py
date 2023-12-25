@@ -51,7 +51,7 @@ from .friend import Friend, IncomingPendingFriend, OutgoingPendingFriend
 from .enums import (Platform, Region, UserSearchPlatform, AwayStatus,
                     SeasonStartTimestamp, SeasonEndTimestamp,
                     BattlePassStat, StatsCollectionType, VBucksPlatform, DiscoverySurface, DiscoverySearchOrderType,
-                    PurchaseRefreshType, VerifierModeOverride)
+                    PurchaseRefreshType, VerifierModeOverride, LegoWorldGrantRole, LegoWorldGrantType)
 from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty,
                     Party)
 from .stats import StatsV2, StatsCollection, _StatsBase, RankedSeasonEntry, RankedStatsEntry
@@ -62,8 +62,9 @@ from .playlist import Playlist
 from .presence import Presence
 from .auth import Auth, RefreshTokenAuth
 from .avatar import Avatar
-from .typedefs import MaybeCoro, DatetimeOrTimestamp, StrOrInt, AgeRating
+from .typedefs import MaybeCoro, DatetimeOrTimestamp, StrOrInt, AgeRating, LegoWorldMetadata
 from .utils import LockEvent, MaybeLock, from_iso, is_display_name, to_iso
+from .lego import LegoWorld, LegoWorldGrant
 
 log = logging.getLogger(__name__)
 
@@ -2840,6 +2841,37 @@ class BasicClient:
                 raise Forbidden('You don\'t own a Creator Code.')
             raise
         return SACEarnings(data['data'])
+
+    async def fetch_accessible_lego_worlds(self) -> List[LegoWorld]:
+        data = await self.http.get_accessible_lego_worlds()
+        return [LegoWorld(world['world']) for world in data]
+
+    async def fetch_owned_lego_worlds(self) -> List[LegoWorld]:
+        data = await self.http.get_owned_lego_worlds()
+        return [LegoWorld(world) for world in data]
+
+    async def fetch_lego_world(self, world_id: str) -> LegoWorld:
+        data = await self.http.get_lego_world(world_id)
+        return LegoWorld(data)
+
+    async def generate_lego_world(self, metadata: LegoWorldMetadata) -> LegoWorld:
+        data = await self.http.create_lego_world(metadata.constraint, metadata.to_payload())
+        return LegoWorld(data)
+
+    async def delete_lego_world(self, world_id: str) -> None:
+        await self.http.delete_lego_world(world_id)
+
+    async def fetch_lego_world_grants(self, world_id: str) -> List[LegoWorldGrant]:
+        data = await self.http.get_lego_world_grants(world_id)
+        return [LegoWorldGrant(grant) for grant in data]
+
+    async def invite_player_to_lego_world(self, world_id: str, player_id: str) -> None:
+        await self.http.invite_player_to_lego_world(
+            world_id, player_id, LegoWorldGrantRole.KEYHOLDER.value, LegoWorldGrantType.PERSISTENT.value
+        )
+
+    async def remove_player_from_lego_world(self, world_id: str, player_id: str) -> None:
+        await self.http.delete_lego_world_account_grant(world_id, player_id)
 
 
 class Client(BasicClient):

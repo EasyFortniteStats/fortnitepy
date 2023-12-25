@@ -436,3 +436,21 @@ class VerifierModeOverride(Enum):
     OCCURRENCE_ONLY = 'OccurrenceOnly'
     DEFAULT_TO_CONFIG = 'DefaultToConfig'
     OCCURRENCE_ONLY_REMOVE_RECEIPTS = 'OccurrenceOnlyRemoveReceipts'
+
+
+class LegoWorldMode(Enum):
+    SURVIVAL = 'Survival'
+    SANDBOX = 'Sandbox'
+
+
+class LegoWorldMetadataConstraint(Enum):
+    DEFAULT = 'juno_default'
+
+
+class LegoWorldGrantRole(Enum):
+    WORLD_OWNER = 'world_owner'
+    KEYHOLDER = 'juno_keyholder'
+
+
+class LegoWorldGrantType(Enum):
+    PERSISTENT = 'PERSISTENT'
