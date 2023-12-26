@@ -24,7 +24,7 @@ class LegoWorld:
         self.created_at: datetime.datetime = datetime.datetime.fromisoformat(data['createdAt'])
         self.updated_at: datetime.datetime = datetime.datetime.fromisoformat(data['updatedAt'])
         self.sanction: dict = data['sanction']
-        self.session: LegoWorldSession = LegoWorldSession(data['session'])
+        self.session: Optional[LegoWorldSession] = LegoWorldSession(data['session']) if data['session'] else None
 
         from .typedefs import LegoWorldMetadata
         metadata_constraint = LegoWorldMetadataConstraint(data['metadataConstraint'])
@@ -181,14 +181,14 @@ class NoLegoWorldMetadata(BaseLegoWorldMetadata):
 class LegoWorldSession:
 
     def __init__(self, data: dict):
-        self.namespace_id: str = data['namespaceId']
-        self.world_id: str = data['worldId']
-        self.owning_session_id: str = data['owningSessionId']
-        self.session_key: str = data['sessionKey']
-        self.current_player_ids: List[str] = data['currentPlayers']
-        self.created_at: datetime.datetime = datetime.datetime.fromisoformat(data['sessionCreatedAt'])
-        self.last_server_heartbeat: datetime.datetime = datetime.datetime.fromisoformat(data['lastServerHeartbeat'])
-        self.total_seconds_played: Optional[int] = data['totalSecondsPlayed']
+        self.namespace_id: Optional[str] = data.get('namespaceId')
+        self.world_id: Optional[str] = data.get('worldId')
+        self.owning_session_id: Optional[str] = data['owningSessionId']
+        self.session_key: Optional[str] = data['sessionKey']
+        self.current_player_ids: Optional[List[str]] = data['currentPlayers']
+        self.created_at: Optional[datetime.datetime] = datetime.datetime.fromisoformat(data['sessionCreatedAt']) if data['sessionCreatedAt'] else None
+        self.last_server_heartbeat: Optional[datetime.datetime] = datetime.datetime.fromisoformat(data['lastServerHeartbeat']) if data['lastServerHeartbeat'] else None
+        self.total_seconds_played: int = data['totalSecondsPlayed']
         self.raw_data: dict = data
 
 
