@@ -24,7 +24,7 @@ class LegoWorld:
         self.created_at: datetime.datetime = datetime.datetime.fromisoformat(data['createdAt'])
         self.updated_at: datetime.datetime = datetime.datetime.fromisoformat(data['updatedAt'])
         self.sanction: dict = data['sanction']
-        self.session: LegoWorldSession = data['session']
+        self.session: LegoWorldSession = LegoWorldSession(data['session'])
 
         from .typedefs import LegoWorldMetadata
         metadata_constraint = LegoWorldMetadataConstraint(data['metadataConstraint'])
