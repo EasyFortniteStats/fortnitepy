@@ -10,7 +10,7 @@ class LegoWorld:
 
     def __init__(self, data: dict):
         self.namespace_id: str = data['namespaceId']
-        self.world_id: str = data['worldId']
+        self.id: str = data['worldId']
         self.owner_account_id: str = data['ownerAccountId']
         self.version: int = data['version']
         self.current_version: int = data['currentVersion']
