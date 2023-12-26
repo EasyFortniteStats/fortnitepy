@@ -198,7 +198,7 @@ class LegoWorldGrant:
         self.namespace_id: str = data['namespaceId']
         self.world_id: str = data['worldId']
         self.account_id: str = data['accountId']
-        self.role: LegoWorldGrantRole = LegoWorldGrantRole(data['role'])
+        self.role: LegoWorldGrantRole = LegoWorldGrantRole(data['roleId'])
         self.type: LegoWorldGrantType = LegoWorldGrantType(data['type'])
         self.granted_by: str = data['grantedBy']
         self.granted_at: datetime.datetime = datetime.datetime.fromisoformat(data['grantedAt'])
