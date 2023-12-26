@@ -2844,7 +2844,7 @@ class BasicClient:
 
     async def fetch_accessible_lego_worlds(self) -> List[AccessibleLegoWorld]:
         data = await self.http.get_accessible_lego_worlds()
-        return [AccessibleLegoWorld(world['world']) for world in data]
+        return [AccessibleLegoWorld(world) for world in data]
 
     async def fetch_owned_lego_worlds(self) -> List[LegoWorld]:
         data = await self.http.get_owned_lego_worlds()
