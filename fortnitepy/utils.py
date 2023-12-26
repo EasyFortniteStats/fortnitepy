@@ -153,3 +153,21 @@ def is_display_name(value: str) -> bool:
         ``True`` if string is valid else ``False``
     """
     return isinstance(value, str) and 3 <= len(value) <= 16
+
+
+def format_seed(seed: int) -> str:
+    """Formats a seed to a LEGO Fortnite world,
+
+    Parameters
+    ----------
+    seed: :class:`int`
+        The seed to format.
+
+    Returns
+    -------
+    :class:`str`
+        The formatted seed.
+    """
+    seed_str = str(seed).zfill(10)
+    formatted_seed = '.'.join([seed_str[i:i + 2] for i in range(0, len(seed_str), 2)])
+    return formatted_seed
