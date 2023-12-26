@@ -453,6 +453,7 @@ class LegoWorldMode(Enum):
 
 class LegoWorldMetadataConstraint(Enum):
     DEFAULT = 'juno_default'
+    NO_METADATA = 'nometadata'
 
 
 class LegoWorldGrantRole(Enum):

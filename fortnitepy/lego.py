@@ -24,7 +24,7 @@ class LegoWorld:
         metadata_constraint = LegoWorldMetadataConstraint(data['metadataConstraint'])
         metadata = None
         for metadata_type in LegoWorldMetadata.__args__:
-            if metadata_type.constraint is metadata_constraint:
+            if metadata_type.get_constraint() is metadata_constraint:
                 metadata = metadata_type.from_data(data['metadata'])
                 break
         self.metadata: LegoWorldMetadata = metadata
@@ -56,7 +56,6 @@ class BaseLegoWorldMetadata:
 
 
 class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
-    constraint = LegoWorldMetadataConstraint.DEFAULT
 
     def __init__(
             self,
@@ -153,6 +152,24 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
         if self.hunger is not None:
             payload['hunger'] = self._convert_from_boolean(self.hunger)
         return payload
+
+    @staticmethod
+    def get_constraint() -> LegoWorldMetadataConstraint:
+        return LegoWorldMetadataConstraint.DEFAULT
+
+
+class NoLegoWorldMetadata(BaseLegoWorldMetadata):
+
+    @classmethod
+    def from_data(cls, data: dict) -> "NoLegoWorldMetadata":
+        return cls()
+
+    def to_payload(self) -> dict:
+        return {}
+
+    @staticmethod
+    def get_constraint() -> LegoWorldMetadataConstraint:
+        return LegoWorldMetadataConstraint.NO_METADATA
 
 
 class LegoWorldSession:
