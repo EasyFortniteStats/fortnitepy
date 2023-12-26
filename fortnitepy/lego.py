@@ -15,8 +15,8 @@ class LegoWorld:
         self.version: int = data['version']
         self.current_version: int = data['currentVersion']
         self.name: str = data['name']
-        self.created_at: datetime.datetime = from_iso(data['createdAt'])
-        self.updated_at: datetime.datetime = from_iso(data['updatedAt'])
+        self.created_at: datetime.datetime = datetime.datetime.fromisoformat(data['createdAt'])
+        self.updated_at: datetime.datetime = datetime.datetime.fromisoformat(data['updatedAt'])
         self.sanction: dict = data['sanction']
         self.session: LegoWorldSession = data['session']
 
@@ -163,8 +163,8 @@ class LegoWorldSession:
         self.owning_session_id: str = data['owningSessionId']
         self.session_key: str = data['sessionKey']
         self.current_player_ids: List[str] = data['currentPlayers']
-        self.created_at: datetime.datetime = from_iso(data['sessionCreatedAt'])
-        self.last_server_heartbeat: datetime.datetime = from_iso(data['lastServerHeartbeat'])
+        self.created_at: datetime.datetime = datetime.datetime.fromisoformat(data['sessionCreatedAt'])
+        self.last_server_heartbeat: datetime.datetime = datetime.datetime.fromisoformat(data['lastServerHeartbeat'])
         self.total_seconds_played: Optional[int] = data['totalSecondsPlayed']
 
 
@@ -177,5 +177,5 @@ class LegoWorldGrant:
         self.role: LegoWorldGrantRole = LegoWorldGrantRole(data['role'])
         self.type: LegoWorldGrantType = LegoWorldGrantType(data['type'])
         self.granted_by: str = data['grantedBy']
-        self.granted_at: datetime.datetime = from_iso(data['grantedAt'])
-        self.expires_at: Optional[datetime.datetime] = from_iso(data['expiresAt'])
+        self.granted_at: datetime.datetime = datetime.datetime.fromisoformat(data['grantedAt'])
+        self.expires_at: Optional[datetime.datetime] = datetime.datetime.fromisoformat(data['expiresAt'])
