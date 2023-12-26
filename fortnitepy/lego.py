@@ -3,7 +3,13 @@ from typing import Optional, List
 
 from .enums import LegoWorldMode, LegoWorldMetadataConstraint, LegoWorldGrantType, LegoWorldGrantRole
 
-from .utils import from_iso
+
+class AccessibleLegoWorld:
+    def __init__(self, data: dict):
+        self.world: LegoWorld = LegoWorld(data['world'])
+        self.grants: List[LegoWorldGrant] = [LegoWorldGrant(grant) for grant in data['grants']]
+        self.session: Optional[LegoWorldSession] = LegoWorldSession(data['session']) if data['session'] else None
+        self.raw_data: dict = data
 
 
 class LegoWorld:
@@ -28,6 +34,7 @@ class LegoWorld:
                 metadata = metadata_type.from_data(data['metadata'])
                 break
         self.metadata: LegoWorldMetadata = metadata
+        self.raw_data: dict = data
 
 
 class BaseLegoWorldMetadata:
@@ -182,6 +189,7 @@ class LegoWorldSession:
         self.created_at: datetime.datetime = datetime.datetime.fromisoformat(data['sessionCreatedAt'])
         self.last_server_heartbeat: datetime.datetime = datetime.datetime.fromisoformat(data['lastServerHeartbeat'])
         self.total_seconds_played: Optional[int] = data['totalSecondsPlayed']
+        self.raw_data: dict = data
 
 
 class LegoWorldGrant:
@@ -195,3 +203,4 @@ class LegoWorldGrant:
         self.granted_by: str = data['grantedBy']
         self.granted_at: datetime.datetime = datetime.datetime.fromisoformat(data['grantedAt'])
         self.expires_at: Optional[datetime.datetime] = datetime.datetime.fromisoformat(data['expiresAt'])
+        self.raw_data: dict = data

@@ -64,7 +64,7 @@ from .auth import Auth, RefreshTokenAuth
 from .avatar import Avatar
 from .typedefs import MaybeCoro, DatetimeOrTimestamp, StrOrInt, AgeRating, LegoWorldMetadata
 from .utils import LockEvent, MaybeLock, from_iso, is_display_name, to_iso
-from .lego import LegoWorld, LegoWorldGrant
+from .lego import LegoWorld, LegoWorldGrant, AccessibleLegoWorld
 
 log = logging.getLogger(__name__)
 
@@ -2842,9 +2842,9 @@ class BasicClient:
             raise
         return SACEarnings(data['data'])
 
-    async def fetch_accessible_lego_worlds(self) -> List[LegoWorld]:
+    async def fetch_accessible_lego_worlds(self) -> List[AccessibleLegoWorld]:
         data = await self.http.get_accessible_lego_worlds()
-        return [LegoWorld(world['world']) for world in data]
+        return [AccessibleLegoWorld(world['world']) for world in data]
 
     async def fetch_owned_lego_worlds(self) -> List[LegoWorld]:
         data = await self.http.get_owned_lego_worlds()
