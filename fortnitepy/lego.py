@@ -31,7 +31,6 @@ class LegoWorld:
 
 
 class BaseLegoWorldMetadata:
-    constraint: LegoWorldMetadataConstraint
 
     @classmethod
     def from_data(cls, data: dict) -> None:

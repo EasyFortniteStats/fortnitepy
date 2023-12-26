@@ -2855,7 +2855,7 @@ class BasicClient:
         return LegoWorld(data)
 
     async def generate_lego_world(self, metadata: LegoWorldMetadata) -> LegoWorld:
-        data = await self.http.create_lego_world(metadata.constraint, metadata.to_payload())
+        data = await self.http.create_lego_world(metadata.get_constraint().value, metadata.to_payload())
         return LegoWorld(data)
 
     async def delete_lego_world(self, world_id: str) -> None:
