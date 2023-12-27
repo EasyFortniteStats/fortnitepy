@@ -427,6 +427,7 @@ def run_multiple(clients: List['BasicClient'], *,
     HTTPException
         A request error occured while logging in.
     """  # noqa
+
     async def runner():
         try:
             await start_multiple(
@@ -1734,6 +1735,7 @@ class BasicClient:
         if check is None:
             def _check(*args):
                 return True
+
             check = _check
 
         ev = (event.lower()).replace(self.event_prefix, '')
@@ -1850,6 +1852,7 @@ class BasicClient:
             log.debug('{} has been registered as a handler for the '
                       'event {}'.format(coro.__name__, name))
             return coro
+
         return pred(event_or_coro) if is_coro else pred
 
     def _process_stats_times(self, start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
@@ -1927,8 +1930,8 @@ class BasicClient:
                                               start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
                                               end_time: Optional[DatetimeOrTimestamp] = None  # noqa
                                               ) -> List[dict]:
-        chunks = [user_ids[i:i+51] for i in range(0, len(user_ids), 51)]
-        stats_chunks = [stats[i:i+20] for i in range(0, len(stats), 20)]
+        chunks = [user_ids[i:i + 51] for i in range(0, len(user_ids), 51)]
+        stats_chunks = [stats[i:i + 20] for i in range(0, len(stats), 20)]
 
         tasks = []
         for chunk in chunks:
@@ -2643,7 +2646,8 @@ class BasicClient:
             refresh_type: PurchaseRefreshType,
             verifier_mode_override: VerifierModeOverride = VerifierModeOverride.DEFAULT_TO_CONFIG
     ) -> None:
-        await self.http.redeem_real_money_purchases(auth_tokens, receipt_ids, refresh_type.value, verifier_mode_override.value)
+        await self.http.redeem_real_money_purchases(auth_tokens, receipt_ids, refresh_type.value,
+                                                    verifier_mode_override.value)
 
     async def fetch_br_inventory(self, user_id: str) -> Optional[BattleRoyaleInventory]:
         data = await self.http.get_br_inventory(user_id)
@@ -2851,7 +2855,13 @@ class BasicClient:
         return [LegoWorld(world) for world in data]
 
     async def fetch_lego_world(self, world_id: str) -> LegoWorld:
-        data = await self.http.get_lego_world(world_id)
+        try:
+            data = await self.http.get_lego_world(world_id)
+        except HTTPException as exc:
+            m = 'errors.com.epicgames.dbs.wasp.world_not_found'
+            if exc.message_code == m:
+                raise NotFound('World not found.')
+            raise
         return LegoWorld(data)
 
     async def generate_lego_world(self, metadata: LegoWorldMetadata) -> LegoWorld:
@@ -2859,19 +2869,43 @@ class BasicClient:
         return LegoWorld(data)
 
     async def delete_lego_world(self, world_id: str) -> None:
-        await self.http.delete_lego_world(world_id)
+        try:
+            await self.http.delete_lego_world(world_id)
+        except HTTPException as exc:
+            m = 'errors.com.epicgames.dbs.wasp.world_not_found'
+            if exc.message_code == m:
+                raise NotFound('World not found.')
+            raise
 
     async def fetch_lego_world_grants(self, world_id: str) -> List[LegoWorldGrant]:
-        data = await self.http.get_lego_world_grants(world_id)
+        try:
+            data = await self.http.get_lego_world_grants(world_id)
+        except HTTPException as exc:
+            m = 'errors.com.epicgames.dbs.wasp.world_not_found'
+            if exc.message_code == m:
+                raise NotFound('World not found.')
+            raise
         return [LegoWorldGrant(grant) for grant in data]
 
     async def invite_player_to_lego_world(self, world_id: str, player_id: str) -> None:
-        await self.http.invite_player_to_lego_world(
-            world_id, player_id, LegoWorldGrantRole.KEYHOLDER.value, LegoWorldGrantType.PERSISTENT.value
-        )
+        try:
+            await self.http.invite_player_to_lego_world(
+                world_id, player_id, LegoWorldGrantRole.KEYHOLDER.value, LegoWorldGrantType.PERSISTENT.value
+            )
+        except HTTPException as exc:
+            m = 'errors.com.epicgames.dbs.wasp.world_not_found'
+            if exc.message_code == m:
+                raise NotFound('World not found.')
+            raise
 
     async def remove_player_from_lego_world(self, world_id: str, player_id: str) -> None:
-        await self.http.delete_lego_world_account_grant(world_id, player_id)
+        try:
+            await self.http.delete_lego_world_account_grant(world_id, player_id)
+        except HTTPException as exc:
+            m = 'errors.com.epicgames.dbs.wasp.world_not_found'
+            if exc.message_code == m:
+                raise NotFound('World not found.')
+            raise
 
 
 class Client(BasicClient):

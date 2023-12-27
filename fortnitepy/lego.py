@@ -202,5 +202,8 @@ class LegoWorldGrant:
         self.type: LegoWorldGrantType = LegoWorldGrantType(data['type'])
         self.granted_by: str = data['grantedBy']
         self.granted_at: datetime.datetime = datetime.datetime.fromisoformat(data['grantedAt'])
-        self.expires_at: Optional[datetime.datetime] = datetime.datetime.fromisoformat(data['expiresAt'])
+        try:
+            self.expires_at: Optional[datetime.datetime] = datetime.datetime.fromisoformat(data['expiresAt'])
+        except ValueError:
+            self.expires_at: Optional[datetime.datetime] = None
         self.raw_data: dict = data
