@@ -2002,7 +2002,7 @@ class HTTPClient:
         return await self.get(r)
 
     async def invite_player_to_lego_world(self, world_id: str, account_id: str, role_id: str, type_: str) -> None:
-        r = LegoService('/api/v1/namespace/fn/invites/world/:worldId', world_id=world_id, account_id=account_id)
+        r = LegoService('/api/v1/namespace/fn/invites/world/{world_id}', world_id=world_id)
         payload = {
             "namespaceId": "fn",
             "worldId": world_id,
