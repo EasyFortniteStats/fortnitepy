@@ -497,7 +497,7 @@ class BasicClient:
     def __init__(self, auth: Auth,
                  **kwargs: Any) -> None:
         self.cache_users = kwargs.get('cache_users', True)
-        self.build = kwargs.get('build', '++Fortnite+Release-14.10-CL-14288110')  # noqa
+        self.build = kwargs.get('build', '++Fortnite+Release-28.01-CL-30313795')  # noqa
         self.os = kwargs.get('os', 'Windows/10.0.17134.1.768.64bit')
 
         self.kill_other_sessions = True
