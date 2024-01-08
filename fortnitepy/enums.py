@@ -294,6 +294,16 @@ class CosmeticType(Enum):
     WRAP = 'AthenaItemWrap'
     MUSIC = 'AthenaMusicPack'
     LOADING_SCREEN = 'AthenaLoadingScreen'
+    CAR_BODY = 'VehicleCosmetics_Skin'
+    DECAL = 'VehicleCosmetics_Skin'
+    WHEEL = 'VehicleCosmetics_Wheel'
+    AURA = 'SparksAura'
+    GUITAR = 'SparksGuitar'
+    BASS = 'SparksBass'
+    DRUMS = 'SparksDrum'
+    MICROPHONE = 'SparksMic'
+    KEYTAR = 'SparksKeyboard'
+    JAM_TRACK = 'SparksSong'
 
 
 class SaveTheWorldFounderPack(Enum):
