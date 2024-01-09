@@ -294,7 +294,7 @@ class CosmeticType(Enum):
     WRAP = 'AthenaItemWrap'
     MUSIC = 'AthenaMusicPack'
     LOADING_SCREEN = 'AthenaLoadingScreen'
-    CAR_BODY = 'VehicleCosmetics_Skin'
+    CAR_BODY = 'VehicleCosmetics_Body'
     DECAL = 'VehicleCosmetics_Skin'
     WHEEL = 'VehicleCosmetics_Wheel'
     AURA = 'SparksAura'
