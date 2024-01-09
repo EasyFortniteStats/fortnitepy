@@ -300,8 +300,8 @@ class CosmeticType(Enum):
     AURA = 'SparksAura'
     GUITAR = 'SparksGuitar'
     BASS = 'SparksBass'
-    DRUMS = 'SparksDrum'
-    MICROPHONE = 'SparksMic'
+    DRUMS = 'SparksDrums'
+    MICROPHONE = 'SparksMicrophone'
     KEYTAR = 'SparksKeyboard'
     JAM_TRACK = 'SparksSong'
 
