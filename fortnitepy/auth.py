@@ -1071,6 +1071,11 @@ class AdvancedAuth(Auth):
     def prompt_enabled(self) -> bool:
         return True in (self.prompt_exchange_code, self.prompt_authorization_code)  # noqa
 
+    def device_code_expires_at(self) -> Optional[datetime.datetime]:
+        if self.device_code_auth_ready():
+            return self._used_auth.expires_at
+        return None
+
     def get_prompt_type_name(self) -> str:
         if self.prompt_exchange_code:
             return 'exchange'
