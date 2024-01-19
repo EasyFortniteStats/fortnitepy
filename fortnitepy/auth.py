@@ -648,9 +648,15 @@ class AuthorizationCodeAuth(ExchangeCodeAuth):
 
 
 class DeviceCodeAuth(Auth):
+    canceled: bool = False
     device_code: str
     expires_at: datetime.datetime
     interval: int
+    _client_access_token: str
+
+    def __init__(self, timeout: Optional[float] = None, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.timeout: Optional[float] = timeout
 
     async def identifier(self) -> str:
         return self.device_code
@@ -666,31 +672,50 @@ class DeviceCodeAuth(Auth):
             url = AccountPublicService('/account/api/oauth/token').url
             async with session.post(url, data=payload, headers=headers) as r:
                 client_credentials = await r.json()
-            client_access_token = client_credentials['access_token']
+            self._client_access_token = client_credentials['access_token']
 
             params = {
                 'prompt': 'login'
             }
             headers = {
-                'Authorization': 'bearer {0}'.format(client_access_token),
+                'Authorization': 'bearer {0}'.format(self._client_access_token),
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
             url = AccountPublicService('/account/api/oauth/deviceAuthorization').url
             async with session.post(url, params=params, headers=headers) as r:
                 device_code = await r.json()
 
+            expires_in = device_code['expires_in']
+            if self.timeout is not None and expires_in > self.timeout:
+                expires_in = self.timeout
+
             self.device_code = device_code['device_code']
-            self.expires_at = datetime.datetime.now() + datetime.timedelta(seconds=device_code['expires_in'])
+            self.expires_at = datetime.datetime.now() + datetime.timedelta(seconds=expires_in)
             self.interval = device_code['interval']
             return device_code['user_code']
+
+    async def cancel(self) -> None:
+        self.canceled = True
+
+        if self.expires_at < datetime.datetime.now():
+            return
+
+        async with aiohttp.ClientSession() as session:
+            headers = {
+                'Authorization': 'bearer {0}'.format(self._client_access_token),
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+            url = AccountPublicService(
+                '/account/api/oauth/deviceAuthorization/{user_code}', user_code=self.device_code
+            ).url
+            await session.delete(url, headers=headers)
 
     async def ios_authenticate(self, priority: int = 0) -> dict:
         payload = {
             'grant_type': 'device_code',
             'device_code': self.device_code,
         }
-
-        while datetime.datetime.now() < (self.expires_at - datetime.timedelta(seconds=5)):
+        while datetime.datetime.now() < (self.expires_at - datetime.timedelta(seconds=5)) and not self.canceled:
             try:
                 data = await self.client.http.account_oauth_grant(
                     auth='basic {0}'.format(self.ios_token),
@@ -705,6 +730,12 @@ class DeviceCodeAuth(Auth):
                     break
                 else:
                     raise
+
+        if self.canceled:
+            raise AuthException(
+                'Device code authorization was canceled by user.',
+                asyncio.CancelledError('Authorization was canceled by user.')
+            )
 
         raise AuthException(
             'Device code hasn\'t been authorized in time.', asyncio.TimeoutError('Authorization timed out.')
@@ -1051,6 +1082,10 @@ class AdvancedAuth(Auth):
         self._used_auth = auth
 
         return await auth.create_code()
+
+    async def cancel_device_code_auth(self) -> None:
+        if isinstance(self._used_auth, DeviceCodeAuth):
+            await self._used_auth.cancel()
 
     async def run_email_and_password_authenticate(self) -> dict:
         auth = EmailAndPasswordAuth(
