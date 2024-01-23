@@ -433,6 +433,7 @@ class RussiaRating(_RatingAuthorityRating):
 
 class CERORating(_RatingAuthorityRating):
     AGE_0 = 'CERO_AGE_0'
+    AGE_15 = 'CERO_AGE_15'
 
     @staticmethod
     def get_authority():
