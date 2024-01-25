@@ -297,6 +297,7 @@ class CosmeticType(Enum):
     CAR_BODY = 'VehicleCosmetics_Body'
     DECAL = 'VehicleCosmetics_Skin'
     WHEEL = 'VehicleCosmetics_Wheel'
+    TRAIL = 'VehicleCosmetics_DriftTrail'
     AURA = 'SparksAura'
     GUITAR = 'SparksGuitar'
     BASS = 'SparksBass'
