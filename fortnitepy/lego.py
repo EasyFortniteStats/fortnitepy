@@ -73,6 +73,7 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
             npcs: Optional[bool] = None,
             drop_inventory_on_death: Optional[bool] = None,
             death: Optional[bool] = None,
+            friendly_fire: Optional[bool] = None,
             temperature: Optional[bool] = None,
             thumbnail_table_row_name: Optional[str] = None,
             stamina_drain: Optional[bool] = None,
@@ -85,6 +86,7 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
         self.npcs: Optional[bool] = npcs
         self.drop_inventory_on_death: Optional[bool] = drop_inventory_on_death
         self.death: Optional[bool] = death
+        self.friendly_fire: Optional[bool] = friendly_fire
         self.temperature: Optional[bool] = temperature
         self.thumbnail_table_row_name: Optional[str] = thumbnail_table_row_name
         self.stamina_drain: Optional[bool] = stamina_drain
@@ -100,6 +102,7 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
                 npcs=True,
                 drop_inventory_on_death=True,
                 death=True,
+                friendly_fire=False,
                 temperature=True,
                 stamina_drain=True,
                 hunger=True
@@ -112,6 +115,7 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
                 npcs=True,
                 drop_inventory_on_death=True,
                 death=True,
+                friendly_fire=False,
                 temperature=False,
                 stamina_drain=True,
                 hunger=False
@@ -127,6 +131,7 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
             npcs=cls._convert_from_string(data.get('npcs')),
             drop_inventory_on_death=cls._convert_from_string(data.get('dropInventoryOnDeath')),
             death=cls._convert_from_string(data.get('death')),
+            friendly_fire=cls._convert_from_string(data.get('friendlyFire')),
             temperature=cls._convert_from_string(data.get('temperature')),
             thumbnail_table_row_name=data.get('thumbnailTableRowName'),
             stamina_drain=cls._convert_from_string(data.get('staminaDrain')),
@@ -149,6 +154,8 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
             payload['dropInventoryOnDeath'] = self._convert_from_boolean(self.drop_inventory_on_death)
         if self.death is not None:
             payload['death'] = self._convert_from_boolean(self.death)
+        if self.friendly_fire is not None:
+            payload['friendlyFire'] = self._convert_from_boolean(self.friendly_fire)
         if self.temperature is not None:
             payload['temperature'] = self._convert_from_boolean(self.temperature)
         if self.thumbnail_table_row_name is not None:
