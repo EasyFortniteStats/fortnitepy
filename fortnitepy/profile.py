@@ -287,6 +287,20 @@ class CommonCoreProfile:
     def get_banner_color(self):
         return [item for item in self.items if item.type == 'HomebaseBannerColor']
 
+    def get_refundable_purchases(self, only_undoable: bool = False) -> List["VBucksPurchase"]:
+        purchases = []
+        for purchase in self.vbucks_purchase_history.purchases if self.vbucks_purchase_history else []:
+            is_undoable = purchase.undoable_until and purchase.undoable_until > datetime.utcnow()
+            undo_cooldown = [cooldown for cooldown in self.undo_cooldowns if cooldown.offer_id == purchase.offer_id]
+            if is_undoable and undo_cooldown and undo_cooldown[0].expires_at > datetime.utcnow():
+                is_undoable = False
+            if only_undoable and not is_undoable:
+                continue
+            if not purchase.free_refund_eligible:
+                continue
+            purchases.append(purchase)
+        return purchases
+
 
 class PromotionStatus:
 
