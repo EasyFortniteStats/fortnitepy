@@ -291,8 +291,11 @@ class CommonCoreProfile:
         purchases = []
         for purchase in self.vbucks_purchase_history.purchases if self.vbucks_purchase_history else []:
             is_undoable = purchase.undoable_until and purchase.undoable_until > datetime.utcnow()
-            undo_cooldown = [cooldown for cooldown in self.undo_cooldowns if cooldown.offer_id == purchase.offer_id]
-            if is_undoable and undo_cooldown and undo_cooldown[0].expires_at > datetime.utcnow():
+            active_undo_cooldowns = [
+                c for c in self.undo_cooldowns
+                if c.offer_id == purchase.offer_id and c.expires_at > datetime.utcnow()
+            ]
+            if is_undoable and any(active_undo_cooldowns):
                 is_undoable = False
             if only_undoable and not is_undoable:
                 continue
