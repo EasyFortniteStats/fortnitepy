@@ -1604,13 +1604,16 @@ class HTTPClient:
         )
         return await self.post(r, json={})
 
-    async def claim_login_reward(self, profile_id: Literal['campaign', 'profile0']) -> dict:
+    async def claim_mfa_reward(self, profile_id: Literal['common_core'], claim_for_stw: bool) -> dict:
         r = FortnitePublicService(
-            '/fortnite/api/game/v2/profile/{client_id}/client/ClaimLoginReward?profileId={profile_id}&rvn=-1',
+            '/fortnite/api/game/v2/profile/{client_id}/client/ClaimMfaEnabled?profileId={profile_id}&rvn=-1',
             client_id=self.client.user.id,
             profile_id=profile_id,
         )
-        return await self.post(r, json={})
+        payload = {
+            "bClaimForStw": claim_for_stw
+        }
+        return await self.post(r, json=payload)
 
     async def set_affiliate_name(self, affiliate_name: str) -> dict:
         r = FortnitePublicService(

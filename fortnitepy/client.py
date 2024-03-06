@@ -37,8 +37,7 @@ from .creative import (
     CreativeDiscovery, CreativeIsland, CreativeDiscoverySearchEntry, IslandLookup, CreativeDiscoveryV2,
     CreativeDiscoveryV2Page
 )
-from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, DailyRewardNotification, \
-    BattleRoyaleInventory
+from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, BattleRoyaleInventory
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
                      DuplicateFriendship, FriendshipRequestAlreadySent,
                      MaxFriendshipsExceeded, InviteeMaxFriendshipsExceeded,
@@ -2581,10 +2580,8 @@ class BasicClient:
                 raise InvalidCreatorCode('Creator code is invalid.')
             raise
 
-    async def claim_login_rewards(self) -> DailyRewardNotification:
-        profile_data = await self.http.claim_login_reward('campaign')
-        notifications = [n for n in profile_data['notifications'] if n['type'] == 'daily_rewards']
-        return DailyRewardNotification(notifications[0])
+    async def claim_mfa_rewards(self, claim_for_stw: bool = False) -> None:
+        await self.http.claim_mfa_reward('common_core', claim_for_stw)
 
     async def set_vbucks_platform(self, platform: VBucksPlatform):
         await self.http.set_mtx_platform(platform.value)
