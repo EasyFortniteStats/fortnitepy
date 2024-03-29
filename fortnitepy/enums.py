@@ -301,7 +301,7 @@ class CosmeticType(Enum):
 
     WRAP = 'AthenaItemWrap'
 
-    BANNER = 'BannerToken'
+    #  BANNER = 'BannerToken'
     LOBBY_MUSIC = 'AthenaMusicPack'
     LOADING_SCREEN = 'AthenaLoadingScreen'
 
