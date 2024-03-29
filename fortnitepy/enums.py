@@ -287,24 +287,40 @@ class VBucksPlatform(Enum):
 class CosmeticType(Enum):
     OUTFIT = 'AthenaCharacter'
     BACKPACK = 'AthenaBackpack'
+    PET = 'AthenaPet'
+    PET_CARRIER = 'AthenaPetCarrier'
     PICKAXE = 'AthenaPickaxe'
     GLIDER = 'AthenaGlider'
     CONTRAIL = 'AthenaSkyDiveContrail'
-    DANCE = 'AthenaDance'
-    WRAP = 'AthenaItemWrap'
-    MUSIC = 'AthenaMusicPack'
-    LOADING_SCREEN = 'AthenaLoadingScreen'
-    CAR_BODY = 'VehicleCosmetics_Body'
-    DECAL = 'VehicleCosmetics_Skin'
-    WHEEL = 'VehicleCosmetics_Wheel'
-    TRAIL = 'VehicleCosmetics_DriftTrail'
     AURA = 'SparksAura'
+
+    EMOTE = 'AthenaDance'
+    EMOTICON = 'AthenaEmoji'
+    SPRAY = 'AthenaSpray'
+    TOY = 'AthenaToy'
+
+    WRAP = 'AthenaItemWrap'
+
+    BANNER = 'BannerToken'
+    LOBBY_MUSIC = 'AthenaMusicPack'
+    LOADING_SCREEN = 'AthenaLoadingScreen'
+
     GUITAR = 'SparksGuitar'
     BASS = 'SparksBass'
     DRUMS = 'SparksDrums'
     MICROPHONE = 'SparksMicrophone'
     KEYTAR = 'SparksKeyboard'
+
+    CAR_BODY = 'VehicleCosmetics_Body'
+    DECAL = 'VehicleCosmetics_Skin'
+    WHEEL = 'VehicleCosmetics_Wheel'
+    TRAIL = 'VehicleCosmetics_DriftTrail'
+    BOOST = 'VehicleCosmetics_Booster'
+
     JAM_TRACK = 'SparksSong'
+
+    LEGO_BUILD = 'JunoBuildingSet'
+    LEGO_DECOR_BUNDLE = 'JunoBuildingProp'
 
 
 class SaveTheWorldFounderPack(Enum):
