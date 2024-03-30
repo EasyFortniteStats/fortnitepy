@@ -2281,7 +2281,7 @@ class BasicClient:
 
         return data[user_id]
 
-    async def fetch_ranked_season(
+    async def fetch_ranked_seasons(
             self,
             *,
             ends_after: Optional[datetime.datetime] = None,
