@@ -1907,10 +1907,12 @@ class HTTPClient:
     #             Ranked              #
     ###################################
 
-    async def get_ranked_season(self, *, ends_after: Optional[str] = None) -> dict:
+    async def get_ranked_season(self, *, ends_after: Optional[str] = None, ranking_type: Optional[str]) -> dict:
         params = {}
         if ends_after:
             params['endsAfter'] = ends_after
+        if ranking_type:
+            params['rankingType'] = ranking_type
 
         r = RankedService('/api/v1/games/fortnite/tracks/query')
         return await self.get(r, params=params)
@@ -1922,6 +1924,13 @@ class HTTPClient:
 
         r = RankedService('/api/v1/games/fortnite/trackprogress/{user_id}', user_id=user_id)
         return await self.get(r, params=params)
+
+    async def get_multiple_ranked_stats_by_id(self, user_ids: List[str], ranking_guid: str) -> dict:
+        payload = {
+            'userIds': user_ids
+        }
+        r = RankedService('/api/v1/games/fortnite/trackprogress/{trackguid}', trackguid=ranking_guid)
+        return await self.post(r, json=payload)
 
     ###################################
     #             Avatar              #
