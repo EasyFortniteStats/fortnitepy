@@ -178,7 +178,6 @@ class CreativeIslandRatings:
     def __init__(self, data: dict):
         self.rating_received_at: Optional[datetime] = datetime.fromisoformat(data['rating_received_time']) \
             if data.get('rating_received_time') else None
-        self.cert_id: str = data['cert_id']
         self.boards: List[CreativeIslandRatingBoard] = [
             CreativeIslandRatingBoard(n, b) for n, b in data['boards'].items()
         ]
