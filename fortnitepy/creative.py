@@ -94,6 +94,7 @@ class CreativeIsland:
         self.last_activated_at: Optional[datetime] = datetime.fromisoformat(data['lastActivatedDate']) \
             if data.get('lastActivatedDate') else None
         self.discovery_intent: str = data['discoveryIntent']
+        self.link_category: str = data['linkCategory']
         self.raw_data: dict = data
 
 
@@ -101,6 +102,9 @@ class CreativeIslandMetadata:
     def __init__(self, data: dict):
         lobby_background_image_urls = data.get('lobby_background_image_urls', {})
         self.lobby_background_image_url: Optional[str] = lobby_background_image_urls.get('url')
+        self.frontend_plugin: Optional[str] = data.get('frontendPlugin')
+        self.game_featuresets: List[str] = data.get('gameFeaturesets', [])
+        self.product_modes: List[str] = data.get('product_modes', [])
         self.quicksilver_id: Optional[str] = data.get('quicksilver_id')
         # max_source_ver: {patch: 0, major: "", minor: 0}
         self.public_modules: Dict[str, int] = data.get('public_modules', {})
