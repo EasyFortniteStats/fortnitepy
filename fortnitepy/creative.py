@@ -94,7 +94,7 @@ class CreativeIsland:
         self.last_activated_at: Optional[datetime] = datetime.fromisoformat(data['lastActivatedDate']) \
             if data.get('lastActivatedDate') else None
         self.discovery_intent: str = data['discoveryIntent']
-        self.link_category: str = data['linkCategory']
+        self.link_category: Optional[str] = data.get('linkCategory')
         self.raw_data: dict = data
 
 
