@@ -1927,9 +1927,9 @@ class HTTPClient:
 
     async def get_multiple_ranked_stats_by_id(self, user_ids: List[str], ranking_guid: str) -> dict:
         payload = {
-            'userIds': user_ids
+            'accountIds': user_ids
         }
-        r = RankedService('/api/v1/games/fortnite/trackprogress/{trackguid}', trackguid=ranking_guid)
+        r = RankedService('/api/v1/games/fortnite/trackprogress/byAccountIds/{trackguid}', trackguid=ranking_guid)
         return await self.post(r, json=payload)
 
     ###################################
