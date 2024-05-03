@@ -77,7 +77,8 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
             temperature: Optional[bool] = None,
             thumbnail_table_row_name: Optional[str] = None,
             stamina_drain: Optional[bool] = None,
-            hunger: Optional[bool] = None
+            hunger: Optional[bool] = None,
+            power_system: Optional[bool] = None
     ):
         self.seed: Optional[int] = seed
         self.mode: Optional[LegoWorldMode] = mode
@@ -91,6 +92,7 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
         self.thumbnail_table_row_name: Optional[str] = thumbnail_table_row_name
         self.stamina_drain: Optional[bool] = stamina_drain
         self.hunger: Optional[bool] = hunger
+        self.power_system: Optional[bool] = power_system
 
     @classmethod
     def default_from_world_mode(cls, mode: LegoWorldMode):
@@ -105,7 +107,8 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
                 friendly_fire=False,
                 temperature=True,
                 stamina_drain=True,
-                hunger=True
+                hunger=True,
+                power_system=True
             )
         elif mode is LegoWorldMode.SANDBOX:
             return cls(
@@ -118,7 +121,8 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
                 friendly_fire=False,
                 temperature=False,
                 stamina_drain=True,
-                hunger=False
+                hunger=False,
+                power_system=False
             )
 
     @classmethod
@@ -135,7 +139,8 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
             temperature=cls._convert_from_string(data.get('temperature')),
             thumbnail_table_row_name=data.get('thumbnailTableRowName'),
             stamina_drain=cls._convert_from_string(data.get('staminaDrain')),
-            hunger=cls._convert_from_string(data.get('hunger'))
+            hunger=cls._convert_from_string(data.get('hunger')),
+            power_system=cls._convert_from_string(data.get('powerSystem'))
         )
 
     def to_payload(self) -> dict:
@@ -164,6 +169,8 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
             payload['staminaDrain'] = self._convert_from_boolean(self.stamina_drain)
         if self.hunger is not None:
             payload['hunger'] = self._convert_from_boolean(self.hunger)
+        if self.power_system is not None:
+            payload['powerSystem'] = self._convert_from_boolean(self.power_system)
         return payload
 
     @staticmethod

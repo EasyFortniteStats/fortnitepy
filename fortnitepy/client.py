@@ -37,8 +37,7 @@ from .creative import (
     CreativeDiscovery, CreativeIsland, CreativeDiscoverySearchEntry, IslandLookup, CreativeDiscoveryV2,
     CreativeDiscoveryV2Page
 )
-from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, DailyRewardNotification, \
-    BattleRoyaleInventory
+from .profile import BattleRoyaleProfile, CommonCoreProfile, SaveTheWorldProfile, BattleRoyaleInventory
 from .errors import (PartyError, HTTPException, NotFound, Forbidden,
                      DuplicateFriendship, FriendshipRequestAlreadySent,
                      MaxFriendshipsExceeded, InviteeMaxFriendshipsExceeded,
@@ -51,7 +50,7 @@ from .friend import Friend, IncomingPendingFriend, OutgoingPendingFriend
 from .enums import (Platform, Region, UserSearchPlatform, AwayStatus,
                     SeasonStartTimestamp, SeasonEndTimestamp,
                     BattlePassStat, StatsCollectionType, VBucksPlatform, DiscoverySurface, DiscoverySearchOrderType,
-                    PurchaseRefreshType, VerifierModeOverride, LegoWorldGrantRole, LegoWorldGrantType)
+                    PurchaseRefreshType, VerifierModeOverride, LegoWorldGrantRole, LegoWorldGrantType, RankingType)
 from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty,
                     Party)
 from .stats import StatsV2, StatsCollection, _StatsBase, RankedSeasonEntry, RankedStatsEntry
@@ -2282,8 +2281,16 @@ class BasicClient:
 
         return data[user_id]
 
-    async def fetch_ranked_season(self, *, ends_after: Optional[datetime.datetime]) -> List[RankedSeasonEntry]:
-        data = await self.http.get_ranked_season(ends_after=to_iso(ends_after) if ends_after else None)
+    async def fetch_ranked_seasons(
+            self,
+            *,
+            ends_after: Optional[datetime.datetime] = None,
+            ranking_type: Optional[RankingType] = None
+    ) -> List[RankedSeasonEntry]:
+        data = await self.http.get_ranked_season(
+            ends_after=to_iso(ends_after) if ends_after else None,
+            ranking_type=ranking_type.value if ranking_type else None
+        )
         return [RankedSeasonEntry(entry) for entry in data]
 
     async def fetch_ranked_stats(
@@ -2294,6 +2301,17 @@ class BasicClient:
     ) -> List[RankedStatsEntry]:
         data = await self.http.get_ranked_stats(user_id, ends_after=to_iso(ends_after) if ends_after else None)
         return [RankedStatsEntry(entry) for entry in data]
+
+    async def fetch_multiple_ranked_stats_by_id(self, user_ids: List[str], ranking_guid: str) -> List[RankedStatsEntry]:
+        chunks = (user_ids[i:i + 25] for i in range(0, len(user_ids), 25))
+
+        tasks = [self.http.get_multiple_ranked_stats_by_id(chunk, ranking_guid) for chunk in chunks]
+        if tasks:
+            done = await asyncio.gather(*tasks)
+        else:
+            done = []
+
+        return [RankedStatsEntry(entry) for entries in done for entry in entries]
 
     async def fetch_leaderboard(self, stat: str) -> List[Dict[str, StrOrInt]]:
         """|coro|
@@ -2581,10 +2599,8 @@ class BasicClient:
                 raise InvalidCreatorCode('Creator code is invalid.')
             raise
 
-    async def claim_login_rewards(self) -> DailyRewardNotification:
-        profile_data = await self.http.claim_login_reward('campaign')
-        notifications = [n for n in profile_data['notifications'] if n['type'] == 'daily_rewards']
-        return DailyRewardNotification(notifications[0])
+    async def claim_mfa_rewards(self, claim_for_stw: bool = False) -> None:
+        await self.http.claim_mfa_reward('common_core', claim_for_stw)
 
     async def set_vbucks_platform(self, platform: VBucksPlatform):
         await self.http.set_mtx_platform(platform.value)

@@ -1604,13 +1604,16 @@ class HTTPClient:
         )
         return await self.post(r, json={})
 
-    async def claim_login_reward(self, profile_id: Literal['campaign', 'profile0']) -> dict:
+    async def claim_mfa_reward(self, profile_id: Literal['common_core'], claim_for_stw: bool) -> dict:
         r = FortnitePublicService(
-            '/fortnite/api/game/v2/profile/{client_id}/client/ClaimLoginReward?profileId={profile_id}&rvn=-1',
+            '/fortnite/api/game/v2/profile/{client_id}/client/ClaimMfaEnabled?profileId={profile_id}&rvn=-1',
             client_id=self.client.user.id,
             profile_id=profile_id,
         )
-        return await self.post(r, json={})
+        payload = {
+            "bClaimForStw": claim_for_stw
+        }
+        return await self.post(r, json=payload)
 
     async def set_affiliate_name(self, affiliate_name: str) -> dict:
         r = FortnitePublicService(
@@ -1904,10 +1907,12 @@ class HTTPClient:
     #             Ranked              #
     ###################################
 
-    async def get_ranked_season(self, *, ends_after: Optional[str] = None) -> dict:
+    async def get_ranked_season(self, *, ends_after: Optional[str] = None, ranking_type: Optional[str]) -> dict:
         params = {}
         if ends_after:
             params['endsAfter'] = ends_after
+        if ranking_type:
+            params['rankingType'] = ranking_type
 
         r = RankedService('/api/v1/games/fortnite/tracks/query')
         return await self.get(r, params=params)
@@ -1919,6 +1924,13 @@ class HTTPClient:
 
         r = RankedService('/api/v1/games/fortnite/trackprogress/{user_id}', user_id=user_id)
         return await self.get(r, params=params)
+
+    async def get_multiple_ranked_stats_by_id(self, user_ids: List[str], ranking_guid: str) -> dict:
+        payload = {
+            'accountIds': user_ids
+        }
+        r = RankedService('/api/v1/games/fortnite/trackprogress/byAccountIds/{trackguid}', trackguid=ranking_guid)
+        return await self.post(r, json=payload)
 
     ###################################
     #             Avatar              #
