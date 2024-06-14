@@ -37,6 +37,7 @@ class BattleRoyaleProfile:
         ]
 
         self.saved_loadout_ids: List[str] = stats['loadouts']
+        self.loadout_presets: Dict[str, Dict[str, str]] = stats.get('loadout_presets', {})
         self.use_random_loadout = stats.get('use_random_loadout', False)
         self.last_applied_loadout_id: Optional[str] = stats.get('last_applied_loadout')
 
@@ -103,13 +104,13 @@ class PastSeasonStats:
 
     def __init__(self, data: dict):
         self.season: int = data['seasonNumber']
-        self.wins: int = data['numWins']
+        self.wins: int = data.get('numWins', 0)
         self.xp: int = data['seasonXp']
         self.level: int = data['seasonLevel']
-        self.battlepass_xp: int = data['bookXp']
+        self.battlepass_xp: int = data.get('bookXp', 0)
         self.battlepass_level: int = data['bookLevel']
-        self.has_purchased_battle_pass: bool = data['purchasedVIP']
-        self.crown_wins: int = data['numRoyalRoyales']
+        self.has_purchased_battle_pass: bool = data.get('purchasedVIP', False)
+        self.crown_wins: int = data.get('numRoyalRoyales', 0)
 
         self.raw_data: dict = data
 
