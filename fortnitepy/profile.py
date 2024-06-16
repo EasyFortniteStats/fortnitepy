@@ -105,7 +105,7 @@ class PastSeasonStats:
     def __init__(self, data: dict):
         self.season: int = data['seasonNumber']
         self.wins: int = data.get('numWins', 0)
-        self.xp: int = data['seasonXp']
+        self.xp: int = data.get('seasonXp', 0)
         self.level: int = data['seasonLevel']
         self.battlepass_xp: int = data.get('bookXp', 0)
         self.battlepass_level: int = data['bookLevel']
