@@ -475,8 +475,20 @@ class VerifierModeOverride(Enum):
 
 
 class LegoWorldMode(Enum):
+    COZY = 'Cozy'
     SURVIVAL = 'Survival'
     SANDBOX = 'Sandbox'
+    HARDCORE = 'Hardcore'
+
+class LegoWorldDifficulty(Enum):
+    EASY = 'Easy'
+    NORMAL = 'Normal'
+    HARDCORE = 'Hardcore'
+
+class LegoWorldDeathType(Enum):
+    ON = 'On'
+    OFF = 'Off'
+    PERMANENT = 'Permanent'
 
 
 class LegoWorldMetadataConstraint(Enum):

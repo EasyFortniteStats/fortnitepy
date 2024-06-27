@@ -1,7 +1,10 @@
 import datetime
 from typing import Optional, List
 
-from .enums import LegoWorldMode, LegoWorldMetadataConstraint, LegoWorldGrantType, LegoWorldGrantRole
+from .enums import (
+    LegoWorldMode, LegoWorldMetadataConstraint, LegoWorldGrantType, LegoWorldGrantRole,
+    LegoWorldDifficulty, LegoWorldDeathType
+)
 
 
 class AccessibleLegoWorld:
@@ -66,111 +69,165 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
     def __init__(
             self,
             *,
-            seed: Optional[int] = None,
             mode: Optional[LegoWorldMode] = None,
-            friendly_creatures: Optional[bool] = None,
-            hostile_creatures: Optional[bool] = None,
-            npcs: Optional[bool] = None,
-            drop_inventory_on_death: Optional[bool] = None,
-            death: Optional[bool] = None,
-            friendly_fire: Optional[bool] = None,
-            temperature: Optional[bool] = None,
             thumbnail_table_row_name: Optional[str] = None,
-            stamina_drain: Optional[bool] = None,
+            seed: Optional[int] = None,
+            hostile_creatures: Optional[bool] = None,
+            difficulty: Optional[LegoWorldDifficulty] = None,
+            elite_hostile_creatures: Optional[bool] = None,
             hunger: Optional[bool] = None,
-            power_system: Optional[bool] = None
+            temperature: Optional[bool] = None,
+            stamina_drain: Optional[bool] = None,
+            death: Optional[LegoWorldDeathType] = None,
+            drop_inventory_on_death: Optional[bool] = None,
+            friendly_creatures: Optional[bool] = None,
+            friendly_fire: Optional[bool] = None,
+            npcs: Optional[bool] = None,
+            power_system: Optional[bool] = None,
+            recruited_creature_perma_death: Optional[bool] = None
     ):
-        self.seed: Optional[int] = seed
         self.mode: Optional[LegoWorldMode] = mode
-        self.friendly_creatures: Optional[bool] = friendly_creatures
-        self.hostile_creatures: Optional[bool] = hostile_creatures
-        self.npcs: Optional[bool] = npcs
-        self.drop_inventory_on_death: Optional[bool] = drop_inventory_on_death
-        self.death: Optional[bool] = death
-        self.friendly_fire: Optional[bool] = friendly_fire
-        self.temperature: Optional[bool] = temperature
         self.thumbnail_table_row_name: Optional[str] = thumbnail_table_row_name
-        self.stamina_drain: Optional[bool] = stamina_drain
+        self.seed: Optional[int] = seed
+        self.hostile_creatures: Optional[bool] = hostile_creatures
+        self.difficulty: Optional[LegoWorldDifficulty] = difficulty
+        self.elite_hostile_creatures: Optional[bool] = elite_hostile_creatures
         self.hunger: Optional[bool] = hunger
+        self.temperature: Optional[bool] = temperature
+        self.stamina_drain: Optional[bool] = stamina_drain
+        self.death: Optional[LegoWorldDeathType] = death
+        self.drop_inventory_on_death: Optional[bool] = drop_inventory_on_death
+        self.friendly_creatures: Optional[bool] = friendly_creatures
+        self.friendly_fire: Optional[bool] = friendly_fire
+        self.npcs: Optional[bool] = npcs
         self.power_system: Optional[bool] = power_system
+        self.recruited_creature_perma_death: Optional[bool] = recruited_creature_perma_death
 
     @classmethod
     def default_from_world_mode(cls, mode: LegoWorldMode):
+        if mode is LegoWorldMode.COZY:
+            return cls(
+                mode=LegoWorldMode.COZY,
+                hostile_creatures=True,
+                difficulty=LegoWorldDifficulty.EASY,
+                elite_hostile_creatures=False,
+                hunger=False,
+                temperature=False,
+                stamina_drain=False,
+                death=LegoWorldDeathType.ON,
+                drop_inventory_on_death=False,
+                friendly_creatures=True,
+                friendly_fire=False,
+                npcs=True,
+                power_system=False,
+                recruited_creature_perma_death=False
+            )
         if mode is LegoWorldMode.SURVIVAL:
             return cls(
                 mode=LegoWorldMode.SURVIVAL,
-                friendly_creatures=True,
                 hostile_creatures=True,
-                npcs=True,
-                drop_inventory_on_death=True,
-                death=True,
-                friendly_fire=False,
+                difficulty=LegoWorldDifficulty.NORMAL,
+                elite_hostile_creatures=False,
+                hunger=True,
                 temperature=True,
                 stamina_drain=True,
-                hunger=True,
-                power_system=True
+                death=LegoWorldDeathType.ON,
+                drop_inventory_on_death=True,
+                friendly_creatures=True,
+                friendly_fire=False,
+                npcs=True,
+                power_system=True,
+                recruited_creature_perma_death=True
             )
         elif mode is LegoWorldMode.SANDBOX:
             return cls(
                 mode=LegoWorldMode.SANDBOX,
-                friendly_creatures=True,
                 hostile_creatures=False,
-                npcs=True,
-                drop_inventory_on_death=True,
-                death=True,
-                friendly_fire=False,
-                temperature=False,
-                stamina_drain=True,
+                difficulty=LegoWorldDifficulty.NORMAL,
+                elite_hostile_creatures=False,
                 hunger=False,
-                power_system=False
+                temperature=False,
+                stamina_drain=False,
+                death=LegoWorldDeathType.ON,
+                friendly_creatures=True,
+                friendly_fire=False,
+                npcs=True,
+                power_system=False,
+                recruited_creature_perma_death=False
+            )
+        elif mode is LegoWorldMode.HARDCORE:
+            return cls(
+                mode=LegoWorldMode.HARDCORE,
+                hostile_creatures=True,
+                difficulty=LegoWorldDifficulty.HARDCORE,
+                elite_hostile_creatures=True,
+                hunger=True,
+                temperature=True,
+                stamina_drain=True,
+                death=LegoWorldDeathType.PERMANENT,
+                drop_inventory_on_death=True,
+                friendly_creatures=True,
+                friendly_fire=False,
+                npcs=True,
+                power_system=True,
+                recruited_creature_perma_death=True
             )
 
     @classmethod
     def from_data(cls, data: dict) -> 'DefaultLegoWorldMetadata':
         return cls(
-            seed=data.get('seed'),
             mode=LegoWorldMode(data.get('mode')),
-            friendly_creatures=cls._convert_from_string(data.get('friendlyCreatures')),
-            hostile_creatures=cls._convert_from_string(data.get('hostileCreatures')),
-            npcs=cls._convert_from_string(data.get('npcs')),
-            drop_inventory_on_death=cls._convert_from_string(data.get('dropInventoryOnDeath')),
-            death=cls._convert_from_string(data.get('death')),
-            friendly_fire=cls._convert_from_string(data.get('friendlyFire')),
-            temperature=cls._convert_from_string(data.get('temperature')),
             thumbnail_table_row_name=data.get('thumbnailTableRowName'),
-            stamina_drain=cls._convert_from_string(data.get('staminaDrain')),
+            seed=data.get('seed'),
+            hostile_creatures=cls._convert_from_string(data.get('hostileCreatures')),
+            difficulty=LegoWorldDifficulty(data.get('difficulty')),
+            elite_hostile_creatures=cls._convert_from_string(data.get('eliteHostileCreatures')),
             hunger=cls._convert_from_string(data.get('hunger')),
-            power_system=cls._convert_from_string(data.get('powerSystem'))
+            temperature=cls._convert_from_string(data.get('temperature')),
+            stamina_drain=cls._convert_from_string(data.get('staminaDrain')),
+            death=LegoWorldDeathType(data.get('death')),
+            drop_inventory_on_death=cls._convert_from_string(data.get('dropInventoryOnDeath')),
+            friendly_creatures=cls._convert_from_string(data.get('friendlyCreatures')),
+            friendly_fire=cls._convert_from_string(data.get('friendlyFire')),
+            npcs=cls._convert_from_string(data.get('npcs')),
+            power_system=cls._convert_from_string(data.get('powerSystem')),
+            recruited_creature_perma_death=cls._convert_from_string(data.get('recruitedCreaturePermaDeath'))
         )
 
     def to_payload(self) -> dict:
         payload = {}
-        if self.seed is not None:
-            payload['seed'] = self.seed
         if self.mode is not None:
             payload['mode'] = self.mode.value
-        if self.friendly_creatures is not None:
-            payload['friendlyCreatures'] = self._convert_from_boolean(self.friendly_creatures)
-        if self.hostile_creatures is not None:
-            payload['hostileCreatures'] = self._convert_from_boolean(self.hostile_creatures)
-        if self.npcs is not None:
-            payload['npcs'] = self._convert_from_boolean(self.npcs)
-        if self.drop_inventory_on_death is not None:
-            payload['dropInventoryOnDeath'] = self._convert_from_boolean(self.drop_inventory_on_death)
-        if self.death is not None:
-            payload['death'] = self._convert_from_boolean(self.death)
-        if self.friendly_fire is not None:
-            payload['friendlyFire'] = self._convert_from_boolean(self.friendly_fire)
-        if self.temperature is not None:
-            payload['temperature'] = self._convert_from_boolean(self.temperature)
         if self.thumbnail_table_row_name is not None:
             payload['thumbnailTableRowName'] = self.thumbnail_table_row_name
-        if self.stamina_drain is not None:
-            payload['staminaDrain'] = self._convert_from_boolean(self.stamina_drain)
+        if self.seed is not None:
+            payload['seed'] = self.seed
+        if self.hostile_creatures is not None:
+            payload['hostileCreatures'] = self.hostile_creatures
+        if self.difficulty is not None:
+            payload['difficulty'] = self.difficulty.value
+        if self.elite_hostile_creatures is not None:
+            payload['eliteHostileCreatures'] = self.elite_hostile_creatures
         if self.hunger is not None:
-            payload['hunger'] = self._convert_from_boolean(self.hunger)
+            payload['hunger'] = self.hunger
+        if self.temperature is not None:
+            payload['temperature'] = self.temperature
+        if self.stamina_drain is not None:
+            payload['staminaDrain'] = self.stamina_drain
+        if self.death is not None:
+            payload['death'] = self.death.value
+        if self.drop_inventory_on_death is not None:
+            payload['dropInventoryOnDeath'] = self.drop_inventory_on_death
+        if self.friendly_creatures is not None:
+            payload['friendlyCreatures'] = self.friendly_creatures
+        if self.friendly_fire is not None:
+            payload['friendlyFire'] = self.friendly_fire
+        if self.npcs is not None:
+            payload['npcs'] = self.npcs
         if self.power_system is not None:
-            payload['powerSystem'] = self._convert_from_boolean(self.power_system)
+            payload['powerSystem'] = self.power_system
+        if self.recruited_creature_perma_death is not None:
+            payload['recruitedCreaturePermaDeath'] = self.recruited_creature_perma_death
         return payload
 
     @staticmethod
