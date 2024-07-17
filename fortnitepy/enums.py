@@ -362,8 +362,8 @@ class ACBRating(_RatingAuthorityRating):
 
 
 class PEGIRating(_RatingAuthorityRating):
-    # AGE_18 = 'PEGI_AGE_18'
-    # AGE_16 = 'PEGI_AGE_16'
+    AGE_18 = 'PEGI_AGE_18'
+    AGE_16 = 'PEGI_AGE_16'
     AGE_12 = 'PEGI_AGE_12'
     AGE_7 = 'PEGI_AGE_7'
     AGE_3 = 'PEGI_AGE_3'
