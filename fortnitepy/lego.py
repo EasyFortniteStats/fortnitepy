@@ -84,7 +84,8 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
             friendly_fire: Optional[bool] = None,
             npcs: Optional[bool] = None,
             power_system: Optional[bool] = None,
-            recruited_creature_perma_death: Optional[bool] = None
+            recruited_creature_perma_death: Optional[bool] = None,
+            flying: Optional[bool] = None
     ):
         self.mode: Optional[LegoWorldMode] = mode
         self.thumbnail_table_row_name: Optional[str] = thumbnail_table_row_name
@@ -102,6 +103,7 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
         self.npcs: Optional[bool] = npcs
         self.power_system: Optional[bool] = power_system
         self.recruited_creature_perma_death: Optional[bool] = recruited_creature_perma_death
+        self.flying: Optional[bool] = flying
 
     @classmethod
     def default_from_world_mode(cls, mode: LegoWorldMode):
@@ -120,7 +122,8 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
                 friendly_fire=False,
                 npcs=True,
                 power_system=False,
-                recruited_creature_perma_death=False
+                recruited_creature_perma_death=False,
+                flying=False
             )
         if mode is LegoWorldMode.SURVIVAL:
             return cls(
@@ -137,7 +140,8 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
                 friendly_fire=False,
                 npcs=True,
                 power_system=True,
-                recruited_creature_perma_death=True
+                recruited_creature_perma_death=True,
+                flying=False
             )
         elif mode is LegoWorldMode.SANDBOX:
             return cls(
@@ -153,7 +157,8 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
                 friendly_fire=False,
                 npcs=True,
                 power_system=False,
-                recruited_creature_perma_death=False
+                recruited_creature_perma_death=False,
+                flying=True
             )
         elif mode is LegoWorldMode.HARDCORE:
             return cls(
@@ -170,7 +175,8 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
                 friendly_fire=False,
                 npcs=True,
                 power_system=True,
-                recruited_creature_perma_death=True
+                recruited_creature_perma_death=True,
+                flying=False
             )
 
     @classmethod
@@ -191,7 +197,8 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
             friendly_fire=cls._convert_from_string(data.get('friendlyFire')),
             npcs=cls._convert_from_string(data.get('npcs')),
             power_system=cls._convert_from_string(data.get('powerSystem')),
-            recruited_creature_perma_death=cls._convert_from_string(data.get('recruitedCreaturePermaDeath'))
+            recruited_creature_perma_death=cls._convert_from_string(data.get('recruitedCreaturePermaDeath')),
+            flying=cls._convert_from_string(data.get('flying'))
         )
 
     def to_payload(self) -> dict:
@@ -228,6 +235,8 @@ class DefaultLegoWorldMetadata(BaseLegoWorldMetadata):
             payload['powerSystem'] = self.power_system
         if self.recruited_creature_perma_death is not None:
             payload['recruitedCreaturePermaDeath'] = self.recruited_creature_perma_death
+        if self.flying is not None:
+            payload['flying'] = self.flying
         return payload
 
     @staticmethod
