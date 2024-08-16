@@ -274,7 +274,7 @@ class VBucksPlatform(Enum):
     ANDROID = 'EpicAndroid'
     PLAYSTATION = 'PSN'
     XBOX = 'Live'
-    IOS = 'IOSAppStore'
+    IOS = 'EpicIOS'
     NINTENDO = 'Nintendo'
     SAMSUNG = 'Samsung'
     EPIC = 'Epic'
