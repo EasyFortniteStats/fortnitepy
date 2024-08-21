@@ -270,17 +270,18 @@ class Profile(Enum):
 
 
 class VBucksPlatform(Enum):
+    EPIC = 'Epic'
     PC = 'EpicPC'
     ANDROID = 'EpicAndroid'
+    IOS = 'EpicIOS'
     PLAYSTATION = 'PSN'
     XBOX = 'Live'
-    IOS = 'EpicIOS'
     NINTENDO = 'Nintendo'
     SAMSUNG = 'Samsung'
-    EPIC = 'Epic'
     WE_GAME = 'WeGame'
     PC_KOREA = 'EpicPCKorea'
     GOOGLE_PLAY = 'GooglePlay'
+    APP_STORE = 'IOSAppStore'
     SHARED = 'Shared'
 
 
