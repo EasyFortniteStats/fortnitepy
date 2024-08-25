@@ -42,6 +42,7 @@ from .errors import (PartyError, HTTPException, NotFound, Forbidden,
                      DuplicateFriendship, FriendshipRequestAlreadySent,
                      MaxFriendshipsExceeded, InviteeMaxFriendshipsExceeded,
                      InviteeMaxFriendshipRequestsExceeded, PartyIsFull, InvalidCreatorCode)
+from .shop import WebShop
 from .xmpp import XMPPClient
 from .http import HTTPClient
 from .user import (ClientUser, User, BlockedUser, SacSearchEntryUser,
@@ -2922,6 +2923,10 @@ class BasicClient:
             if exc.message_code == m:
                 raise NotFound('World not found.')
             raise
+
+    async def fetch_web_shop(self, locale: str = 'en') -> WebShop:
+        data = await self.http.get_web_shop(locale)
+        return WebShop(data)
 
 
 class Client(BasicClient):
