@@ -1073,7 +1073,7 @@ class HTTPClient:
         params = {
             'sid': sid
         }
-        return await self.get(EpicGames('/id/api/exchange'), params=params)
+        return await self.get(EpicGames('/id/api/sso'), params=params)
 
     ###################################
     #        Payment Website          #
