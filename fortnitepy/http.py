@@ -1069,6 +1069,12 @@ class HTTPClient:
         r = EpicGames('/id/api/exchange/generate')
         return await self.post(r, headers=headers)
 
+    async def epicgames_sso(self, sid: str) -> Any:
+        params = {
+            'sid': sid
+        }
+        return await self.get(EpicGames('/id/api/exchange'), params=params)
+
     ###################################
     #        Payment Website          #
     ###################################
