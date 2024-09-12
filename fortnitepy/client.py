@@ -2613,11 +2613,11 @@ class BasicClient:
             currency_sub_type: str,
             expected_price: int,
             quantity: int = 1
-    ):
-        await self.http.purchase_catalog_entry(offer_id, quantity, currency_type, currency_sub_type, expected_price)
+    ) -> dict:
+        return await self.http.purchase_catalog_entry(offer_id, quantity, currency_type, currency_sub_type, expected_price)
 
-    async def purchase_items(self, items: List[ItemPurchase]):
-        await self.http.purchase_multiple_catalog_entries([item.to_payload() for item in items])
+    async def purchase_items(self, items: List[ItemPurchase]) -> dict:
+        return await self.http.purchase_multiple_catalog_entries([item.to_payload() for item in items])
 
     async def gift_item(
             self,
@@ -2627,8 +2627,8 @@ class BasicClient:
             currency_sub_type: str,
             expected_price: int,
             gift_wrap: Optional[str]
-    ):
-        await self.http.gift_catalog_entry(
+    ) -> dict:
+        return await self.http.gift_catalog_entry(
             offer_id, currency_type, currency_sub_type, expected_price, receiver_account_ids,
             f'GiftBox:{gift_wrap}' if gift_wrap else None
         )
