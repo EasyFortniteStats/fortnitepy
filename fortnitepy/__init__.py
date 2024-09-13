@@ -45,6 +45,7 @@ from .enums import *
 from .creative import *
 from .errors import *
 from .store import Store, FeaturedStoreItem, DailyStoreItem, ItemPurchase
+from .shop import *
 from .news import BattleRoyaleNewsPost
 from .playlist import Playlist
 from .avatar import Avatar

@@ -90,7 +90,9 @@ class Auth:
         xsrf_token = await self.fetch_xsrf_token()
         exchange_code = await self.get_exchange_code()
         await self.client.http.epicgames_exchange(xsrf_token, exchange_code)
-        await self.client.http.epicgames_redirect(xsrf_token, 'https://epicgames.com')
+        data = await self.client.http.epicgames_redirect(xsrf_token, 'https://epicgames.com')
+        await self.client.http.epicgames_sso(data['sid'])
+        await self.client.http.request('HEAD', 'https://sac.epicgames.com')
 
     async def _authenticate(self, priority: int = 0) -> None:
         max_attempts = 3

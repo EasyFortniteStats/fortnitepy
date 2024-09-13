@@ -268,6 +268,11 @@ class SacEpicGames(Route):
     AUTH = None
 
 
+class FortniteWeb(Route):
+    BASE = 'https://www.fortnite.com'
+    AUTH = None
+
+
 class PaymentWebsite(Route):
     BASE = 'https://payment-website-pci.ol.epicgames.com'
     AUTH = None
@@ -1063,6 +1068,12 @@ class HTTPClient:
 
         r = EpicGames('/id/api/exchange/generate')
         return await self.post(r, headers=headers)
+
+    async def epicgames_sso(self, sid: str) -> Any:
+        params = {
+            'sid': sid
+        }
+        return await self.get(EpicGames('/id/api/sso'), params=params)
 
     ###################################
     #        Payment Website          #
@@ -1961,6 +1972,19 @@ class HTTPClient:
     async def get_sac_earnings_data(self) -> dict:
         r = SacEpicGames('/api/get-earnings-data')
         return await self.get(r)
+
+    ###################################
+    #               Fortnite Web               #
+    ###################################
+
+    async def get_web_shop(self, locale: str):
+        params = {
+            'lang': locale,
+            '_data': 'routes%2Fshop._index'
+        }
+
+        r = FortniteWeb('/shop')
+        return await self.get(r, params=params)
 
     ###################################
     #                                 LEGO                                #
