@@ -2645,8 +2645,12 @@ class BasicClient:
         profile_change = profile_data['profileChanges'][0]
         return CommonCoreProfile(profile_change['profile'])
 
-    async def refund_item(self, purchase_id: str, quick_return: bool):
-        await self.http.refund_mtx_purchase(purchase_id, quick_return)
+    async def refund_item(self, purchase_id: str, quick_return: bool) -> Optional[CommonCoreProfile]:
+        profile_data = await self.http.refund_mtx_purchase(purchase_id, quick_return)
+        if not profile_data or not profile_data['profileChanges']:
+            return None
+        profile_change = profile_data['profileChanges'][0]
+        return CommonCoreProfile(profile_change['profile'])
 
     async def fetch_code(self, code: str) -> Code:
         try:

@@ -1722,15 +1722,19 @@ class HTTPClient:
             quick_return: bool = True,
     ) -> dict:
         r = FortnitePublicService(
-            '/fortnite/api/game/v2/profile/{client_id}/client/RefundMtxPurchase?profileId=common_core&rvn=-1',
+            '/fortnite/api/game/v2/profile/{client_id}/client/RefundMtxPurchase',
             client_id=self.client.user.id,
         )
+        params = {
+            "profileId": "common_core",
+            "rvn": -1
+        }
         payload = {
             'purchaseId': purchase_id,
             'quickReturn': quick_return,
             'gameContext': 'Frontend.AthenaLobby',
         }
-        return await self.post(r, json=payload)
+        return await self.post(r, params=params, json=payload)
 
     async def redeem_real_money_purchases(
             self,
