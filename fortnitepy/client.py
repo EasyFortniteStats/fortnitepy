@@ -2613,11 +2613,19 @@ class BasicClient:
             currency_sub_type: str,
             expected_price: int,
             quantity: int = 1
-    ) -> dict:
-        return await self.http.purchase_catalog_entry(offer_id, quantity, currency_type, currency_sub_type, expected_price)
+    ) -> Optional[CommonCoreProfile]:
+        profile_data = await self.http.purchase_catalog_entry(offer_id, quantity, currency_type, currency_sub_type, expected_price)
+        if not profile_data or not profile_data['profileChanges']:
+            return None
+        profile_change = profile_data['profileChanges'][0]
+        return CommonCoreProfile(profile_change['profile'])
 
-    async def purchase_items(self, items: List[ItemPurchase]) -> dict:
-        return await self.http.purchase_multiple_catalog_entries([item.to_payload() for item in items])
+    async def purchase_items(self, items: List[ItemPurchase]) -> Optional[CommonCoreProfile]:
+        profile_data = await self.http.purchase_multiple_catalog_entries([item.to_payload() for item in items])
+        if not profile_data or not profile_data['profileChanges']:
+            return None
+        profile_change = profile_data['profileChanges'][0]
+        return CommonCoreProfile(profile_change['profile'])
 
     async def gift_item(
             self,
@@ -2627,11 +2635,15 @@ class BasicClient:
             currency_sub_type: str,
             expected_price: int,
             gift_wrap: Optional[str]
-    ) -> dict:
-        return await self.http.gift_catalog_entry(
+    ) -> Optional[CommonCoreProfile]:
+        profile_data = await self.http.gift_catalog_entry(
             offer_id, currency_type, currency_sub_type, expected_price, receiver_account_ids,
             f'GiftBox:{gift_wrap}' if gift_wrap else None
         )
+        if not profile_data or not profile_data['profileChanges']:
+            return None
+        profile_change = profile_data['profileChanges'][0]
+        return CommonCoreProfile(profile_change['profile'])
 
     async def refund_item(self, purchase_id: str, quick_return: bool):
         await self.http.refund_mtx_purchase(purchase_id, quick_return)

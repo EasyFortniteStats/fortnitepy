@@ -1655,9 +1655,13 @@ class HTTPClient:
             expected_total_price: int,
     ) -> dict:
         r = FortnitePublicService(
-            '/fortnite/api/game/v2/profile/{client_id}/client/PurchaseCatalogEntry?profileId=common_core&rvn=-1',
+            '/fortnite/api/game/v2/profile/{client_id}/client/PurchaseCatalogEntry',
             client_id=self.client.user.id,
         )
+        params = {
+            "profileId": "common_core",
+            "rvn": -1
+        }
         payload = {
             'offerId': offer_id,
             'purchaseQuantity': purchase_quantity,
@@ -1666,19 +1670,22 @@ class HTTPClient:
             'expectedTotalPrice': expected_total_price,
             'gameContext': 'GameContext: Frontend.CatabaScreen',
         }
-        return await self.post(r, json=payload)
+        return await self.post(r, params=params, json=payload)
 
     async def purchase_multiple_catalog_entries(
             self,
             purchase_entries: List[dict],
     ) -> dict:
         r = FortnitePublicService(
-            '/fortnite/api/game/v2/profile/{client_id}/client/PurchaseMultipleCatalogEntries'
-            '?profileId=common_core&rvn=-1',
+            '/fortnite/api/game/v2/profile/{client_id}/client/PurchaseMultipleCatalogEntries',
             client_id=self.client.user.id,
         )
+        params = {
+            "profileId": "common_core",
+            "rvn": -1
+        }
         payload = {'purchaseInfoList': purchase_entries}
-        return await self.post(r, json=payload)
+        return await self.post(r, params=params, json=payload)
 
     async def gift_catalog_entry(
             self,
@@ -1690,9 +1697,13 @@ class HTTPClient:
             gift_wrap_template_id: str,
     ) -> dict:
         r = FortnitePublicService(
-            '/fortnite/api/game/v2/profile/{client_id}/client/GiftCatalogEntry?profileId=common_core&rvn=-1',
+            '/fortnite/api/game/v2/profile/{client_id}/client/GiftCatalogEntry',
             client_id=self.client.user.id,
         )
+        params = {
+            "profileId": "common_core",
+            "rvn": -1
+        }
         payload = {
             'offerId': offer_id,
             'currency': currency_type,
@@ -1703,7 +1714,7 @@ class HTTPClient:
             'giftWrapTemplateId': gift_wrap_template_id,
             'personalMessage': ''
         }
-        return await self.post(r, json=payload)
+        return await self.post(r, params=params, json=payload)
 
     async def refund_mtx_purchase(
             self,
