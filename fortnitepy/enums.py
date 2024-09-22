@@ -389,8 +389,8 @@ class GenericRating(_RatingAuthorityRating):
 
 
 class ClassIndRating(_RatingAuthorityRating):
-    # AGE_18 = 'CLASSIND_AGE_18'
-    # AGE_16 = 'CLASSIND_AGE_16'
+    AGE_18 = 'CLASSIND_AGE_18'
+    AGE_16 = 'CLASSIND_AGE_16'
     AGE_14 = 'CLASSIND_AGE_14'
     AGE_12 = 'CLASSIND_AGE_12'
     AGE_10 = 'CLASSIND_AGE_10'
