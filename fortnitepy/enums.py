@@ -376,8 +376,8 @@ class PEGIRating(_RatingAuthorityRating):
 
 
 class GenericRating(_RatingAuthorityRating):
-    # AGE_18 = 'GEN_AGE_18'
-    # AGE_16 = 'GEN_AGE_16'
+    AGE_18 = 'GEN_AGE_18'
+    AGE_16 = 'GEN_AGE_16'
     AGE_12 = 'GEN_AGE_12'
     AGE_7 = 'GEN_AGE_7'
     AGE_3 = 'GEN_AGE_3'
