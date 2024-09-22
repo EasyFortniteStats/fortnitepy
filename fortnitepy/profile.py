@@ -300,7 +300,7 @@ class CommonCoreProfile:
                 is_undoable = False
             if only_undoable and not is_undoable:
                 continue
-            if not purchase.free_refund_eligible:
+            if not purchase.free_refund_eligible and not is_undoable:
                 continue
             purchases.append(purchase)
         return purchases
