@@ -350,6 +350,7 @@ class _RatingAuthorityRating(Enum):
 
 
 class ACBRating(_RatingAuthorityRating):
+    AGE_RC = 'ACB_AGE_RC'
     AGE_R18 = 'ACB_AGE_R18'
     AGE_MA15 = 'ACB_AGE_MA15'
     AGE_M = 'ACB_AGE_M'
