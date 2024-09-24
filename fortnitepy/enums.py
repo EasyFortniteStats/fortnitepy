@@ -256,6 +256,8 @@ class RankingType(Enum):
     BATTLE_ROYALE = 'ranked-br'
     ZERO_BUILD = 'ranked-zb'
     ROCKET_RACING = 'delmar-competitive'
+    RELOAD_BUILD = 'ranked_blastberry_build'
+    RELOAD_ZERO_BUILD = 'ranked_blastberry_nobuild'
 
 
 class StatsCollectionType(Enum):
