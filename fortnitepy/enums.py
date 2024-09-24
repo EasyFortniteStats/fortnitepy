@@ -352,6 +352,7 @@ class _RatingAuthorityRating(Enum):
 
 
 class ACBRating(_RatingAuthorityRating):
+    AGE_RC = 'ACB_AGE_RC'
     AGE_R18 = 'ACB_AGE_R18'
     AGE_MA15 = 'ACB_AGE_MA15'
     AGE_M = 'ACB_AGE_M'
@@ -378,8 +379,8 @@ class PEGIRating(_RatingAuthorityRating):
 
 
 class GenericRating(_RatingAuthorityRating):
-    # AGE_18 = 'GEN_AGE_18'
-    # AGE_16 = 'GEN_AGE_16'
+    AGE_18 = 'GEN_AGE_18'
+    AGE_16 = 'GEN_AGE_16'
     AGE_12 = 'GEN_AGE_12'
     AGE_7 = 'GEN_AGE_7'
     AGE_3 = 'GEN_AGE_3'
@@ -390,8 +391,8 @@ class GenericRating(_RatingAuthorityRating):
 
 
 class ClassIndRating(_RatingAuthorityRating):
-    # AGE_18 = 'CLASSIND_AGE_18'
-    # AGE_16 = 'CLASSIND_AGE_16'
+    AGE_18 = 'CLASSIND_AGE_18'
+    AGE_16 = 'CLASSIND_AGE_16'
     AGE_14 = 'CLASSIND_AGE_14'
     AGE_12 = 'CLASSIND_AGE_12'
     AGE_10 = 'CLASSIND_AGE_10'
