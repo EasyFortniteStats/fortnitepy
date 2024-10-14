@@ -429,7 +429,7 @@ class GRACRating(_RatingAuthorityRating):
 
 
 class ESRBRating(_RatingAuthorityRating):
-    # Age 18 missing (A or AO)
+    AGE_AO = 'ESRB_AGE_AO'
     AGE_M = 'ESRB_AGE_M'
     AGE_T = 'ESRB_AGE_T'
     AGE_E10 = 'ESRB_AGE_E10'
