@@ -100,6 +100,7 @@ class CreativeIsland:
 
 class CreativeIslandMetadata:
     def __init__(self, data: dict):
+        self.blog_category: Optional[str] = data.get('blog_category')
         lobby_background_image_urls = data.get('lobby_background_image_urls', {})
         self.lobby_background_image_url: Optional[str] = lobby_background_image_urls.get('url')
         self.frontend_plugin: Optional[str] = data.get('frontendPlugin')
@@ -126,6 +127,7 @@ class CreativeIslandMetadata:
         self.compressed_generated_image_url_s: Optional[str] = compressed_generated_image_urls.get('url_s')
         self.locale: Optional[str] = data.get('locale')
         self.title: str = data['title']
+        self.alt_title: Dict[str, str] = data.get('alt_title', {})
         self.matchmaking = CreativeIslandMatchmaking(data['matchmaking']) if data.get('matchmaking') else None
         self.matchmaking_v2: Optional[CreativeIslandMatchmakingV2] = (
             CreativeIslandMatchmakingV2(data['matchmakingV2']) if data.get('matchmakingV2') else None
