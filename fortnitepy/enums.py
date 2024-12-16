@@ -259,6 +259,8 @@ class RankingType(Enum):
     RELOAD_BUILD = 'ranked_blastberry_build'
     RELOAD_ZERO_BUILD = 'ranked_blastberry_nobuild'
     BALLISTIC = 'ranked-feral'
+    OG_BUILD = 'ranked-figment-build'
+    OG_ZERO_BUILD = 'ranked-figment-nobuild'
 
 
 class StatsCollectionType(Enum):
