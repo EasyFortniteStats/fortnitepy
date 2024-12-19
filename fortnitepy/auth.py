@@ -131,7 +131,7 @@ class Auth:
             )
 
             try:
-                await self.client.http.fortnite_grant_access(**kwargs)
+                await self.client.http.fortnite_request_access(**kwargs)
             except HTTPException as e:
                 if e.message_code != 'errors.com.epicgames.bad_request':
                     raise

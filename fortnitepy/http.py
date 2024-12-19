@@ -1557,9 +1557,9 @@ class HTTPClient:
     #         Fortnite Public         #
     ###################################
 
-    async def fortnite_grant_access(self, **kwargs: Any) -> Any:
+    async def fortnite_request_access(self, **kwargs: Any) -> Any:
         r = FortnitePublicService(
-            '/fortnite/api/game/v2/grant_access/{client_id}',
+            'fortnite/api/game/v2/request_access/{client_id}',
             client_id=self.client.user.id
         )
         return await self.post(r, json={}, **kwargs)
