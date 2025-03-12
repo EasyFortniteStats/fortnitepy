@@ -261,6 +261,9 @@ class RankingType(Enum):
     BALLISTIC = 'ranked-feral'
     OG_BUILD = 'ranked-figment-build'
     OG_ZERO_BUILD = 'ranked-figment-nobuild'
+    THE_GATEWAY_BUILD = 'ranked-bling'
+    THE_GATEWAY_ZERO_BUILD = 'ranked-bling-nobuild'
+    UNKNOWN = 'unknown'
 
 
 class StatsCollectionType(Enum):

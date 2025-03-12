@@ -23,11 +23,14 @@ SOFTWARE.
 """
 
 import datetime
+import logging
 from typing import Optional
 
 from .user import User
 from .enums import Platform, RankingType
 from .utils import from_iso
+
+log = logging.getLogger(__name__)
 
 replacers = {
     'placetop1': 'wins',
@@ -336,7 +339,11 @@ class RankedSeasonEntry:
         self.raw: dict = data
         self.game_id: str = data['gameId']
         self.track_guid: str = data['trackguid']
-        self.ranking_type: RankingType = RankingType(data['rankingType'])
+        try:
+            self.ranking_type: RankingType = RankingType(data['rankingType'])
+        except KeyError:
+            log.warning(f'Failed to parse ranking type {data["rankingType"]}')
+            self.ranking_type = RankingType.UNKNOWN
         self.starts_at: datetime.datetime = from_iso(data['beginTime'])
         self.ends_at: datetime.datetime = from_iso(data['endTime'])
         self.division_count: int = data['divisionCount']
@@ -349,7 +356,11 @@ class RankedStatsEntry:
         self.game_id: str = data['gameId']
         self.track_guid: str = data['trackguid']
         self.account_id: str = data['accountId']
-        self.ranking_type: RankingType = RankingType(data['rankingType'])
+        try:
+            self.ranking_type: RankingType = RankingType(data['rankingType'])
+        except KeyError:
+            log.warning(f'Failed to parse ranking type {data["rankingType"]}')
+            self.ranking_type = RankingType.UNKNOWN
         self.last_update: datetime.datetime = from_iso(data['lastUpdated'])
         self.current_division: int = data['currentDivision']
         self.highest_division: int = data['highestDivision']
