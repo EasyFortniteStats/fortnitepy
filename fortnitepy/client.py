@@ -22,61 +22,61 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import datetime
 import asyncio
+import datetime
 import logging
 import time
-
-from aioxmpp import JID
-from aiohttp import BaseConnector
 from typing import (
-    Iterable,
-    Union,
-    Optional,
     Any,
     Awaitable,
     Callable,
     Dict,
+    Iterable,
     List,
+    Optional,
     Tuple,
+    Union,
 )
 
-from .errors import (
-    PartyError,
-    HTTPException,
-    NotFound,
-    Forbidden,
-    DuplicateFriendship,
-    FriendshipRequestAlreadySent,
-    MaxFriendshipsExceeded,
-    InviteeMaxFriendshipsExceeded,
-    InviteeMaxFriendshipRequestsExceeded,
-    PartyIsFull,
-)
-from .xmpp import XMPPClient
-from .http import HTTPClient
-from .user import ClientUser, User, BlockedUser, SacSearchEntryUser, UserSearchEntry
-from .friend import Friend, IncomingPendingFriend, OutgoingPendingFriend
-from .enums import (
-    Platform,
-    Region,
-    UserSearchPlatform,
-    AwayStatus,
-    SeasonStartTimestamp,
-    SeasonEndTimestamp,
-    BattlePassStat,
-    StatsCollectionType,
-)
-from .party import DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty, Party
-from .stats import StatsV2, StatsCollection, _StatsBase
-from .store import Store
-from .news import BattleRoyaleNewsPost
-from .playlist import Playlist
-from .presence import Presence
+from aiohttp import BaseConnector
+from aioxmpp import JID
+
 from .auth import Auth, RefreshTokenAuth
 from .avatar import Avatar
-from .typedefs import MaybeCoro, DatetimeOrTimestamp, StrOrInt
+from .enums import (
+    AwayStatus,
+    BattlePassStat,
+    Platform,
+    Region,
+    SeasonEndTimestamp,
+    SeasonStartTimestamp,
+    StatsCollectionType,
+    UserSearchPlatform,
+)
+from .errors import (
+    DuplicateFriendship,
+    Forbidden,
+    FriendshipRequestAlreadySent,
+    HTTPException,
+    InviteeMaxFriendshipRequestsExceeded,
+    InviteeMaxFriendshipsExceeded,
+    MaxFriendshipsExceeded,
+    NotFound,
+    PartyError,
+    PartyIsFull,
+)
+from .friend import Friend, IncomingPendingFriend, OutgoingPendingFriend
+from .http import HTTPClient
+from .news import BattleRoyaleNewsPost
+from .party import ClientParty, DefaultPartyConfig, DefaultPartyMemberConfig, Party
+from .playlist import Playlist
+from .presence import Presence
+from .stats import StatsCollection, StatsV2, _StatsBase
+from .store import Store
+from .typedefs import DatetimeOrTimestamp, MaybeCoro, StrOrInt
+from .user import BlockedUser, ClientUser, SacSearchEntryUser, User, UserSearchEntry
 from .utils import LockEvent, MaybeLock, from_iso, is_display_name
+from .xmpp import XMPPClient
 
 log = logging.getLogger(__name__)
 
@@ -728,14 +728,13 @@ class BasicClient:
     async def _setup_client_user(self, priority: int = 0):
         tasks = [
             self.http.account_get_by_user_id(self.auth.account_id, priority=priority),
-            self.http.account_graphql_get_clients_external_auths(priority=priority),
             self.http.account_get_external_auths_by_id(
                 self.auth.account_id, priority=priority
             ),
         ]
 
-        data, ext_data, extra_ext_data, *_ = await asyncio.gather(*tasks)
-        data["externalAuths"] = ext_data["myAccount"]["externalAuths"] or []
+        data, extra_ext_data, *_ = await asyncio.gather(*tasks)
+        data["externalAuths"] = []
         data["extraExternalAuths"] = extra_ext_data
         self.user = ClientUser(self, data)
 
