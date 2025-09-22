@@ -22,7 +22,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-
 import re
 
 from typing import Any, Optional
@@ -35,13 +34,13 @@ from .context import Context
 
 
 __all__ = (
-    'Converter',
-    'IDConverter',
-    'UserConverter',
-    'PartyMemberConverter',
-    'FriendConverter',
-    'IDConverter',
-    'Greedy',
+    "Converter",
+    "IDConverter",
+    "UserConverter",
+    "PartyMemberConverter",
+    "FriendConverter",
+    "IDConverter",
+    "Greedy",
 )
 
 
@@ -57,7 +56,7 @@ class Converter:
     must be a coroutine.
     """
 
-    async def convert(self, ctx: 'Context', argument: str) -> Any:
+    async def convert(self, ctx: "Context", argument: str) -> Any:
         """|coro|
 
         The method to override to do conversion logic.
@@ -73,12 +72,12 @@ class Converter:
         argument: :class:`str`
             The argument that is being converted.
         """
-        raise NotImplementedError('Derived classes need to implement this.')
+        raise NotImplementedError("Derived classes need to implement this.")
 
 
 class IDConverter(Converter):
     def __init__(self) -> None:
-        self._id_regex = re.compile(r'([0-9a-fA-F]{32})$')
+        self._id_regex = re.compile(r"([0-9a-fA-F]{32})$")
 
     def _get_id_match(self, argument: str) -> Any:
         return self._id_regex.match(argument)
@@ -172,7 +171,7 @@ class FriendConverter(IDConverter):
 
 
 class _Greedy:
-    __slots__ = ('converter',)
+    __slots__ = ("converter",)
 
     def __init__(self, *, converter: Optional[Converter] = None) -> None:
         self.converter = converter
@@ -181,18 +180,20 @@ class _Greedy:
         if not isinstance(params, tuple):
             params = (params,)
         if len(params) != 1:
-            raise TypeError('Greedy[...] only takes a single argument')
+            raise TypeError("Greedy[...] only takes a single argument")
 
         converter = params[0]
 
-        if not (callable(converter) or isinstance(converter, Converter)
-                or hasattr(converter, '__origin__')):
-            raise TypeError('Greedy[...] expects a type or a Converter '
-                            'instance.')
+        if not (
+            callable(converter)
+            or isinstance(converter, Converter)
+            or hasattr(converter, "__origin__")
+        ):
+            raise TypeError("Greedy[...] expects a type or a Converter instance.")
 
         NoneType = type(None)
         if converter is str or converter is NoneType or converter is _Greedy:
-            raise TypeError('Greedy[%s] is invalid.' % converter.__name__)
+            raise TypeError("Greedy[%s] is invalid." % converter.__name__)
 
         return self.__class__(converter=converter)
 

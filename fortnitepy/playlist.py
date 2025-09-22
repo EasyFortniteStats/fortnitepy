@@ -28,29 +28,38 @@ from typing import Optional
 
 
 class Playlist:
-
-    __slots__ = ('_image', '_internal_name', '_special_border', '_type',
-                 '_violator', '_display_subname', '_description')
+    __slots__ = (
+        "_image",
+        "_internal_name",
+        "_special_border",
+        "_type",
+        "_violator",
+        "_display_subname",
+        "_description",
+    )
 
     def __init__(self, data: dict) -> None:
-        self._image = data['image']
-        self._internal_name = data['playlist_name']
-        self._special_border = data.get('special_border')
-        self._type = data.get('_type')
-        self._violator = data.get('violator')
-        self._display_subname = data.get('display_subname')
-        self._description = data.get('description')
+        self._image = data["image"]
+        self._internal_name = data["playlist_name"]
+        self._special_border = data.get("special_border")
+        self._type = data.get("_type")
+        self._violator = data.get("violator")
+        self._display_subname = data.get("display_subname")
+        self._description = data.get("description")
 
     def __str__(self) -> str:
         return self.internal_name
 
     def __repr__(self) -> str:
-        return ('<Playlist internal_name={0.internal_name!r} '
-                'image_url={0.image_url!r} type={0.type!r}>'.format(self))
+        return (
+            "<Playlist internal_name={0.internal_name!r} "
+            "image_url={0.image_url!r} type={0.type!r}>".format(self)
+        )
 
     def __eq__(self, other):
-        return (isinstance(other, Playlist)
-                and other._internal_name == self._internal_name)
+        return (
+            isinstance(other, Playlist) and other._internal_name == self._internal_name
+        )
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -75,7 +84,7 @@ class Playlist:
         """Optional[:class:`str`]: Special border of the playlist.
         Will be ``None`` if no special border is found for this playlist.
         """
-        if self._special_border == 'None':
+        if self._special_border == "None":
             return None
         return self._special_border
 
@@ -86,7 +95,7 @@ class Playlist:
         in-game.
         Will be ``None`` if no violator is found for this playlist.
         """
-        if self._violator == '':
+        if self._violator == "":
             return None
         return self._violator
 

@@ -25,21 +25,43 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-__version__ = '4.0.0a1'
+__version__ = "4.0.0a1"
 
 from .client import BasicClient, Client, run_multiple, start_multiple, close_multiple
-from .auth import (Auth, EmailAndPasswordAuth, ExchangeCodeAuth,
-                   AuthorizationCodeAuth, DeviceAuth, RefreshTokenAuth,
-                   AdvancedAuth)
+from .auth import (
+    Auth,
+    EmailAndPasswordAuth,
+    ExchangeCodeAuth,
+    AuthorizationCodeAuth,
+    DeviceAuth,
+    RefreshTokenAuth,
+    AdvancedAuth,
+)
 from .friend import Friend, IncomingPendingFriend, OutgoingPendingFriend
 from .message import FriendMessage, PartyMessage
-from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, PartyMember,
-                    ClientPartyMember, JustChattingClientPartyMember, Party, 
-                    ClientParty, ReceivedPartyInvitation, SentPartyInvitation,
-                    PartyJoinConfirmation, PartyJoinRequest, SquadAssignment)
+from .party import (
+    DefaultPartyConfig,
+    DefaultPartyMemberConfig,
+    PartyMember,
+    ClientPartyMember,
+    JustChattingClientPartyMember,
+    Party,
+    ClientParty,
+    ReceivedPartyInvitation,
+    SentPartyInvitation,
+    PartyJoinConfirmation,
+    PartyJoinRequest,
+    SquadAssignment,
+)
 from .presence import Presence, PresenceGameplayStats, PresenceParty
-from .user import (ClientUser, User, BlockedUser, ExternalAuth,
-                   UserSearchEntry, SacSearchEntryUser)
+from .user import (
+    ClientUser,
+    User,
+    BlockedUser,
+    ExternalAuth,
+    UserSearchEntry,
+    SacSearchEntryUser,
+)
 from .stats import StatsV2, StatsCollection
 from .enums import *
 from .errors import *

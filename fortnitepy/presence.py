@@ -69,29 +69,36 @@ class PresenceGameplayStats:
         ``True`` if friend fell to death in its current game, else ``False``
     """
 
-    __slots__ = ('friend', 'state', 'playlist', 'players_alive', 'kills',
-                 'num_kills', 'fell_to_death')
+    __slots__ = (
+        "friend",
+        "state",
+        "playlist",
+        "players_alive",
+        "kills",
+        "num_kills",
+        "fell_to_death",
+    )
 
-    def __init__(self, friend: 'Friend',
-                 data: str,
-                 players_alive: int) -> None:
+    def __init__(self, friend: "Friend", data: str, players_alive: int) -> None:
         self.friend = friend
-        self.state = data.get('state')
-        self.playlist = data.get('playlist')
+        self.state = data.get("state")
+        self.playlist = data.get("playlist")
         self.players_alive = players_alive
 
-        self.kills = data.get('numKills')
+        self.kills = data.get("numKills")
         if self.kills is not None:
             self.kills = int(self.kills)
 
         self.num_kills = self.kills
 
-        self.fell_to_death = True if data.get('bFellToDeath') else False
+        self.fell_to_death = True if data.get("bFellToDeath") else False
 
     def __repr__(self) -> str:
-        return ('<PresenceGameplayStats friend={0.friend!r} '
-                'players_alive={0.players_alive} num_kills={0.num_kills} '
-                'playlist={0.playlist!r}>'.format(self))
+        return (
+            "<PresenceGameplayStats friend={0.friend!r} "
+            "players_alive={0.players_alive} num_kills={0.num_kills} "
+            "playlist={0.playlist!r}>".format(self)
+        )
 
 
 class PresenceParty:
@@ -153,39 +160,52 @@ class PresenceParty:
         The party's playercount.
     """
 
-    __slots__ = ('client', 'private', 'platform', 'id', 'party_type_id',
-                 'key', 'app_id', 'build_id', 'net_cl', 'party_flags',
-                 'not_accepting_reason', 'playercount')
+    __slots__ = (
+        "client",
+        "private",
+        "platform",
+        "id",
+        "party_type_id",
+        "key",
+        "app_id",
+        "build_id",
+        "net_cl",
+        "party_flags",
+        "not_accepting_reason",
+        "playercount",
+    )
 
-    def __init__(self, client: 'Client', data: dict) -> None:
+    def __init__(self, client: "Client", data: dict) -> None:
         self.client = client
-        self.private = data.get('bIsPrivate', False)
+        self.private = data.get("bIsPrivate", False)
 
-        pl = data.get('sourcePlatform')
+        pl = data.get("sourcePlatform")
         self.platform = Platform(pl) if pl is not None else None
-        self.id = data.get('partyId')
-        self.party_type_id = data.get('partyTypeId')
-        self.key = data.get('key')
-        self.app_id = data.get('appId')
-        self.build_id = data.get('buildId')
+        self.id = data.get("partyId")
+        self.party_type_id = data.get("partyTypeId")
+        self.key = data.get("key")
+        self.app_id = data.get("appId")
+        self.build_id = data.get("buildId")
 
-        if self.build_id is not None and self.build_id.startswith('1:1:'):
+        if self.build_id is not None and self.build_id.startswith("1:1:"):
             self.net_cl = self.build_id[4:]
         else:
             self.net_cl = None
 
-        self.party_flags = data.get('partyFlags')
-        self.not_accepting_reason = data.get('notAcceptingReason')
+        self.party_flags = data.get("partyFlags")
+        self.not_accepting_reason = data.get("notAcceptingReason")
 
-        self.playercount = data.get('pc')
+        self.playercount = data.get("pc")
         if self.playercount is not None:
             self.playercount = int(self.playercount)
 
     def __repr__(self) -> str:
-        return ('<PresenceParty private={0.private} id={0.id!r} '
-                'playercount={0.playercount}>'.format(self))
+        return (
+            "<PresenceParty private={0.private} id={0.id!r} "
+            "playercount={0.playercount}>".format(self)
+        )
 
-    async def join(self) -> 'ClientParty':
+    async def join(self) -> "ClientParty":
         """|coro|
 
         Joins the friends' party.
@@ -205,10 +225,10 @@ class PresenceParty:
             The party that was just joined.
         """
         if self.client.party.id == self.id:
-            raise PartyError('You are already a member of this party.')
+            raise PartyError("You are already a member of this party.")
 
         if self.private:
-            raise Forbidden('You cannot join a private party.')
+            raise Forbidden("You cannot join a private party.")
 
         return await self.client.join_party(self.id)
 
@@ -273,20 +293,41 @@ class Presence:
         The playercount of the friend's server.
     """
 
-    __slots__ = ('client', 'available', 'away', 'friend', 'platform',
-                 'received_at', 'status', 'playing', 'joinable',
-                 'has_voice_support', 'session_id',
-                 'has_properties', 'homebase_rating', 'lfg',
-                 'sub_game', 'in_unjoinable_match', 'playlist', 'party_size',
-                 'max_party_size', 'game_session_join_key',
-                 'server_player_count', 'gameplay_stats', 'party')
+    __slots__ = (
+        "client",
+        "available",
+        "away",
+        "friend",
+        "platform",
+        "received_at",
+        "status",
+        "playing",
+        "joinable",
+        "has_voice_support",
+        "session_id",
+        "has_properties",
+        "homebase_rating",
+        "lfg",
+        "sub_game",
+        "in_unjoinable_match",
+        "playlist",
+        "party_size",
+        "max_party_size",
+        "game_session_join_key",
+        "server_player_count",
+        "gameplay_stats",
+        "party",
+    )
 
-    def __init__(self, client: 'Client',
-                 from_id: str,
-                 platform: str,
-                 available: bool,
-                 away: bool,
-                 data: dict) -> None:
+    def __init__(
+        self,
+        client: "Client",
+        from_id: str,
+        platform: str,
+        available: bool,
+        away: bool,
+        data: dict,
+    ) -> None:
         self.client = client
         self.available = available
         self.away = away
@@ -294,63 +335,54 @@ class Presence:
         self.platform = Platform(platform)
         self.received_at = datetime.datetime.utcnow()
 
-        self.status = data['Status']
-        self.playing = data['bIsPlaying']
-        self.joinable = data['bIsJoinable']
-        self.has_voice_support = data['bHasVoiceSupport']
-        self.session_id = (data['SessionId'] if
-                           data['SessionId'] != "" else None)
+        self.status = data["Status"]
+        self.playing = data["bIsPlaying"]
+        self.joinable = data["bIsJoinable"]
+        self.has_voice_support = data["bHasVoiceSupport"]
+        self.session_id = data["SessionId"] if data["SessionId"] != "" else None
 
-        raw_properties = data.get('Properties', {})
+        raw_properties = data.get("Properties", {})
         self.has_properties = raw_properties != {}
 
         # All values below will be "None" if properties is empty.
 
-        _basic_info = raw_properties.get('FortBasicInfo_j', {})
-        self.homebase_rating = _basic_info.get('homeBaseRating')
+        _basic_info = raw_properties.get("FortBasicInfo_j", {})
+        self.homebase_rating = _basic_info.get("homeBaseRating")
 
-        if raw_properties.get('FortLFG_I') is None:
+        if raw_properties.get("FortLFG_I") is None:
             self.lfg = None
         else:
-            self.lfg = int(raw_properties.get('FortLFG_I')) == 1
+            self.lfg = int(raw_properties.get("FortLFG_I")) == 1
 
-        self.sub_game = raw_properties.get('FortSubGame_i')
+        self.sub_game = raw_properties.get("FortSubGame_i")
 
-        self.in_unjoinable_match = raw_properties.get(
-            'InUnjoinableMatch_b'
-        )
+        self.in_unjoinable_match = raw_properties.get("InUnjoinableMatch_b")
         if self.in_unjoinable_match is not None:
             self.in_unjoinable_match = int(self.in_unjoinable_match)
 
-        self.playlist = raw_properties.get('GamePlaylistName_s')
+        self.playlist = raw_properties.get("GamePlaylistName_s")
 
-        players_alive = raw_properties.get('Event_PlayersAlive_s')
+        players_alive = raw_properties.get("Event_PlayersAlive_s")
         if players_alive is not None:
             players_alive = int(players_alive)
 
-        self.party_size = raw_properties.get('Event_PartySize_s')
+        self.party_size = raw_properties.get("Event_PartySize_s")
         if self.party_size is not None:
             self.party_size = int(self.party_size)
 
-        self.max_party_size = raw_properties.get('Event_PartyMaxSize_s')
+        self.max_party_size = raw_properties.get("Event_PartyMaxSize_s")
         if self.max_party_size is not None:
             self.max_party_size = int(self.max_party_size)
 
-        self.game_session_join_key = raw_properties.get(
-            'GameSessionJoinKey_s'
-        )
+        self.game_session_join_key = raw_properties.get("GameSessionJoinKey_s")
 
-        self.server_player_count = raw_properties.get(
-            'ServerPlayerCount_i'
-        )
+        self.server_player_count = raw_properties.get("ServerPlayerCount_i")
         if self.server_player_count is not None:
             self.server_player_count = int(self.server_player_count)
 
-        if 'FortGameplayStats_j' in raw_properties:
+        if "FortGameplayStats_j" in raw_properties:
             self.gameplay_stats = PresenceGameplayStats(
-                self.friend,
-                raw_properties['FortGameplayStats_j'],
-                players_alive
+                self.friend, raw_properties["FortGameplayStats_j"], players_alive
             )
         else:
             self.gameplay_stats = None
@@ -362,5 +394,7 @@ class Presence:
             self.party = PresenceParty(self.client, raw_properties[key])
 
     def __repr__(self) -> str:
-        return ('<Presence friend={0.friend!r} available={0.available} '
-                'received_at={0.received_at!r}>'.format(self))
+        return (
+            "<Presence friend={0.friend!r} available={0.available} "
+            "received_at={0.received_at!r}>".format(self)
+        )

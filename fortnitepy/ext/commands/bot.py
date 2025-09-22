@@ -22,7 +22,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-
 import logging
 import inspect
 import asyncio
@@ -38,10 +37,16 @@ from fortnitepy.auth import Auth
 from fortnitepy.typedefs import MaybeCoro, ListOrTuple
 
 from ._types import _BaseCommand
-from .errors import (ExtensionFailed, ExtensionMissingEntryPoint,
-                     ExtensionNotLoaded, ExtensionAlreadyLoaded,
-                     ExtensionNotFound, CheckFailure, CommandError,
-                     CommandNotFound)
+from .errors import (
+    ExtensionFailed,
+    ExtensionMissingEntryPoint,
+    ExtensionNotLoaded,
+    ExtensionAlreadyLoaded,
+    ExtensionNotFound,
+    CheckFailure,
+    CommandError,
+    CommandNotFound,
+)
 from .core import GroupMixin
 from .cog import Cog
 from .view import StringView
@@ -59,7 +64,7 @@ def _is_submodule(parent: str, child: str) -> bool:
 
 class _DefaultRepr:
     def __repr__(self) -> str:
-        return '<default-help-command>'
+        return "<default-help-command>"
 
 
 _default = _DefaultRepr()
@@ -125,26 +130,33 @@ class Bot(GroupMixin, Client):
         This is used by :meth:`.is_owner()` and checks that call this method.
     """
 
-    def __init__(self, command_prefix: Any, auth: Auth, *,
-                 help_command: Optional[HelpCommand] = _default,
-                 description: Optional[str] = None,
-                 **kwargs: Any) -> None:
-        kwargs['case_insensitive'] = kwargs.get('case_insensitive', False)
+    def __init__(
+        self,
+        command_prefix: Any,
+        auth: Auth,
+        *,
+        help_command: Optional[HelpCommand] = _default,
+        description: Optional[str] = None,
+        **kwargs: Any,
+    ) -> None:
+        kwargs["case_insensitive"] = kwargs.get("case_insensitive", False)
         super().__init__(auth, **kwargs)
 
         self.command_prefix = command_prefix
-        self.description = inspect.cleandoc(description) if description else ''
-        self.owner_id = kwargs.get('owner_id')
-        self.owner_ids = kwargs.get('owner_ids', set())
+        self.description = inspect.cleandoc(description) if description else ""
+        self.owner_id = kwargs.get("owner_id")
+        self.owner_ids = kwargs.get("owner_ids", set())
 
         if self.owner_id and self.owner_ids:
-            raise TypeError('Both owner_id and owner_ids are set.')
+            raise TypeError("Both owner_id and owner_ids are set.")
 
-        if (self.owner_ids and not isinstance(self.owner_ids,
-                                              collections.abc.Collection)):
+        if self.owner_ids and not isinstance(
+            self.owner_ids, collections.abc.Collection
+        ):
             raise TypeError(
-                'owner_ids must be a collection not '
-                '{0.__class__!r}'.format(self.owner_ids)
+                "owner_ids must be a collection not {0.__class__!r}".format(
+                    self.owner_ids
+                )
             )
 
         self.__cogs = {}
@@ -160,8 +172,8 @@ class Bot(GroupMixin, Client):
         else:
             self.help_command = help_command
 
-        self.add_event_handler('friend_message', self.process_commands)
-        self.add_event_handler('party_message', self.process_commands)
+        self.add_event_handler("friend_message", self.process_commands)
+        self.add_event_handler("party_message", self.process_commands)
 
     def register_methods(self) -> None:
         for _, obj in inspect.getmembers(self):
@@ -177,13 +189,13 @@ class Bot(GroupMixin, Client):
 
         super().register_methods()
 
-    async def close(self, *,
-                    close_http: bool = True,
-                    dispatch_close: bool = True) -> None:
+    async def close(
+        self, *, close_http: bool = True, dispatch_close: bool = True
+    ) -> None:
         if dispatch_close:
             await asyncio.gather(
-                self.dispatch_and_wait_event('before_close'),
-                self.dispatch_and_wait_event('close'),
+                self.dispatch_and_wait_event("before_close"),
+                self.dispatch_and_wait_event("close"),
             )
 
         for extension in tuple(self.__extensions):
@@ -198,10 +210,7 @@ class Bot(GroupMixin, Client):
             except Exception:
                 pass
 
-        await self._close(
-            close_http=close_http,
-            dispatch_close=dispatch_close
-        )
+        await self._close(close_http=close_http, dispatch_close=dispatch_close)
 
     def check(self, func: MaybeCoro) -> MaybeCoro:
         r"""A decorator that adds a check globally to every command.
@@ -225,8 +234,7 @@ class Bot(GroupMixin, Client):
         self.add_check(func)
         return func
 
-    def add_check(self, func: MaybeCoro, *,
-                  call_once: bool = False) -> None:
+    def add_check(self, func: MaybeCoro, *, call_once: bool = False) -> None:
         """Adds a global check to the bot.
 
         This is the non-decorator interface to :meth:`.check`
@@ -245,8 +253,7 @@ class Bot(GroupMixin, Client):
         else:
             self._checks.append(func)
 
-    def remove_check(self, func: MaybeCoro, *,
-                     call_once: bool = False) -> None:
+    def remove_check(self, func: MaybeCoro, *, call_once: bool = False) -> None:
         """Removes a global check from the bot.
 
         Parameters
@@ -294,8 +301,7 @@ class Bot(GroupMixin, Client):
         self.add_check(func, call_once=True)
         return func
 
-    async def can_run(self, ctx: Context, *,
-                      call_once: bool = False) -> bool:
+    async def can_run(self, ctx: Context, *, call_once: bool = False) -> bool:
         data = self._check_once if call_once else self._checks
 
         if len(data) == 0:
@@ -359,7 +365,7 @@ class Bot(GroupMixin, Client):
             The coroutine passed is not actually a coroutine.
         """
         if not asyncio.iscoroutinefunction(coro):
-            raise TypeError('The pre-invoke hook must be a coroutine.')
+            raise TypeError("The pre-invoke hook must be a coroutine.")
 
         self._before_invoke = coro
         return coro
@@ -392,7 +398,7 @@ class Bot(GroupMixin, Client):
             The coroutine passed is not actually a coroutine.
         """
         if not asyncio.iscoroutinefunction(coro):
-            raise TypeError('The post-invoke hook must be a coroutine.')
+            raise TypeError("The post-invoke hook must be a coroutine.")
 
         self._after_invoke = coro
         return coro
@@ -416,7 +422,7 @@ class Bot(GroupMixin, Client):
         """
 
         if not isinstance(cog, Cog):
-            raise TypeError('Cogs must derive from Cog.')
+            raise TypeError("Cogs must derive from Cog.")
 
         cog = cog._inject(self)
         self.__cogs[cog.__cog_name__] = cog
@@ -483,8 +489,9 @@ class Bot(GroupMixin, Client):
         for event_list in self._events.copy().values():
             remove = []
             for index, event in enumerate(event_list):
-                if (event.__module__ is not None
-                        and _is_submodule(name, event.__module__)):
+                if event.__module__ is not None and _is_submodule(
+                    name, event.__module__
+                ):
                     remove.append(index)
 
             for index in reversed(remove):
@@ -492,7 +499,7 @@ class Bot(GroupMixin, Client):
 
     def _call_module_finalizers(self, lib: object, key: str) -> None:
         try:
-            func = getattr(lib, 'cog_teardown')
+            func = getattr(lib, "cog_teardown")
         except AttributeError:
             pass
         else:
@@ -508,8 +515,7 @@ class Bot(GroupMixin, Client):
                 if _is_submodule(name, module):
                     del sys.modules[module]
 
-    def _load_from_module_spec(self, spec: types.ModuleType,
-                               key: str) -> None:
+    def _load_from_module_spec(self, spec: types.ModuleType, key: str) -> None:
         # precondition: key not in self.__extensions
         lib = importlib.util.module_from_spec(spec)
         sys.modules[key] = lib
@@ -520,7 +526,7 @@ class Bot(GroupMixin, Client):
             raise ExtensionFailed(key, e) from e
 
         try:
-            setup = getattr(lib, 'extension_setup')
+            setup = getattr(lib, "extension_setup")
         except AttributeError:
             del sys.modules[key]
             raise ExtensionMissingEntryPoint(key)
@@ -671,8 +677,7 @@ class Bot(GroupMixin, Client):
     def help_command(self, value: Optional[HelpCommand]) -> None:
         if value is not None:
             if not isinstance(value, HelpCommand):
-                raise TypeError('help_command must be a subclass '
-                                'of HelpCommand')
+                raise TypeError("help_command must be a subclass of HelpCommand")
             if self._help_command is not None:
                 self._help_command._remove_from_bot(self)
             self._help_command = value
@@ -717,19 +722,21 @@ class Bot(GroupMixin, Client):
                 if isinstance(ret, collections.abc.Iterable):
                     raise
 
-                raise TypeError('command_prefix must be plain string, '
-                                'iterable of strings, or callable '
-                                'returning either of these, not '
-                                '{}'.format(ret.__class__.__name__))
+                raise TypeError(
+                    "command_prefix must be plain string, "
+                    "iterable of strings, or callable "
+                    "returning either of these, not "
+                    "{}".format(ret.__class__.__name__)
+                )
 
             if not ret:
-                raise ValueError('Iterable command_prefix must contain at '
-                                 'least one prefix')
+                raise ValueError(
+                    "Iterable command_prefix must contain at least one prefix"
+                )
 
         return ret
 
-    async def get_context(self, message: Message, *,
-                          cls: Context = Context) -> Context:
+    async def get_context(self, message: Message, *, cls: Context = Context) -> Context:
         r"""|coro|
 
         Returns the invocation context from the message.
@@ -783,16 +790,20 @@ class Bot(GroupMixin, Client):
 
             except TypeError:
                 if not isinstance(prefix, list):
-                    raise TypeError('get_prefix must return either a string '
-                                    'or a list of string, not '
-                                    '{}'.format(prefix.__class__.__name__))
+                    raise TypeError(
+                        "get_prefix must return either a string "
+                        "or a list of string, not "
+                        "{}".format(prefix.__class__.__name__)
+                    )
 
                 for value in prefix:
                     if not isinstance(value, str):
-                        raise TypeError('Iterable command_prefix or list '
-                                        'returned from get_prefix must '
-                                        'contain only strings, not '
-                                        '{}'.format(value.__class__.__name__))
+                        raise TypeError(
+                            "Iterable command_prefix or list "
+                            "returned from get_prefix must "
+                            "contain only strings, not "
+                            "{}".format(value.__class__.__name__)
+                        )
 
                 raise
 
@@ -803,22 +814,19 @@ class Bot(GroupMixin, Client):
         return ctx
 
     def _print_error(self, ctx: Context, error: Exception) -> None:
-        print(
-            'Ignoring exception in command {}:'.format(ctx.command),
-            file=sys.stderr
-        )
+        print("Ignoring exception in command {}:".format(ctx.command), file=sys.stderr)
         traceback.print_exception(
-            type(error),
-            error,
-            error.__traceback__,
-            file=sys.stderr
+            type(error), error, error.__traceback__, file=sys.stderr
         )
 
-    async def wait_for_futures(self, futures: ListOrTuple, *,
-                               check: Optional[callable] = None,
-                               timeout: Optional[int] = None,
-                               cancel: bool = False) -> None:
-
+    async def wait_for_futures(
+        self,
+        futures: ListOrTuple,
+        *,
+        check: Optional[callable] = None,
+        timeout: Optional[int] = None,
+        cancel: bool = False,
+    ) -> None:
         def _cancel_futs(pending_futures: Set[asyncio.Future]) -> None:
             for p in pending_futures:
                 if not p.cancelled():
@@ -827,9 +835,7 @@ class Bot(GroupMixin, Client):
         pending = futures
         while pending:
             done, pending = await asyncio.wait(
-                pending,
-                return_when=asyncio.FIRST_COMPLETED,
-                timeout=timeout
+                pending, return_when=asyncio.FIRST_COMPLETED, timeout=timeout
             )
 
             # Set should only contain one value
@@ -839,9 +845,9 @@ class Bot(GroupMixin, Client):
                         _cancel_futs(pending)
                     return future
 
-    async def _wait_for_error_return(self, futures: List[asyncio.Future],
-                                     ctx: Context,
-                                     error: Exception) -> None:
+    async def _wait_for_error_return(
+        self, futures: List[asyncio.Future], ctx: Context, error: Exception
+    ) -> None:
         def check(future):
             return future.result() is False
 
@@ -850,13 +856,9 @@ class Bot(GroupMixin, Client):
             self._print_error(ctx, error)
 
     def dispatch_error(self, ctx: Context, error: Exception) -> None:
-        if self._event_has_handler('command_error'):
-            futures = self.dispatch_event('command_error', ctx, error)
-            asyncio.ensure_future(self._wait_for_error_return(
-                futures,
-                ctx,
-                error
-            ))
+        if self._event_has_handler("command_error"):
+            futures = self.dispatch_event("command_error", ctx, error)
+            asyncio.ensure_future(self._wait_for_error_return(futures, ctx, error))
         else:
             self._print_error(ctx, error)
 
@@ -873,22 +875,20 @@ class Bot(GroupMixin, Client):
         """
 
         if ctx.command is not None:
-            self.dispatch_event('command', ctx)
+            self.dispatch_event("command", ctx)
 
             try:
                 if await self.can_run(ctx, call_once=True):
                     await ctx.command.invoke(ctx)
                 else:
-                    raise CheckFailure('The global check once functions '
-                                       'failed.')
+                    raise CheckFailure("The global check once functions failed.")
             except CommandError as exc:
                 await ctx.command.dispatch_error(ctx, exc)
             else:
-                self.dispatch_event('command_completion', ctx)
+                self.dispatch_event("command_completion", ctx)
 
         elif ctx.invoked_with:
-            exc = CommandNotFound('Command "{}" is not found'
-                                  ''.format(ctx.invoked_with))
+            exc = CommandNotFound('Command "{}" is not found'.format(ctx.invoked_with))
             self.dispatch_error(ctx, exc)
 
     async def process_commands(self, message: Message) -> None:

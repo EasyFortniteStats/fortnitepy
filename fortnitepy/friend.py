@@ -27,8 +27,7 @@ import datetime
 from typing import TYPE_CHECKING, List, Optional
 
 from .user import UserBase
-from .errors import (FriendOffline, InvalidOffer, PartyError, Forbidden,
-                     HTTPException)
+from .errors import FriendOffline, InvalidOffer, PartyError, Forbidden, HTTPException
 from .presence import Presence
 from .enums import Platform
 from .avatar import Avatar
@@ -40,18 +39,21 @@ if TYPE_CHECKING:
 
 
 class FriendBase(UserBase):
+    __slots__ = UserBase.__slots__ + (
+        "_status",
+        "_direction",
+        "_favorite",
+        "_created_at",
+    )
 
-    __slots__ = UserBase.__slots__ + \
-                ('_status', '_direction', '_favorite', '_created_at')
-
-    def __init__(self, client: 'Client', data: dict) -> None:
+    def __init__(self, client: "Client", data: dict) -> None:
         super().__init__(client, data)
 
     def _update(self, data: dict) -> None:
         super()._update(data)
-        self._status = data['status']
-        self._direction = data['direction']
-        self._created_at = from_iso(data['created'])
+        self._status = data["status"]
+        self._direction = data["direction"]
+        self._created_at = from_iso(data["created"])
 
     @property
     def status(self) -> str:
@@ -70,7 +72,7 @@ class FriendBase(UserBase):
         """:class:`bool`: ``True`` if this friend was the one to send the
         friend request else ``False`. Aliased to ``inbound`` as well.
         """
-        return self._direction == 'INBOUND'
+        return self._direction == "INBOUND"
 
     inbound = incoming
 
@@ -79,7 +81,7 @@ class FriendBase(UserBase):
         """:class:`bool`: ``True`` if the bot was the one to send the friend
         request else ``False``. Aliased to ``outbound`` as well.
         """
-        return self._direction == 'OUTBOUND'
+        return self._direction == "OUTBOUND"
 
     outbound = outgoing
 
@@ -105,40 +107,42 @@ class FriendBase(UserBase):
     def get_raw(self) -> dict:
         return {
             **(super().get_raw()),
-            'status': self._status,
-            'direction': self._direction,
-            'created': self._created_at
+            "status": self._status,
+            "direction": self._direction,
+            "created": self._created_at,
         }
 
 
 class Friend(FriendBase):
     """Represents a friend on Fortnite"""
 
-    __slots__ = FriendBase.__slots__ + ('_nickname', '_note', '_last_logout')
+    __slots__ = FriendBase.__slots__ + ("_nickname", "_note", "_last_logout")
 
-    def __init__(self, client: 'Client', data: dict) -> None:
+    def __init__(self, client: "Client", data: dict) -> None:
         super().__init__(client, data)
         self._last_logout = None
         self._nickname = None
         self._note = None
 
     def __repr__(self) -> str:
-        return ('<Friend id={0.id!r} display_name={0.display_name!r} '
-                'epicgames_account={0.epicgames_account!r}>'.format(self))
+        return (
+            "<Friend id={0.id!r} display_name={0.display_name!r} "
+            "epicgames_account={0.epicgames_account!r}>".format(self)
+        )
 
     def _update(self, data: dict) -> None:
         super()._update(data)
-        self._favorite = data.get('favorite')
+        self._favorite = data.get("favorite")
 
     def _update_last_logout(self, dt: datetime.datetime) -> None:
         self._last_logout = dt
 
     def _update_summary(self, data: dict) -> None:
-        _alias = data['alias']
-        self._nickname = _alias if _alias != '' else None
+        _alias = data["alias"]
+        self._nickname = _alias if _alias != "" else None
 
-        _note = data['note']
-        self._note = _note if _note != '' else None
+        _note = data["note"]
+        self._note = _note if _note != "" else None
 
     @property
     def favorite(self) -> bool:
@@ -215,6 +219,7 @@ class Friend(FriendBase):
             if a.friend.id != self.id:
                 return False
             return a.available is available
+
         return check
 
     async def wait_until_online(self) -> None:
@@ -226,8 +231,7 @@ class Friend(FriendBase):
         pres = self.last_presence
         if pres is None or pres.available is False:
             pres = await self.client.wait_for(
-                'friend_presence',
-                check=self._online_check(available=True)
+                "friend_presence", check=self._online_check(available=True)
             )
 
     async def wait_until_offline(self) -> None:
@@ -239,8 +243,7 @@ class Friend(FriendBase):
         pres = self.last_presence
         if pres is not None and pres.available is not False:
             pres = await self.client.wait_for(
-                'friend_presence',
-                check=self._online_check(available=False)
+                "friend_presence", check=self._online_check(available=False)
             )
 
     async def fetch_last_logout(self) -> Optional[datetime.datetime]:
@@ -262,13 +265,11 @@ class Friend(FriendBase):
         presences = await self.client.http.presence_get_last_online()
         presence = presences.get(self.id)
         if presence is not None:
-            self._update_last_logout(
-                from_iso(presence[0]['last_online'])
-            )
+            self._update_last_logout(from_iso(presence[0]["last_online"]))
 
         return self.last_logout
 
-    async def fetch_mutual_friends(self) -> List['Friend']:
+    async def fetch_mutual_friends(self) -> List["Friend"]:
         """|coro|
 
         Fetches a list of friends you and this friend have in common.
@@ -314,15 +315,17 @@ class Friend(FriendBase):
             An error occured while requesting.
         """
         if not (3 <= len(nickname) <= 16):
-            raise ValueError('Invalid nickname length')
+            raise ValueError("Invalid nickname length")
 
         try:
             await self.client.http.friends_set_nickname(self.id, nickname)
         except HTTPException as e:
-            ignored = ('errors.com.epicgames.common.unsupported_media_type',
-                       'errors.com.epicgames.validation.validation_failed')
+            ignored = (
+                "errors.com.epicgames.common.unsupported_media_type",
+                "errors.com.epicgames.validation.validation_failed",
+            )
             if e.message_code in ignored:
-                raise ValueError('Invalid nickname')
+                raise ValueError("Invalid nickname")
             raise
         self._nickname = nickname
 
@@ -359,15 +362,17 @@ class Friend(FriendBase):
             An error occured while requesting.
         """
         if not (3 <= len(note) <= 255):
-            raise ValueError('Invalid note length')
+            raise ValueError("Invalid note length")
 
         try:
             await self.client.http.friends_set_note(self.id, note)
         except HTTPException as e:
-            ignored = ('errors.com.epicgames.common.unsupported_media_type',
-                       'errors.com.epicgames.validation.validation_failed')
+            ignored = (
+                "errors.com.epicgames.common.unsupported_media_type",
+                "errors.com.epicgames.validation.validation_failed",
+            )
             if e.message_code in ignored:
-                raise ValueError('Invalid note')
+                raise ValueError("Invalid note")
             raise
         self._note = note
 
@@ -408,7 +413,7 @@ class Friend(FriendBase):
         """
         await self.client.xmpp.send_friend_message(self.jid, content)
 
-    async def join_party(self) -> 'ClientParty':
+    async def join_party(self) -> "ClientParty":
         """|coro|
 
         Attempts to join this friends' party.
@@ -429,10 +434,10 @@ class Friend(FriendBase):
         """
         _pre = self.last_presence
         if _pre is None:
-            raise PartyError('Could not join party. Reason: Party not found')
+            raise PartyError("Could not join party. Reason: Party not found")
 
         if _pre.party.private:
-            raise Forbidden('Could not join party. Reason: Party is private')
+            raise Forbidden("Could not join party. Reason: Party is private")
 
         return await _pre.party.join()
 
@@ -483,17 +488,13 @@ class Friend(FriendBase):
         try:
             await self.client.http.party_send_intention(self.id)
         except HTTPException as exc:
-            m = 'errors.com.epicgames.social.party.user_already_in_party'
+            m = "errors.com.epicgames.social.party.user_already_in_party"
             if exc.message_code == m:
-                raise PartyError(
-                    'The bot is already a part of this friends party.'
-                )
+                raise PartyError("The bot is already a part of this friends party.")
 
-            m = 'errors.com.epicgames.social.party.user_has_no_party'
+            m = "errors.com.epicgames.social.party.user_has_no_party"
             if exc.message_code == m:
-                raise FriendOffline(
-                    'The friend you requested to join is offline.'
-                )
+                raise FriendOffline("The friend you requested to join is offline.")
 
             raise
 
@@ -521,13 +522,13 @@ class Friend(FriendBase):
                 offer_id,
             )
         except HTTPException as exc:
-            m = 'errors.com.epicgames.modules.gamesubcatalog.purchase_not_allowed'  # noqa
+            m = "errors.com.epicgames.modules.gamesubcatalog.purchase_not_allowed"  # noqa
             if exc.message_code == m:
                 return True
 
-            m = 'errors.com.epicgames.modules.gamesubcatalog.catalog_out_of_date'  # noqa
+            m = "errors.com.epicgames.modules.gamesubcatalog.catalog_out_of_date"  # noqa
             if exc.message_code == m:
-                raise InvalidOffer('The offer_id passed is not valid.')
+                raise InvalidOffer("The offer_id passed is not valid.")
 
             raise
 
@@ -571,9 +572,11 @@ class IncomingPendingFriend(PendingFriendBase):
     __slots__ = PendingFriendBase.__slots__
 
     def __repr__(self) -> str:
-        return ('<IncomingPendingFriend id={0.id!r} '
-                'display_name={0.display_name!r} '
-                'epicgames_account={0.epicgames_account!r}>'.format(self))
+        return (
+            "<IncomingPendingFriend id={0.id!r} "
+            "display_name={0.display_name!r} "
+            "epicgames_account={0.epicgames_account!r}>".format(self)
+        )
 
     async def accept(self) -> Friend:
         """|coro|
@@ -607,13 +610,14 @@ class IncomingPendingFriend(PendingFriendBase):
 
 
 class OutgoingPendingFriend(PendingFriendBase):
-
     __slots__ = PendingFriendBase.__slots__
 
     def __repr__(self) -> str:
-        return ('<OutgoingPendingFriend id={0.id!r} '
-                'display_name={0.display_name!r} '
-                'epicgames_account={0.epicgames_account!r}>'.format(self))
+        return (
+            "<OutgoingPendingFriend id={0.id!r} "
+            "display_name={0.display_name!r} "
+            "epicgames_account={0.epicgames_account!r}>".format(self)
+        )
 
     async def cancel(self) -> None:
         """|coro|

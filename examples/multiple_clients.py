@@ -16,7 +16,7 @@ import os
 import json
 
 instances = {}
-filename = 'device_auths.json'
+filename = "device_auths.json"
 credentials = {
     "email1": "password1",
     "email2": "password2",
@@ -30,32 +30,40 @@ credentials = {
     "email10": "password10",
 }
 
+
 def get_device_auth_details():
     if os.path.isfile(filename):
-        with open(filename, 'r') as fp:
+        with open(filename, "r") as fp:
             return json.load(fp)
     return {}
+
 
 def store_device_auth_details(email, details):
     existing = get_device_auth_details()
     existing[email] = details
 
-    with open(filename, 'w') as fp:
+    with open(filename, "w") as fp:
         json.dump(existing, fp)
+
 
 async def event_sub_device_auth_generate(details, email):
     store_device_auth_details(email, details)
 
+
 async def event_sub_ready(client):
     instances[client.user.id] = client
-    print('{0.user.display_name} ready.'.format(client))
+    print("{0.user.display_name} ready.".format(client))
+
 
 async def event_sub_friend_request(request):
-    print('{0.client.user.display_name} received a friend request.'.format(request))
+    print("{0.client.user.display_name} received a friend request.".format(request))
     await request.accept()
 
+
 async def event_sub_party_member_join(member):
-    print("{0.display_name} joined {0.client.user.display_name}'s party.".format(member))            
+    print(
+        "{0.display_name} joined {0.client.user.display_name}'s party.".format(member)
+    )
 
 
 clients = []
@@ -67,27 +75,30 @@ for email, password in credentials.items():
         prompt_authorization_code=True,
         prompt_code_if_invalid=True,
         delete_existing_device_auths=True,
-        **device_auths.get(email, {})
+        **device_auths.get(email, {}),
     )
 
     client = fortnitepy.Client(
         auth=authentication,
         default_party_member_config=fortnitepy.DefaultPartyMemberConfig(
             meta=(
-                functools.partial(fortnitepy.ClientPartyMember.set_outfit, 'CID_175_Athena_Commando_M_Celestial'), # galaxy skin
+                functools.partial(
+                    fortnitepy.ClientPartyMember.set_outfit,
+                    "CID_175_Athena_Commando_M_Celestial",
+                ),  # galaxy skin
             )
-        )
+        ),
     )
 
     # register events here
-    client.add_event_handler('device_auth_generate', event_sub_device_auth_generate)
-    client.add_event_handler('friend_request', event_sub_friend_request)
-    client.add_event_handler('party_member_join', event_sub_party_member_join)
+    client.add_event_handler("device_auth_generate", event_sub_device_auth_generate)
+    client.add_event_handler("friend_request", event_sub_friend_request)
+    client.add_event_handler("party_member_join", event_sub_party_member_join)
 
     clients.append(client)
 
 fortnitepy.run_multiple(
     clients,
     ready_callback=event_sub_ready,
-    all_ready_callback=lambda: print('All clients ready')
+    all_ready_callback=lambda: print("All clients ready"),
 )

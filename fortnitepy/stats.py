@@ -28,29 +28,29 @@ from .user import User
 from .enums import Platform
 
 replacers = {
-    'placetop1': 'wins',
+    "placetop1": "wins",
 }
 
 skips = (
-    's11_social_bp_level',
-    's13_social_bp_level',
+    "s11_social_bp_level",
+    "s13_social_bp_level",
 )
 
 
 class _StatsBase:
-    __slots__ = ('raw', '_user', '_stats', '_start_time', '_end_time')
+    __slots__ = ("raw", "_user", "_stats", "_start_time", "_end_time")
 
     def __init__(self, user: User, data: dict) -> None:
         self.raw = data
         self._user = user
         self._stats = None
 
-        self._start_time = datetime.datetime.utcfromtimestamp(data['startTime'])  # noqa
+        self._start_time = datetime.datetime.utcfromtimestamp(data["startTime"])  # noqa
 
-        if data['endTime'] == 9223372036854775807:
+        if data["endTime"] == 9223372036854775807:
             self._end_time = datetime.datetime.utcnow()
         else:
-            self._end_time = datetime.datetime.utcfromtimestamp(data['endTime'])  # noqa
+            self._end_time = datetime.datetime.utcfromtimestamp(data["endTime"])  # noqa
 
     @property
     def user(self) -> User:
@@ -84,8 +84,10 @@ class _StatsBase:
 class StatsV2(_StatsBase):
     """Represents a users Battle Royale stats on Fortnite."""
 
-    __slots__ = _StatsBase.__slots__ + ('_combined_stats',
-                                        '_platform_specific_combined_stats')
+    __slots__ = _StatsBase.__slots__ + (
+        "_combined_stats",
+        "_platform_specific_combined_stats",
+    )
 
     def __init__(self, user: User, data: dict) -> None:
         super().__init__(user, data)
@@ -94,8 +96,10 @@ class StatsV2(_StatsBase):
         self._combined_stats = None
 
     def __repr__(self) -> str:
-        return ('<StatsV2 user={0.user!r} start_time={0.start_time!r} '
-                'end_time={0.end_time!r}>'.format(self))
+        return (
+            "<StatsV2 user={0.user!r} start_time={0.start_time!r} "
+            "end_time={0.end_time!r}>".format(self)
+        )
 
     @staticmethod
     def create_stat(stat: str, platform: Platform, playlist: str) -> str:
@@ -104,9 +108,7 @@ class StatsV2(_StatsBase):
                 if v == stat:
                     stat = k
 
-        return 'br_{0}_{1}_m0_playlist_{2}'.format(stat,
-                                                   platform.value,
-                                                   playlist)
+        return "br_{0}_{1}_m0_playlist_{2}".format(stat, platform.value, playlist)
 
     def get_kd(self, data: dict) -> float:
         """Gets the kd of a gamemode
@@ -132,15 +134,15 @@ class StatsV2(_StatsBase):
             Returns the kd with a decimal point accuracy of two.
         """
 
-        kills = data.get('kills', 0)
-        matches = data.get('matchesplayed', 0)
-        wins = data.get('wins', 0)
+        kills = data.get("kills", 0)
+        matches = data.get("matchesplayed", 0)
+        wins = data.get("wins", 0)
 
         try:
             kd = kills / (matches - wins)
         except ZeroDivisionError:
             kd = 0
-        return float(format(kd, '.2f'))
+        return float(format(kd, ".2f"))
 
     def get_winpercentage(self, data: dict) -> float:
         """Gets the winpercentage of a gamemode
@@ -165,8 +167,8 @@ class StatsV2(_StatsBase):
             Returns the winpercentage with a decimal point accuracy of two.
         """  # noqa
 
-        matches = data.get('matchesplayed', 0)
-        wins = data.get('wins', 0)
+        matches = data.get("matchesplayed", 0)
+        wins = data.get("wins", 0)
 
         try:
             winper = (wins * 100) / matches
@@ -174,26 +176,26 @@ class StatsV2(_StatsBase):
             winper = 0
         if winper > 100:
             winper = 100
-        return float(format(winper, '.2f'))
+        return float(format(winper, ".2f"))
 
     def parse(self) -> None:
         result = {}
-        for fullname, stat in self.raw['stats'].items():
+        for fullname, stat in self.raw["stats"].items():
             if fullname in skips:
                 continue
 
-            parts = fullname.split('_')
+            parts = fullname.split("_")
 
             name = parts[1]
             inp = parts[2]
-            playlist = '_'.join(parts[5:])
+            playlist = "_".join(parts[5:])
 
             try:
                 name = replacers[name]
             except KeyError:
                 pass
 
-            if name == 'lastmodified':
+            if name == "lastmodified":
                 stat = datetime.datetime.utcfromtimestamp(stat)
 
             if inp not in result:
@@ -284,7 +286,7 @@ class StatsV2(_StatsBase):
 class StatsCollection(_StatsBase):
     """Represents a users Battle Royale stats collection on Fortnite."""
 
-    __slots__ = _StatsBase.__slots__ + ('_name',)
+    __slots__ = _StatsBase.__slots__ + ("_name",)
 
     def __init__(self, user: User, data: dict) -> None:
         super().__init__(user, data)
@@ -292,17 +294,19 @@ class StatsCollection(_StatsBase):
         self._name = None
 
     def __repr__(self) -> str:
-        return ('<StatsCollection user={0.user!r} start_time={0.start_time!r} '
-                'end_time={0.end_time!r}>'.format(self))
+        return (
+            "<StatsCollection user={0.user!r} start_time={0.start_time!r} "
+            "end_time={0.end_time!r}>".format(self)
+        )
 
     def parse(self) -> None:
         result = {}
 
         # stat example: br_collection_fish_flopper_orange_length_s14
-        for stat, value in self.raw['stats'].items():
-            split = stat.split('_')
-            name = '_'.join(split[3:-1])
-            self._name = '_'.join(split[1:3])
+        for stat, value in self.raw["stats"].items():
+            split = stat.split("_")
+            name = "_".join(split[3:-1])
+            self._name = "_".join(split[1:3])
 
             result[name] = value
 

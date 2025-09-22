@@ -27,20 +27,22 @@ SOFTWARE.
 
 class BattleRoyaleNewsPost:
     def __init__(self, data: dict) -> None:
-        self._image = data['image']
-        self._hidden = data['hidden']
-        self._type = data['_type']
-        self._title = data['title']
-        self._body = data['body']
-        self._spotlight = data['spotlight']
-        self._adspace = data.get('adspace')
+        self._image = data["image"]
+        self._hidden = data["hidden"]
+        self._type = data["_type"]
+        self._title = data["title"]
+        self._body = data["body"]
+        self._spotlight = data["spotlight"]
+        self._adspace = data.get("adspace")
 
     def __str__(self) -> str:
         return self.title
 
     def __repr__(self) -> str:
-        return ('<BattleRoyaleNewsPost title={0.title!r} image={0.image!r} '
-                'spotlight={0.spotlight}>'.format(self))
+        return (
+            "<BattleRoyaleNewsPost title={0.title!r} image={0.image!r} "
+            "spotlight={0.spotlight}>".format(self)
+        )
 
     @property
     def image(self) -> str:

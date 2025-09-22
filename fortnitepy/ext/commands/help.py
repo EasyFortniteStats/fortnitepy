@@ -22,7 +22,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-
 import copy
 import functools
 import inspect
@@ -30,8 +29,18 @@ import re
 import unicodedata
 
 from collections import OrderedDict
-from typing import (TYPE_CHECKING, Any, List, Dict, Optional, Iterable,
-                    Callable, Sequence, Union, Tuple)
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    List,
+    Dict,
+    Optional,
+    Iterable,
+    Callable,
+    Sequence,
+    Union,
+    Tuple,
+)
 from fortnitepy.typedefs import MaybeCoro
 from fortnitepy.party import ClientParty
 from fortnitepy.friend import Friend
@@ -46,12 +55,12 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    'Paginator',
-    'HelpCommand',
-    'FortniteHelpCommand',
+    "Paginator",
+    "HelpCommand",
+    "FortniteHelpCommand",
 )
 
-_IS_ASCII = re.compile(r'^[\x00-\x7f]+$')
+_IS_ASCII = re.compile(r"^[\x00-\x7f]+$")
 
 
 def _string_width(string: str, *, _IS_ASCII: Any = _IS_ASCII) -> int:
@@ -60,7 +69,7 @@ def _string_width(string: str, *, _IS_ASCII: Any = _IS_ASCII) -> int:
     if match:
         return match.endpos
 
-    UNICODE_WIDE_CHAR_TYPE = 'WFA'
+    UNICODE_WIDE_CHAR_TYPE = "WFA"
     width = 0
     func = unicodedata.east_asian_width
     for char in string:
@@ -68,9 +77,7 @@ def _string_width(string: str, *, _IS_ASCII: Any = _IS_ASCII) -> int:
     return width
 
 
-async def maybe_coroutine(func: MaybeCoro,
-                          *args: list,
-                          **kwargs: dict) -> Any:
+async def maybe_coroutine(func: MaybeCoro, *args: list, **kwargs: dict) -> Any:
     value = func(*args, **kwargs)
     if inspect.isawaitable(value):
         return await value
@@ -96,9 +103,9 @@ class Paginator:
         The maximum amount of codepoints allowed in a page.
     """
 
-    def __init__(self, prefix: str = '',
-                 suffix: str = '',
-                 max_size: int = 10000) -> None:
+    def __init__(
+        self, prefix: str = "", suffix: str = "", max_size: int = 10000
+    ) -> None:
         self.prefix = prefix
         self.suffix = suffix
         self.max_size = max_size
@@ -127,7 +134,7 @@ class Paginator:
         """Adds a page to the paginator with no additional checks done."""
         self._pages.append(text)
 
-    def add_line(self, line: str = '', *, empty: bool = False) -> None:
+    def add_line(self, line: str = "", *, empty: bool = False) -> None:
         """Adds a line to the current page.
 
         If the line exceeds the :attr:`max_size` then an exception
@@ -147,8 +154,9 @@ class Paginator:
         """
         max_page_size = self.max_size - self._prefix_len - self._suffix_len
         if len(line) > max_page_size:
-            raise RuntimeError('Line exceeds maximum page size '
-                               '{}'.format(max_page_size))
+            raise RuntimeError(
+                "Line exceeds maximum page size {}".format(max_page_size)
+            )
 
         if self._count + len(line) + 1 > self.max_size - self._suffix_len:
             self.close_page()
@@ -157,7 +165,7 @@ class Paginator:
         self._current_page.append(line)
 
         if empty:
-            self._current_page.append('')
+            self._current_page.append("")
             self._count += 1
 
     def close_page(self) -> None:
@@ -166,7 +174,7 @@ class Paginator:
         if self.suffix is not None:
             self._current_page.append(self.suffix)
 
-        self._pages.append('\n'.join(self._current_page))
+        self._pages.append("\n".join(self._current_page))
 
         if self.prefix is not None:
             self._current_page = []
@@ -189,8 +197,10 @@ class Paginator:
         return self._pages
 
     def __repr__(self) -> str:
-        fmt = ('<Paginator prefix: {0.prefix} suffix: {0.suffix} max_size: '
-               '{0.max_size} count: {0._count}>')
+        fmt = (
+            "<Paginator prefix: {0.prefix} suffix: {0.suffix} max_size: "
+            "{0.max_size} count: {0._count}>"
+        )
         return fmt.format(self)
 
 
@@ -211,7 +221,7 @@ class _HelpCommandImpl(Command):
         self.callback = injected.command_callback
 
         error_handler = injected.help_command_error_handler
-        if not hasattr(error_handler, '__fnpy_help_command_not_overridden__'):
+        if not hasattr(error_handler, "__fnpy_help_command_not_overridden__"):
             if self.cog is not None:
                 self.error_handler = self._error_handler_cog_implementation
             else:
@@ -229,9 +239,9 @@ class _HelpCommandImpl(Command):
         finally:
             self.cog = original_cog
 
-    async def _error_handler_cog_implementation(self, _,
-                                                ctx: Context,
-                                                error: Exception) -> None:
+    async def _error_handler_cog_implementation(
+        self, _, ctx: Context, error: Exception
+    ) -> None:
         await self._injected.help_command_error_handler(ctx, error)
 
     @property
@@ -240,7 +250,7 @@ class _HelpCommandImpl(Command):
         try:
             result.popitem(last=False)
         except Exception:
-            raise ValueError('Missing context parameter') from None
+            raise ValueError("Missing context parameter") from None
         else:
             return result
 
@@ -309,7 +319,7 @@ class HelpCommand:
         constructor.
     """
 
-    def __new__(cls, *args: list, **kwargs: dict) -> 'HelpCommand':
+    def __new__(cls, *args: list, **kwargs: dict) -> "HelpCommand":
         # To prevent race conditions of a single instance while also allowing
         # for settings to be passed the original arguments passed must be
         # assigned to allow for easier copies (which will be made when the
@@ -322,33 +332,30 @@ class HelpCommand:
         # into the function. The keys can be safely copied as-is since they're
         # 99.99% certain of being string keys
         deepcopy = copy.deepcopy
-        self.__original_kwargs__ = {
-            k: deepcopy(v)
-            for k, v in kwargs.items()
-        }
+        self.__original_kwargs__ = {k: deepcopy(v) for k, v in kwargs.items()}
         self.__original_args__ = deepcopy(args)
         return self
 
     def __init__(self, **options: dict) -> None:
-        self.show_hidden = options.pop('show_hidden', False)
-        self.verify_checks = options.pop('verify_checks', True)
-        self.command_attrs = attrs = options.pop('command_attrs', {})
-        attrs.setdefault('name', 'help')
-        attrs.setdefault('help', 'Shows this message')
+        self.show_hidden = options.pop("show_hidden", False)
+        self.verify_checks = options.pop("verify_checks", True)
+        self.command_attrs = attrs = options.pop("command_attrs", {})
+        attrs.setdefault("name", "help")
+        attrs.setdefault("help", "Shows this message")
         self.context = None
         self._command_impl = None
 
-    def copy(self) -> 'HelpCommand':
+    def copy(self) -> "HelpCommand":
         o = self.__class__(*self.__original_args__, **self.__original_kwargs__)
         o._command_impl = self._command_impl
         return o
 
-    def _add_to_bot(self, bot: 'Bot') -> None:
+    def _add_to_bot(self, bot: "Bot") -> None:
         command = _HelpCommandImpl(self, **self.command_attrs)
         bot.add_command(command)
         self._command_impl = command
 
-    def _remove_from_bot(self, bot: 'Bot') -> None:
+    def _remove_from_bot(self, bot: "Bot") -> None:
         bot.remove_command(self._command_impl.name)
         self._command_impl._eject_cog()
         self._command_impl = None
@@ -356,10 +363,7 @@ class HelpCommand:
     def get_bot_mapping(self) -> Dict[Optional[Cog], List[Command]]:
         """Retrieves the bot mapping passed to :meth:`send_bot_help`."""
         bot = self.context.bot
-        mapping = {
-            cog: cog.get_commands()
-            for cog in bot.cogs.values()
-        }
+        mapping = {cog: cog.get_commands() for cog in bot.cogs.values()}
         mapping[None] = [c for c in bot.all_commands.values() if c.cog is None]
         return mapping
 
@@ -386,8 +390,11 @@ class HelpCommand:
 
         command_name = self._command_impl.name
         ctx = self.context
-        if (ctx is None or ctx.command is None
-                or ctx.command.qualified_name != command_name):
+        if (
+            ctx is None
+            or ctx.command is None
+            or ctx.command.qualified_name != command_name
+        ):
             return command_name
         return ctx.invoked_with
 
@@ -407,15 +414,15 @@ class HelpCommand:
 
         parent = command.full_parent_name
         if len(command.aliases) > 0:
-            aliases = '|'.join(command.aliases)
-            fmt = '[%s|%s]' % (command.name, aliases)
+            aliases = "|".join(command.aliases)
+            fmt = "[%s|%s]" % (command.name, aliases)
             if parent:
-                fmt = parent + ' ' + fmt
+                fmt = parent + " " + fmt
             alias = fmt
         else:
-            alias = command.name if not parent else parent + ' ' + command.name
+            alias = command.name if not parent else parent + " " + command.name
 
-        return '%s%s %s' % (self.command_prefix, alias, command.signature)
+        return "%s%s %s" % (self.command_prefix, alias, command.signature)
 
     @property
     def cog(self) -> Optional[Cog]:
@@ -492,16 +499,18 @@ class HelpCommand:
         """  # noqa
 
         if isinstance(command, Group) and len(command.all_commands) > 0:
-            return ('Command "{0.qualified_name}" has no subcommand named '
-                    '{1}'.format(command, string))
-        return 'Command "{0.qualified_name}" has no subcommands.'.format(
-            command
-        )
+            return 'Command "{0.qualified_name}" has no subcommand named {1}'.format(
+                command, string
+            )
+        return 'Command "{0.qualified_name}" has no subcommands.'.format(command)
 
-    async def filter_commands(self, commands: Iterable[Command], *,
-                              sort: bool = False,
-                              key: Optional[Callable] = None
-                              ) -> List[Command]:
+    async def filter_commands(
+        self,
+        commands: Iterable[Command],
+        *,
+        sort: bool = False,
+        key: Optional[Callable] = None,
+    ) -> List[Command]:
         """|coro|
 
         Returns a filtered list of commands and optionally sorts them.
@@ -571,10 +580,7 @@ class HelpCommand:
             The maximum width of the commands.
         """
 
-        as_lengths = (
-            _string_width(c.name)
-            for c in commands
-        )
+        as_lengths = (_string_width(c.name) for c in commands)
         return max(as_lengths, default=0)
 
     def get_destination(self) -> Union[Friend, ClientParty]:
@@ -614,8 +620,7 @@ class HelpCommand:
         await destination.send(error)
 
     @_not_overridden
-    async def help_command_error_handler(self, ctx: Context,
-                                         error: Exception) -> None:
+    async def help_command_error_handler(self, ctx: Context, error: Exception) -> None:
         """|coro|
 
         The help command's error handler, as specified by
@@ -765,8 +770,9 @@ class HelpCommand:
         """
         return None
 
-    async def prepare_help_command(self, ctx: Context,
-                                   command: Optional[Command] = None) -> None:
+    async def prepare_help_command(
+        self, ctx: Context, command: Optional[Command] = None
+    ) -> None:
         """|coro|
 
         A low level method that can be used to prepare the help command
@@ -821,7 +827,7 @@ class HelpCommand:
                 page = 1
                 new = command
             else:
-                new = None if len(split) == 1 else ' '.join(split[:-1])
+                new = None if len(split) == 1 else " ".join(split[:-1])
         else:
             new = command
 
@@ -839,7 +845,7 @@ class HelpCommand:
                 return await self.send_cog_help(cog, page)
 
         if command.startswith(self.command_prefix):
-            command = command[len(self.command_prefix):]
+            command = command[len(self.command_prefix) :]
 
         maybe_coro = maybe_coroutine
 
@@ -847,7 +853,7 @@ class HelpCommand:
         # Since we want to have detailed errors when someone
         # passes an invalid subcommand, we need to walk through
         # the command group chain ourselves.
-        keys = command.split(' ')
+        keys = command.split(" ")
         cmd = bot.all_commands.get(keys[0])
         if cmd is None:
             string = await maybe_coro(self.command_not_found, keys[0])
@@ -861,11 +867,7 @@ class HelpCommand:
                 return await self.send_error_message(string)
             else:
                 if found is None:
-                    string = await maybe_coro(
-                        self.subcommand_not_found,
-                        cmd,
-                        key
-                    )
+                    string = await maybe_coro(self.subcommand_not_found, cmd, key)
                     return await self.send_error_message(string)
                 cmd = found
 
@@ -943,32 +945,32 @@ class FortniteHelpCommand(HelpCommand):
     """
 
     def __init__(self, **options: dict) -> None:
-        self.dm_help = options.pop('dm_help', False)
-        self.paginator = options.pop('paginator', None)
+        self.dm_help = options.pop("dm_help", False)
+        self.paginator = options.pop("paginator", None)
 
-        self.commands_title = options.pop('commands_title', 'Commands:')
-        self.cog_title = options.pop('cog_title', 'Category:')
-        self.usage_title = options.pop('usage_title', 'Usage:')
-        self.description_title = options.pop('description_title', 'Description:')  # noqa
-        self.help_title = options.pop('help_title', 'Help:')
-        self.sub_commands_title = options.pop('sub_commands_title', 'Sub Commands:')  # noqa
+        self.commands_title = options.pop("commands_title", "Commands:")
+        self.cog_title = options.pop("cog_title", "Category:")
+        self.usage_title = options.pop("usage_title", "Usage:")
+        self.description_title = options.pop("description_title", "Description:")  # noqa
+        self.help_title = options.pop("help_title", "Help:")
+        self.sub_commands_title = options.pop("sub_commands_title", "Sub Commands:")  # noqa
 
-        self.no_category = options.pop('no_category_heading', 'No Category')
+        self.no_category = options.pop("no_category_heading", "No Category")
 
-        self.height = options.pop('height', 15)
-        self.width = options.pop('width', 60)
-        self.indent = options.pop('indent', 4)
+        self.height = options.pop("height", 15)
+        self.width = options.pop("width", 60)
+        self.indent = options.pop("indent", 4)
 
-        self.title_prefix = options.pop('title_prefix', ' +')
-        self.title_suffix = options.pop('title_suffix', '+')
-        self.title_char = options.pop('title_char', '=')
+        self.title_prefix = options.pop("title_prefix", " +")
+        self.title_suffix = options.pop("title_suffix", "+")
+        self.title_char = options.pop("title_char", "=")
 
-        self.line_prefix = options.pop('line_prefix', '   ')
-        self.line_suffix = options.pop('line_suffix', '')
+        self.line_prefix = options.pop("line_prefix", "   ")
+        self.line_suffix = options.pop("line_suffix", "")
 
-        self.footer_prefix = options.pop('footer_prefix', ' +')
-        self.footer_suffix = options.pop('footer_suffix', '+')
-        self.footer_char = options.pop('footer_char', '=')
+        self.footer_prefix = options.pop("footer_prefix", " +")
+        self.footer_suffix = options.pop("footer_suffix", "+")
+        self.footer_char = options.pop("footer_char", "=")
 
         if self.paginator is None:
             self.paginator = Paginator()
@@ -1008,7 +1010,7 @@ class FortniteHelpCommand(HelpCommand):
         :class:`str`
             | The sub command name.
             | Defaults to ``{self.command_prefix} {sub_command.qualified_name}``
-        """  # noqa 
+        """  # noqa
         return self.command_prefix + sub_command.qualified_name
 
     def get_bot_header(self, page_num: int, pages_amount: int) -> str:
@@ -1030,11 +1032,7 @@ class FortniteHelpCommand(HelpCommand):
             | Defaults to ``{self.command_prefix} {sub_command.qualified_name}``
         """  # noqa
 
-        return '{0} - {1} / {2}'.format(
-            'All Commands',
-            page_num,
-            pages_amount
-        )
+        return "{0} - {1} / {2}".format("All Commands", page_num, pages_amount)
 
     def get_bot_footer(self, page_num: int, pages_amount: str) -> str:
         """Gets the text to appear in the footer when
@@ -1055,7 +1053,7 @@ class FortniteHelpCommand(HelpCommand):
             | The bot footer.
             | Defaults to ```` (Empty)
         """
-        return ''
+        return ""
 
     def get_command_header(self, command: Command) -> str:
         """Gets the text to appear in the header when
@@ -1074,10 +1072,7 @@ class FortniteHelpCommand(HelpCommand):
             | The header text.
             | Defaults to ``Command | {self.command_prefix}{command.qualified_name}``
         """  # noqa
-        return 'Command | {0}{1}'.format(
-            self.command_prefix,
-            command.qualified_name
-        )
+        return "Command | {0}{1}".format(self.command_prefix, command.qualified_name)
 
     def get_command_footer(self, command: Command) -> str:
         """Gets the text to appear in the footer when
@@ -1096,7 +1091,7 @@ class FortniteHelpCommand(HelpCommand):
             | The footer text.
             | Defaults to ```` (Empty)
         """
-        return ''
+        return ""
 
     def get_group_header(self, group: Group) -> str:
         """Gets the text to appear in the header when
@@ -1115,10 +1110,7 @@ class FortniteHelpCommand(HelpCommand):
             | The header text.
             | Defaults to ``Command | {self.command_prefix}{group.qualified_name}``
         """  # noqa
-        return 'Command | {0}{1}'.format(
-            self.command_prefix,
-            group.qualified_name
-        )
+        return "Command | {0}{1}".format(self.command_prefix, group.qualified_name)
 
     def get_group_footer(self, group: Group) -> str:
         """Gets the text to appear in the footer when
@@ -1137,11 +1129,9 @@ class FortniteHelpCommand(HelpCommand):
             | The footer text.
             | Defaults to ```` (Empty)
         """
-        return ''
+        return ""
 
-    def get_cog_header(self, cog: Cog,
-                       page_num: int,
-                       pages_amount: int) -> str:
+    def get_cog_header(self, cog: Cog, page_num: int, pages_amount: int) -> str:
         """Gets the text to appear in the header when
         :meth:`send_cog_help()` is called.
 
@@ -1162,15 +1152,11 @@ class FortniteHelpCommand(HelpCommand):
             | The header text.
             | Defaults to ``Category | {cog.qualified_name} - {page_num} / {pages_amount}``
         """  # noqa
-        return 'Category | {0} - {1} / {2}'.format(
-            cog.qualified_name,
-            page_num,
-            pages_amount
+        return "Category | {0} - {1} / {2}".format(
+            cog.qualified_name, page_num, pages_amount
         )
 
-    def get_cog_footer(self, cog: Cog,
-                       page_num: int,
-                       pages_amount: int) -> str:
+    def get_cog_footer(self, cog: Cog, page_num: int, pages_amount: int) -> str:
         """Gets the text to appear in the footer when
         :meth:`send_cog_help()` is called.
 
@@ -1191,74 +1177,62 @@ class FortniteHelpCommand(HelpCommand):
             | The footer text.
             | Defaults to ``{self.command_prefix}{self.invoked_with} {cog.qualified_name} <page> | {self.command_prefix}{self.invoked_with} <command>``
         """  # noqa
-        return '{0}{1} {2} <page> | {0}{1} <command>'.format(
-            self.command_prefix,
-            self.invoked_with,
-            cog.qualified_name
+        return "{0}{1} {2} <page> | {0}{1} <command>".format(
+            self.command_prefix, self.invoked_with, cog.qualified_name
         )
 
-    def shorten_text(self, text: str,
-                     max_len: int,
-                     dot_amount: int = 3) -> str:
+    def shorten_text(self, text: str, max_len: int, dot_amount: int = 3) -> str:
         """Shortens text to fit into the :attr:`width`."""
 
         if len(text) > max_len:
-            return text[:max_len-dot_amount] + '.'*dot_amount
+            return text[: max_len - dot_amount] + "." * dot_amount
         return text
 
     def construct_title(self, t: str) -> str:
-        _title = ' ' + t + ' ' if t else ''
+        _title = " " + t + " " if t else ""
         w = self.width - len(self.title_prefix) - len(self.title_suffix)
-        return '{0}{1:{2}^{3}}{4}'.format(
-            self.title_prefix,
-            _title,
-            self.title_char,
-            w,
-            self.title_suffix
+        return "{0}{1:{2}^{3}}{4}".format(
+            self.title_prefix, _title, self.title_char, w, self.title_suffix
         )
 
     def construct_footer(self, f: str) -> str:
-        _footer = ' ' + f + ' ' if f else ''
+        _footer = " " + f + " " if f else ""
         w = self.width - len(self.footer_prefix) - len(self.footer_suffix)
-        return '{0}{1:{2}^{3}}{4}'.format(
-            self.footer_prefix,
-            _footer,
-            self.footer_char,
-            w,
-            self.footer_suffix
+        return "{0}{1:{2}^{3}}{4}".format(
+            self.footer_prefix, _footer, self.footer_char, w, self.footer_suffix
         )
 
-    def fix_too_long(self, string: str,
-                     length: int,
-                     start_length: int) -> Tuple[str, List[str]]:
-        first = string[:start_length-1]
-        string = string[start_length-1:]
+    def fix_too_long(
+        self, string: str, length: int, start_length: int
+    ) -> Tuple[str, List[str]]:
+        first = string[: start_length - 1]
+        string = string[start_length - 1 :]
 
         return (
             first,
-            [string[0+i:length-1+i] for i in range(0, len(string), length-1)]
+            [string[0 + i : length - 1 + i] for i in range(0, len(string), length - 1)],
         )
 
     def chunkstring(self, string: str, length: int) -> List[str]:
         lines = []
-        curr = ''
+        curr = ""
         split = string.split()
         for c, word in enumerate(split, 1):
             spaces = 1 if c != len(split) else 0
             if len(word) + spaces > length:
-                space_left = (length - len(curr))
+                space_left = length - len(curr)
                 start_length = space_left if space_left > 5 else 0
                 first, too_long = self.fix_too_long(word, length, start_length)
                 if first:
-                    curr += first + '-'
+                    curr += first + "-"
 
                 if curr:
                     lines.append(curr)
-                    curr = ''
+                    curr = ""
 
                 for cc, new in enumerate(too_long, 1):
                     if cc != len(too_long):
-                        new += '-'
+                        new += "-"
                         lines.append(new)
                     else:
                         curr += new
@@ -1266,9 +1240,9 @@ class FortniteHelpCommand(HelpCommand):
 
             if len(curr) + len(word) > length:
                 lines.append(curr[:-1])
-                curr = ''
+                curr = ""
 
-            curr += word + ' '
+            curr += word + " "
 
         if curr:
             lines.append(curr)
@@ -1276,32 +1250,23 @@ class FortniteHelpCommand(HelpCommand):
         return lines
 
     def construct_single_line(self, text: str, extra_indent: int = 0) -> str:
-        prefix = self.line_prefix + ' '*extra_indent
+        prefix = self.line_prefix + " " * extra_indent
         suffix = self.line_suffix
 
         w = self.width - len(prefix) - len(suffix)
-        return '{0}{1:<{2}}{3}'.format(
-            prefix,
-            text,
-            w,
-            suffix
-        )
+        return "{0}{1:<{2}}{3}".format(prefix, text, w, suffix)
 
-    def construct_category(self, name: str,
-                           brief: str,
-                           extra_indent: int = 0,
-                           raw: bool = False) -> List[str]:
-        prefix = self.line_prefix + ' '*extra_indent
+    def construct_category(
+        self, name: str, brief: str, extra_indent: int = 0, raw: bool = False
+    ) -> List[str]:
+        prefix = self.line_prefix + " " * extra_indent
         suffix = self.line_suffix
 
         indent = self.indent
 
         w = self.width - len(prefix) - len(suffix)
-        name_line = '{0}{1:<{2}}{3}'.format(
-            prefix,
-            self.shorten_text(name, w),
-            w,
-            suffix
+        name_line = "{0}{1:<{2}}{3}".format(
+            prefix, self.shorten_text(name, w), w, suffix
         )
 
         brief_w = w - indent
@@ -1313,16 +1278,12 @@ class FortniteHelpCommand(HelpCommand):
             gen = brief.splitlines()
 
         for c, line in enumerate(gen, 2):
-            fmt = '{0}{1}{2:<{3}}{4}'.format(
-                prefix,
-                ' '*indent,
-                line,
-                brief_w,
-                suffix
+            fmt = "{0}{1}{2:<{3}}{4}".format(
+                prefix, " " * indent, line, brief_w, suffix
             )
             if c == self.height - 2:
                 to_cut = 3 + len(suffix)
-                new = fmt[:to_cut] + '...' + suffix
+                new = fmt[:to_cut] + "..." + suffix
                 lines.append(new)
                 break
 
@@ -1347,24 +1308,22 @@ class FortniteHelpCommand(HelpCommand):
         pages = self.paginator.pages
         if page_num <= 0 or page_num > len(pages):
             return await self.send_error_message(
-                'Could not find the page you were looking for'
+                "Could not find the page you were looking for"
             )
 
         destination = self.get_destination()
-        await destination.send(pages[page_num-1])
+        await destination.send(pages[page_num - 1])
 
     def get_destination(self) -> Union[Friend, ClientParty]:
         ctx = self.context
         if self.dm_help is True:
             return ctx.author
-        elif (self.dm_help is None
-                and len(self.paginator) > self.dm_help_threshold):
+        elif self.dm_help is None and len(self.paginator) > self.dm_help_threshold:
             return ctx.author
         else:
             return ctx.get_destination()
 
-    async def prepare_help_command(self, ctx: Context,
-                                   command: Command) -> None:
+    async def prepare_help_command(self, ctx: Context, command: Command) -> None:
         self.paginator.clear()
         await super().prepare_help_command(ctx, command)
 
@@ -1397,31 +1356,24 @@ class FortniteHelpCommand(HelpCommand):
         ctx = self.context
         bot = ctx.bot
 
-        no_category = '\u200b{0.no_category}:'.format(self)
+        no_category = "\u200b{0.no_category}:".format(self)
 
         def get_category(command, *, no_category=no_category):
             cog = command.cog
             return cog.qualified_name if cog is not None else no_category
 
-        filtered = await self.filter_commands(
-            bot.commands,
-            sort=True,
-            key=get_category
-        )
+        filtered = await self.filter_commands(bot.commands, sort=True, key=get_category)
 
         chunks = []
         curr = []
 
         if bot.description:
-            parts = self.construct_category(
-                self.description_title,
-                bot.description
-            )
+            parts = self.construct_category(self.description_title, bot.description)
             curr.extend(parts)
 
         for command in filtered:
             name = self.get_command_name(command)
-            brief = command.brief or ''
+            brief = command.brief or ""
             lines = self.construct_category(name, brief)
 
             if len(lines) + len(curr) > self.height - 2:
@@ -1435,97 +1387,71 @@ class FortniteHelpCommand(HelpCommand):
 
         chunks_length = len(chunks)
         for c, chunk in enumerate(chunks, 1):
-
-            footer_fmt = self.get_bot_footer(c, chunks_length) or ''
+            footer_fmt = self.get_bot_footer(c, chunks_length) or ""
             page_chunks = [
-                self.construct_title(
-                    self.get_bot_header(c, chunks_length) or ''
-                ),
+                self.construct_title(self.get_bot_header(c, chunks_length) or ""),
                 *chunk,
-                self.construct_footer(footer_fmt.format(
-                    self.command_prefix,
-                    self.invoked_with,
-                ))
+                self.construct_footer(
+                    footer_fmt.format(
+                        self.command_prefix,
+                        self.invoked_with,
+                    )
+                ),
             ]
-            self.paginator.add_page(
-                '\u200b\n' + '\n'.join(page_chunks)
-            )
+            self.paginator.add_page("\u200b\n" + "\n".join(page_chunks))
 
         await self.send_page(page)
 
     async def send_command_help(self, command: Command) -> None:
         result = self.construct_command_help(command)
 
-        title = self.construct_title(self.get_command_header(command) or '')
-        footer = self.construct_footer(self.get_command_footer(command) or '')
-        self.paginator.add_page(
-            '\u200b\n' + '\n'.join([title, *result, footer])
-        )
+        title = self.construct_title(self.get_command_header(command) or "")
+        footer = self.construct_footer(self.get_command_footer(command) or "")
+        self.paginator.add_page("\u200b\n" + "\n".join([title, *result, footer]))
 
         await self.send_pages()
 
     async def send_group_help(self, group: Group) -> None:
         result = self.construct_command_help(group)
 
-        filtered = await self.filter_commands(
-            group.commands,
-            sort=True
-        )
+        filtered = await self.filter_commands(group.commands, sort=True)
 
         for c, command in enumerate(filtered):
             if c == 0:
                 title = self.sub_commands_title
-                result.append('\n'+self.construct_single_line(title))
+                result.append("\n" + self.construct_single_line(title))
 
             name = self.get_sub_command_name(command)
-            brief = command.brief or ''
-            lines = self.construct_category(
-                name,
-                brief,
-                extra_indent=self.indent
-            )
+            brief = command.brief or ""
+            lines = self.construct_category(name, brief, extra_indent=self.indent)
 
             result.extend(lines)
 
-        title = self.construct_title(
-            self.get_group_header(group)
-        )
-        footer = self.construct_footer('')
-        self.paginator.add_page(
-            '\u200b\n' + '\n'.join([title, *result, footer])
-        )
+        title = self.construct_title(self.get_group_header(group))
+        footer = self.construct_footer("")
+        self.paginator.add_page("\u200b\n" + "\n".join([title, *result, footer]))
 
         await self.send_pages()
 
     async def send_cog_help(self, cog: Cog, page: str) -> None:
-        filtered = await self.filter_commands(
-            cog.get_commands(),
-            sort=True
-        )
+        filtered = await self.filter_commands(cog.get_commands(), sort=True)
 
         chunks = []
         curr = []
 
         if cog.description:
-            parts = self.construct_category(
-                self.description_title,
-                cog.description
-            )
+            parts = self.construct_category(self.description_title, cog.description)
             curr.extend(parts)
 
         for c, command in enumerate(filtered):
             if c == 0:
                 title = self.commands_title
-                pre = '\n' if curr else ''
-                curr.append(pre+self.construct_single_line(title))
+                pre = "\n" if curr else ""
+                curr.append(pre + self.construct_single_line(title))
 
             name = self.get_command_name(command)
-            brief = command.brief or ''
-            lines = self.construct_category(
-                name,
-                brief,
-                extra_indent=self.indent
-            )
+            brief = command.brief or ""
+            lines = self.construct_category(name, brief, extra_indent=self.indent)
 
             if len(lines) + len(curr) > self.height - 2:
                 chunks.append(curr)
@@ -1539,17 +1465,11 @@ class FortniteHelpCommand(HelpCommand):
         chunks_length = len(chunks)
         for c, chunk in enumerate(chunks, 1):
             title = self.construct_title(
-                self.get_cog_header(cog, c, chunks_length) or ''
+                self.get_cog_header(cog, c, chunks_length) or ""
             )
-            fmt = self.get_cog_footer(cog, c, chunks_length) or ''
+            fmt = self.get_cog_footer(cog, c, chunks_length) or ""
             footer = self.construct_footer(fmt)
-            page_chunks = [
-                title,
-                *chunk,
-                footer
-            ]
-            self.paginator.add_page(
-                '\u200b\n' + '\n'.join(page_chunks)
-            )
+            page_chunks = [title, *chunk, footer]
+            self.paginator.add_page("\u200b\n" + "\n".join(page_chunks))
 
         await self.send_page(page)

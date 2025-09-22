@@ -22,7 +22,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-
 import asyncio
 import functools
 import inspect
@@ -43,20 +42,20 @@ from .converter import Converter
 
 
 __all__ = (
-    'Command',
-    'Group',
-    'GroupMixin',
-    'command',
-    'group',
-    'check',
-    'check_any',
-    'before_invoke',
-    'after_invoke',
-    'cooldown',
-    'max_concurrency',
-    'dm_only',
-    'party_only',
-    'is_owner',
+    "Command",
+    "Group",
+    "GroupMixin",
+    "command",
+    "group",
+    "check",
+    "check_any",
+    "before_invoke",
+    "after_invoke",
+    "cooldown",
+    "max_concurrency",
+    "dm_only",
+    "party_only",
+    "is_owner",
 )
 
 
@@ -72,12 +71,13 @@ def wrap_callback(coro: Awaitable) -> Awaitable:
         except Exception as exc:
             raise errors.CommandInvokeError(exc) from exc
         return ret
+
     return wrapped
 
 
-def hooked_wrapped_callback(command: 'Command',
-                            ctx: Context,
-                            coro: Awaitable) -> Awaitable:
+def hooked_wrapped_callback(
+    command: "Command", ctx: Context, coro: Awaitable
+) -> Awaitable:
     @functools.wraps(coro)
     async def wrapped(*args: list, **kwargs: dict) -> Awaitable:
         try:
@@ -98,19 +98,18 @@ def hooked_wrapped_callback(command: 'Command',
             await command.call_after_hooks(ctx)
 
         return ret
+
     return wrapped
 
 
 def _convert_to_bool(argument: str) -> bool:
     lowered = argument.lower()
-    if lowered in ('yes', 'y', 'true', 't', '1', 'enable', 'on'):
+    if lowered in ("yes", "y", "true", "t", "1", "enable", "on"):
         return True
-    elif lowered in ('no', 'n', 'false', 'f', '0', 'disable', 'off'):
+    elif lowered in ("no", "n", "false", "f", "0", "disable", "off"):
         return False
     else:
-        raise errors.BadArgument(
-            lowered + ' is not a recognised boolean option'
-        )
+        raise errors.BadArgument(lowered + " is not a recognised boolean option")
 
 
 class _CaseInsensitiveDict(dict):
@@ -196,7 +195,7 @@ class Command(_BaseCommand):
         first and then the converters are called second. Defaults to ``False``.
     """
 
-    def __new__(cls, *args: list, **kwargs: dict) -> 'Command':
+    def __new__(cls, *args: list, **kwargs: dict) -> "Command":
         self = super().__new__(cls)
 
         self.__fnpy_original_kwargs__ = kwargs.copy()
@@ -204,66 +203,65 @@ class Command(_BaseCommand):
 
     def __init__(self, coro: Awaitable, **kwargs: dict) -> None:
         if not asyncio.iscoroutinefunction(coro):
-            raise TypeError('Command callback must be a coroutine')
+            raise TypeError("Command callback must be a coroutine")
 
-        self.name = kwargs.get('name') or coro.__name__
+        self.name = kwargs.get("name") or coro.__name__
         if not isinstance(self.name, str):
-            raise TypeError('The name of the command must be a string')
+            raise TypeError("The name of the command must be a string")
 
         self.callback = coro
-        self.enabled = kwargs.get('enabled', True)
+        self.enabled = kwargs.get("enabled", True)
 
-        help_doc = kwargs.get('help')
+        help_doc = kwargs.get("help")
         if help_doc is not None:
             help_doc = inspect.cleandoc(help_doc)
         else:
             help_doc = inspect.getdoc(coro)
             if isinstance(help_doc, bytes):
-                help_doc = help_doc.decode('utf-8')
+                help_doc = help_doc.decode("utf-8")
 
         self.help = help_doc
 
-        self.brief = kwargs.get('brief')
-        self.usage = kwargs.get('usage')
-        self.rest_is_raw = kwargs.get('rest_is_raw', False)
-        self.aliases = kwargs.get('aliases', [])
+        self.brief = kwargs.get("brief")
+        self.usage = kwargs.get("usage")
+        self.rest_is_raw = kwargs.get("rest_is_raw", False)
+        self.aliases = kwargs.get("aliases", [])
 
         if not isinstance(self.aliases, (list, tuple)):
-            raise TypeError('aliases must be a list or tuple')
+            raise TypeError("aliases must be a list or tuple")
 
-        self.description = inspect.cleandoc(kwargs.get('description', ''))
-        self.hidden = kwargs.get('hidden', False)
+        self.description = inspect.cleandoc(kwargs.get("description", ""))
+        self.hidden = kwargs.get("hidden", False)
 
         try:
             checks = coro.__fnpy_commands_checks__
             checks.reverse()
         except AttributeError:
-            checks = kwargs.get('checks', [])
+            checks = kwargs.get("checks", [])
         finally:
             self.checks = checks
 
         try:
             cooldown = coro.__fnpy_commands_cooldown__
         except AttributeError:
-            cooldown = kwargs.get('cooldown')
+            cooldown = kwargs.get("cooldown")
         finally:
             self._buckets = CooldownMapping(cooldown)
 
         try:
             max_concurrency = coro.__fnpy_commands_max_concurrency__
         except AttributeError:
-            max_concurrency = kwargs.get('max_concurrency')
+            max_concurrency = kwargs.get("max_concurrency")
         finally:
             self._max_concurrency = max_concurrency
 
-        self.ignore_extra = kwargs.get('ignore_extra', True)
-        self.cooldown_after_parsing = kwargs.get('cooldown_after_parsing',
-                                                 False)
+        self.ignore_extra = kwargs.get("ignore_extra", True)
+        self.cooldown_after_parsing = kwargs.get("cooldown_after_parsing", False)
         self.cog = None
         self.instance = None
 
         # bandaid for the fact that sometimes parent can be the bot instance
-        parent = kwargs.get('parent')
+        parent = kwargs.get("parent")
         self.parent = parent if isinstance(parent, Command) else None
 
         try:
@@ -339,10 +337,7 @@ class Command(_BaseCommand):
         of parameters in that they are passed to the :class:`Command` or
         subclass constructors, sans the name and callback.
         """
-        self.__init__(
-            self.callback,
-            **dict(self.__fnpy_original_kwargs__, **kwargs)
-        )
+        self.__init__(self.callback, **dict(self.__fnpy_original_kwargs__, **kwargs))
 
     async def __call__(self, *args: list, **kwargs: dict) -> Any:
         """|coro|
@@ -361,7 +356,7 @@ class Command(_BaseCommand):
         else:
             return await self.callback(*args, **kwargs)
 
-    def _ensure_assignment_on_copy(self, other: 'Command') -> 'Command':
+    def _ensure_assignment_on_copy(self, other: "Command") -> "Command":
         other._before_invoke = self._before_invoke
         other._after_invoke = self._after_invoke
         if self.checks != other.checks:
@@ -377,11 +372,11 @@ class Command(_BaseCommand):
             pass
         return other
 
-    def copy(self) -> 'Command':
+    def copy(self) -> "Command":
         ret = self.__class__(self.callback, **self.__fnpy_original_kwargs__)
         return self._ensure_assignment_on_copy(ret)
 
-    def _update_copy(self, kwargs: dict) -> 'Command':
+    def _update_copy(self, kwargs: dict) -> "Command":
         if kwargs:
             kw = kwargs.copy()
             kw.update(self.__fnpy_original_kwargs__)
@@ -418,11 +413,13 @@ class Command(_BaseCommand):
         if ret is False:
             ctx.bot.dispatch_error(ctx, error)
 
-    async def _actual_conversion(self,
-                                 ctx: Context,
-                                 converter: Converter,
-                                 argument: str,
-                                 param: inspect.Parameter) -> Any:
+    async def _actual_conversion(
+        self,
+        ctx: Context,
+        converter: Converter,
+        argument: str,
+        param: inspect.Parameter,
+    ) -> Any:
         if converter is bool:
             return _convert_to_bool(argument)
 
@@ -431,12 +428,11 @@ class Command(_BaseCommand):
         except AttributeError:
             pass
         else:
-            if module is not None and (module.startswith('fortnitepy.')
-                                       and not module.endswith('converter')):
+            if module is not None and (
+                module.startswith("fortnitepy.") and not module.endswith("converter")
+            ):
                 converter = getattr(
-                    converters,
-                    converter.__name__ + 'Converter',
-                    converter
+                    converters, converter.__name__ + "Converter", converter
                 )
 
         try:
@@ -446,7 +442,7 @@ class Command(_BaseCommand):
                     ret = await instance.convert(ctx, argument)
                     return ret
                 else:
-                    method = getattr(converter, 'convert', None)
+                    method = getattr(converter, "convert", None)
                     if method is not None and inspect.ismethod(method):
                         ret = await method(ctx, argument)
                         return ret
@@ -470,13 +466,17 @@ class Command(_BaseCommand):
             except AttributeError:
                 name = converter.__class__.__name__
 
-            raise errors.BadArgument('Converting to "{}" failed for parameter '
-                                     '"{}".'.format(name, param.name)) from exc
+            raise errors.BadArgument(
+                'Converting to "{}" failed for parameter "{}".'.format(name, param.name)
+            ) from exc
 
-    async def do_conversion(self, ctx: Context,
-                            converter: Converter,
-                            argument: str,
-                            param: inspect.Parameter) -> Any:
+    async def do_conversion(
+        self,
+        ctx: Context,
+        converter: Converter,
+        argument: str,
+        param: inspect.Parameter,
+    ) -> Any:
         try:
             origin = converter.__origin__
         except AttributeError:
@@ -495,21 +495,14 @@ class Command(_BaseCommand):
 
                     try:
                         value = await self._actual_conversion(
-                            ctx,
-                            conv,
-                            argument,
-                            param
+                            ctx, conv, argument, param
                         )
                     except errors.CommandError as exc:
                         errors.append(exc)
                     else:
                         return value
 
-                raise errors.BadUnionArgument(
-                    param,
-                    converter.__args__,
-                    errors
-                )
+                raise errors.BadUnionArgument(param, converter.__args__, errors)
 
         return await self._actual_conversion(ctx, converter, argument, param)
 
@@ -526,24 +519,20 @@ class Command(_BaseCommand):
     async def transform(self, ctx: Context, param: inspect.Parameter) -> Any:
         required = param.default is param.empty
         converter = self._get_converter(param)
-        consume_rest_is_special = (param.kind == param.KEYWORD_ONLY
-                                   and not self.rest_is_raw)
+        consume_rest_is_special = (
+            param.kind == param.KEYWORD_ONLY and not self.rest_is_raw
+        )
         view = ctx.view
         view.skip_ws()
 
         if type(converter) is converters._Greedy:
             if param.kind == param.POSITIONAL_OR_KEYWORD:
                 return await self._transform_greedy_pos(
-                    ctx,
-                    param,
-                    required,
-                    converter.converter
+                    ctx, param, required, converter.converter
                 )
             elif param.kind == param.VAR_POSITIONAL:
                 return await self._transform_greedy_var_pos(
-                    ctx,
-                    param,
-                    converter.converter
+                    ctx, param, converter.converter
                 )
             else:
                 converter = converter.converter
@@ -567,10 +556,13 @@ class Command(_BaseCommand):
 
         return await self.do_conversion(ctx, converter, argument, param)
 
-    async def _transform_greedy_pos(self, ctx: Context,
-                                    param: inspect.Parameter,
-                                    required: bool,
-                                    converter: Converter) -> Any:
+    async def _transform_greedy_pos(
+        self,
+        ctx: Context,
+        param: inspect.Parameter,
+        required: bool,
+        converter: Converter,
+    ) -> Any:
         view = ctx.view
         result = []
         while not view.eof:
@@ -579,12 +571,7 @@ class Command(_BaseCommand):
             view.skip_ws()
             try:
                 argument = view.get_quoted_word()
-                value = await self.do_conversion(
-                    ctx,
-                    converter,
-                    argument,
-                    param
-                )
+                value = await self.do_conversion(ctx, converter, argument, param)
             except (errors.CommandError, errors.ArgumentParsingError):
                 view.index = previous
                 break
@@ -595,9 +582,9 @@ class Command(_BaseCommand):
             return param.default
         return result
 
-    async def _transform_greedy_var_pos(self, ctx: Context,
-                                        param: inspect.Parameter,
-                                        converter: Converter) -> Any:
+    async def _transform_greedy_var_pos(
+        self, ctx: Context, param: inspect.Parameter, converter: Converter
+    ) -> Any:
         view = ctx.view
         previous = view.index
         try:
@@ -624,7 +611,7 @@ class Command(_BaseCommand):
         try:
             result.popitem(last=False)
         except Exception:
-            raise ValueError('Missing context parameter') from None
+            raise ValueError("Missing context parameter") from None
 
         return result
 
@@ -642,10 +629,10 @@ class Command(_BaseCommand):
             command = command.parent
             elems.append(command.name)
 
-        return ' '.join(reversed(elems))
+        return " ".join(reversed(elems))
 
     @property
-    def parents(self) -> 'Command':
+    def parents(self) -> "Command":
         """:class:`Command`: Retrieves the parents of this command.
 
         If the command has no parents then it returns an empty :class:`list`.
@@ -662,7 +649,7 @@ class Command(_BaseCommand):
         return elems
 
     @property
-    def root_parent(self) -> 'Command':
+    def root_parent(self) -> "Command":
         """Retrieves the root parent of this command.
 
         If the command has no parents then it returns ``None``.
@@ -687,7 +674,7 @@ class Command(_BaseCommand):
 
         parent_name = self.full_parent_name
         if parent_name:
-            return '{} {}'.format(parent_name, self.name)
+            return "{} {}".format(parent_name, self.name)
         else:
             return self.name
 
@@ -709,16 +696,16 @@ class Command(_BaseCommand):
                 next(iterator)
             except StopIteration:
                 raise FortniteException(
-                    'Callback for {0.name} command is missing '
-                    '"self" parameter.'.format(self)
+                    'Callback for {0.name} command is missing "self" parameter.'.format(
+                        self
+                    )
                 )
 
         try:
             next(iterator)
         except StopIteration:
             raise FortniteException(
-                'Callback for {0.name} command is missing '
-                '"ctx" parameter.'.format(self)
+                'Callback for {0.name} command is missing "ctx" parameter.'.format(self)
             )
 
         for name, param in iterator:
@@ -731,10 +718,7 @@ class Command(_BaseCommand):
                     converter = self._get_converter(param)
                     argument = view.read_rest()
                     kwargs[name] = await self.do_conversion(
-                        ctx,
-                        converter,
-                        argument,
-                        param
+                        ctx, converter, argument, param
                     )
                 else:
                     kwargs[name] = await self.transform(ctx, param)
@@ -750,7 +734,7 @@ class Command(_BaseCommand):
 
         if not self.ignore_extra:
             if not view.eof:
-                fmt = 'Too many arguments passed to ' + self.qualified_name
+                fmt = "Too many arguments passed to " + self.qualified_name
                 raise errors.TooManyArguments(fmt)
 
     async def call_before_hooks(self, ctx: Context) -> None:
@@ -801,9 +785,7 @@ class Command(_BaseCommand):
 
     def _prepare_cooldowns(self, ctx: Context) -> None:
         if self._buckets.valid:
-            current = ctx.message.created_at.replace(
-                tzinfo=datetime.timezone.utc
-            )
+            current = ctx.message.created_at.replace(tzinfo=datetime.timezone.utc)
             timestamp = current.timestamp()
 
             bucket = self._buckets.get_bucket(ctx.message, timestamp)
@@ -816,7 +798,7 @@ class Command(_BaseCommand):
 
         if not await self.can_run(ctx):
             raise errors.CheckFailure(
-                'The checks for command {0.qualified_name} failed'.format(self)
+                "The checks for command {0.qualified_name} failed".format(self)
             )
 
         if self.cooldown_after_parsing:
@@ -872,8 +854,7 @@ class Command(_BaseCommand):
         injected = hooked_wrapped_callback(self, ctx, self.callback)
         await injected(*ctx.args, **ctx.kwargs)
 
-    async def reinvoke(self, ctx: Context, *,
-                       call_hooks: bool = False) -> None:
+    async def reinvoke(self, ctx: Context, *, call_hooks: bool = False) -> None:
         ctx.command = self
         await self._parse_arguments(ctx)
 
@@ -921,7 +902,7 @@ class Command(_BaseCommand):
         """
 
         if not asyncio.iscoroutinefunction(coro):
-            raise TypeError('Error handler must be a coroutine')
+            raise TypeError("Error handler must be a coroutine")
 
         self.error_handler = coro
         return coro
@@ -948,7 +929,7 @@ class Command(_BaseCommand):
         """
 
         if not asyncio.iscoroutinefunction(coro):
-            raise TypeError('Before invoke handler must be a coroutine')
+            raise TypeError("Before invoke handler must be a coroutine")
 
         self._before_invoke = coro
         return coro
@@ -975,7 +956,7 @@ class Command(_BaseCommand):
         """
 
         if not asyncio.iscoroutinefunction(coro):
-            raise TypeError('After invoke handler must be a coroutine')
+            raise TypeError("After invoke handler must be a coroutine")
 
         self._after_invoke = coro
         return coro
@@ -999,9 +980,9 @@ class Command(_BaseCommand):
             return self.brief
 
         if self.help is not None:
-            return self.help.split('\n', 1)[0]
+            return self.help.split("\n", 1)[0]
 
-        return ''
+        return ""
 
     def _is_typing_optional(self, annotation: Any) -> bool:
         try:
@@ -1026,7 +1007,7 @@ class Command(_BaseCommand):
 
         params = self.clean_params
         if not params:
-            return ''
+            return ""
 
         result = []
         for name, param in params.items():
@@ -1040,23 +1021,24 @@ class Command(_BaseCommand):
 
                 if should_print:
                     result.append(
-                        '[%s=%s]' % (name, param.default) if not greedy else
-                        '[%s=%s]...' % (name, param.default)
+                        "[%s=%s]" % (name, param.default)
+                        if not greedy
+                        else "[%s=%s]..." % (name, param.default)
                     )
                     continue
                 else:
-                    result.append('[%s]' % name)
+                    result.append("[%s]" % name)
 
             elif param.kind == param.VAR_POSITIONAL:
-                result.append('[%s...]' % name)
+                result.append("[%s...]" % name)
             elif greedy:
-                result.append('[%s]...' % name)
+                result.append("[%s]..." % name)
             elif self._is_typing_optional(param.annotation):
-                result.append('[%s]' % name)
+                result.append("[%s]" % name)
             else:
-                result.append('<%s>' % name)
+                result.append("<%s>" % name)
 
-        return ' '.join(result)
+        return " ".join(result)
 
     async def can_run(self, ctx: Context) -> bool:
         """|coro|
@@ -1083,9 +1065,7 @@ class Command(_BaseCommand):
         """
 
         if not self.enabled:
-            raise errors.DisabledCommand(
-                '{0.name} command is disabled'.format(self)
-            )
+            raise errors.DisabledCommand("{0.name} command is disabled".format(self))
 
         original = ctx.command
         ctx.command = self
@@ -1093,8 +1073,9 @@ class Command(_BaseCommand):
         try:
             if not await ctx.bot.can_run(ctx):
                 raise errors.CheckFailure(
-                    'The global check functions for command '
-                    '{0.qualified_name} failed.'.format(self))
+                    "The global check functions for command "
+                    "{0.qualified_name} failed.".format(self)
+                )
 
             cog = self.cog
             if cog is not None:
@@ -1144,7 +1125,7 @@ class GroupMixin:
 
     def __init__(self, *args: list, **kwargs: dict) -> None:
         super().__init__(*args, **kwargs)
-        case_ins = kwargs.get('case_insensitive')
+        case_ins = kwargs.get("case_insensitive")
         self.all_commands = _CaseInsensitiveDict() if case_ins else {}
         self.case_insensitive = case_ins
 
@@ -1158,7 +1139,7 @@ class GroupMixin:
         if self.case_insensitive is not None:
             return self.case_insensitive
 
-        parent = getattr(self, 'parent', None)
+        parent = getattr(self, "parent", None)
         if parent is not None:
             return self.parent.case_insensitive
         return self.instance.case_insensitive
@@ -1209,16 +1190,14 @@ class GroupMixin:
             If the command passed is not a subclass of :class:`.Command`.
         """
         if not isinstance(command, Command):
-            raise TypeError(
-                'Command passed must be a subclassed instance of Command'
-            )
+            raise TypeError("Command passed must be a subclassed instance of Command")
 
         if isinstance(self, Command):
             command.parent = self
 
         if command.name in self.all_commands:
             raise errors.CommandError(
-                'Command {0.name} is already registered.'.format(command)
+                "Command {0.name} is already registered.".format(command)
             )
 
         if isinstance(command, GroupMixin):
@@ -1230,8 +1209,9 @@ class GroupMixin:
         for alias in command.aliases:
             if alias in self.all_commands:
                 raise errors.CommandError(
-                    'The alias {} is already an existing command or '
-                    'alias.'.format(alias)
+                    "The alias {} is already an existing command or alias.".format(
+                        alias
+                    )
                 )
 
             self.all_commands[alias] = command
@@ -1299,7 +1279,7 @@ class GroupMixin:
             The command that was requested. If not found, returns ``None``.
         """
 
-        if ' ' not in name:
+        if " " not in name:
             return self.all_commands.get(name)
 
         names = name.split()
@@ -1321,7 +1301,7 @@ class GroupMixin:
         """
 
         def decorator(func):
-            kwargs.setdefault('parent', self)
+            kwargs.setdefault("parent", self)
             result = command(*args, **kwargs)(func)
             self.add_command(result)
             return result
@@ -1334,7 +1314,7 @@ class GroupMixin:
         """
 
         def decorator(func):
-            kwargs.setdefault('parent', self)
+            kwargs.setdefault("parent", self)
             result = group(*args, **kwargs)(func)
             self.add_command(result)
             return result
@@ -1367,10 +1347,7 @@ class Group(GroupMixin, Command):
     """
 
     def __init__(self, *args: list, **attrs: dict) -> None:
-        self.invoke_without_command = attrs.pop(
-            'invoke_without_command',
-            False
-        )
+        self.invoke_without_command = attrs.pop("invoke_without_command", False)
         super().__init__(*args, **attrs)
 
     async def invoke(self, ctx: Context) -> None:
@@ -1401,8 +1378,7 @@ class Group(GroupMixin, Command):
             view.previous = previous
             await super().invoke(ctx)
 
-    async def reinvoke(self, ctx: Context, *,
-                       call_hooks: bool = False) -> None:
+    async def reinvoke(self, ctx: Context, *, call_hooks: bool = False) -> None:
         ctx.invoked_subcommand = None
         early_invoke = not self.invoke_without_command
         if early_invoke:
@@ -1441,9 +1417,9 @@ class Group(GroupMixin, Command):
             await super().reinvoke(ctx, call_hooks=call_hooks)
 
 
-def command(name: Optional[str] = None,
-            cls: Optional[Command] = None,
-            **attrs: dict) -> callable:
+def command(
+    name: Optional[str] = None, cls: Optional[Command] = None, **attrs: dict
+) -> callable:
     """A decorator that transforms a function into a :class:`.Command`
     or if called with :func:`.group`, :class:`.Group`.
 
@@ -1479,7 +1455,7 @@ def command(name: Optional[str] = None,
 
     def decorator(func):
         if isinstance(func, Command):
-            raise TypeError('Callback is already a command.')
+            raise TypeError("Callback is already a command.")
         return cls(func, name=name, **attrs)
 
     return decorator
@@ -1491,7 +1467,7 @@ def group(name: Optional[str] = None, **attrs: dict) -> callable:
     This is similar to the :func:`.command` decorator but the ``cls``
     parameter is set to :class:`Group` by default.
     """
-    attrs.setdefault('cls', Group)
+    attrs.setdefault("cls", Group)
     return command(name=name, **attrs)
 
 
@@ -1557,7 +1533,7 @@ def check(predicate: callable) -> MaybeCoro:
         if isinstance(func, Command):
             func.checks.append(predicate)
         else:
-            if not hasattr(func, '__fnpy_commands_checks__'):
+            if not hasattr(func, "__fnpy_commands_checks__"):
                 func.__fnpy_commands_checks__ = []
 
             func.__fnpy_commands_checks__.append(predicate)
@@ -1567,6 +1543,7 @@ def check(predicate: callable) -> MaybeCoro:
     if asyncio.iscoroutinefunction(predicate):
         decorator.predicate = predicate
     else:
+
         @functools.wraps(predicate)
         async def wrapper(ctx):
             return predicate(ctx)
@@ -1624,8 +1601,7 @@ def check_any(*checks: list) -> callable:
             pred = wrapped.predicate
         except AttributeError:
             raise TypeError(
-                '{0} must be wrapped by commands.check '
-                'decorator'.format(wrapped)
+                "{0} must be wrapped by commands.check decorator".format(wrapped)
             ) from None
         else:
             unwrapped.append(pred)
@@ -1646,9 +1622,7 @@ def check_any(*checks: list) -> callable:
     return check(predicate)
 
 
-def cooldown(rate: int,
-             per: float,
-             type: BucketType = BucketType.default) -> callable:
+def cooldown(rate: int, per: float, type: BucketType = BucketType.default) -> callable:
     """A decorator that adds a cooldown to a :class:`.Command`
     or its subclasses.
 
@@ -1679,11 +1653,13 @@ def cooldown(rate: int,
         else:
             func.__fnpy_commands_cooldown__ = Cooldown(rate, per, type)
         return func
+
     return decorator
 
 
-def max_concurrency(number: int, per: BucketType = BucketType.default, *,
-                    wait: bool = False) -> callable:
+def max_concurrency(
+    number: int, per: BucketType = BucketType.default, *, wait: bool = False
+) -> callable:
     """A decorator that adds a maximum concurrency to a :class:`.Command` or
     its subclasses.
 
@@ -1716,6 +1692,7 @@ def max_concurrency(number: int, per: BucketType = BucketType.default, *,
         else:
             func.__fnpy_commands_max_concurrency__ = value
         return func
+
     return decorator
 
 
@@ -1762,6 +1739,7 @@ def before_invoke(coro: Awaitable) -> callable:
         else:
             func.__fnpy_before_invoke__ = coro
         return func
+
     return decorator
 
 
@@ -1778,6 +1756,7 @@ def after_invoke(coro: Awaitable) -> callable:
         else:
             func.__fnpy_after_invoke__ = coro
         return func
+
     return decorator
 
 
@@ -1827,7 +1806,7 @@ def is_owner() -> callable:
 
     async def predicate(ctx):
         if not await ctx.bot.is_owner(ctx.author.id):
-            raise errors.NotOwner('You do not own this bot.')
+            raise errors.NotOwner("You do not own this bot.")
         return True
 
     return check(predicate)

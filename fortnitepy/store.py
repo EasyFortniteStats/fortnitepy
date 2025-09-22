@@ -37,26 +37,27 @@ if TYPE_CHECKING:
 
 class StoreItemBase:
     def __init__(self, data: dict) -> None:
-        self._dev_name = data['devName']
-        self._asset_path = data.get('displayAssetPath')
+        self._dev_name = data["devName"]
+        self._asset_path = data.get("displayAssetPath")
 
         try:
-            self._asset = re.search(r'\.(.+)', self._asset_path).group(1)
+            self._asset = re.search(r"\.(.+)", self._asset_path).group(1)
         except (TypeError, AttributeError):
             self._asset = None
 
-        self._gifts_enabled = (data['giftInfo']['bIsEnabled']
-                               if 'giftInfo' in data else False)
-        self._daily_limit = data['dailyLimit']
-        self._weekly_limit = data['weeklyLimit']
-        self._monthly_limit = data['monthlyLimit']
-        self._offer_id = data['offerId']
-        self._offer_type = data['offerType']
-        self._price = data['prices'][0]['finalPrice']
-        self._refundable = data['refundable']
-        self._items_grants = data['itemGrants']
-        self._meta_info = data.get('metaInfo', [])
-        self._meta = data.get('meta', {})
+        self._gifts_enabled = (
+            data["giftInfo"]["bIsEnabled"] if "giftInfo" in data else False
+        )
+        self._daily_limit = data["dailyLimit"]
+        self._weekly_limit = data["weeklyLimit"]
+        self._monthly_limit = data["monthlyLimit"]
+        self._offer_id = data["offerId"]
+        self._offer_type = data["offerType"]
+        self._price = data["prices"][0]["finalPrice"]
+        self._refundable = data["refundable"]
+        self._items_grants = data["itemGrants"]
+        self._meta_info = data.get("metaInfo", [])
+        self._meta = data.get("meta", {})
 
     def __str__(self) -> str:
         return self.dev_name
@@ -64,9 +65,10 @@ class StoreItemBase:
     @property
     def display_names(self) -> List[str]:
         """List[:class:`str`]: The display names for this item."""
-        match = re.search(r'^\[VIRTUAL][0-9]+ x (.*) for [0-9]+ .*$',
-                          self._dev_name).group(1)
-        return re.split(r', [0-9]+ x ', match)
+        match = re.search(
+            r"^\[VIRTUAL][0-9]+ x (.*) for [0-9]+ .*$", self._dev_name
+        ).group(1)
+        return re.split(r", [0-9]+ x ", match)
 
     @property
     def dev_name(self) -> str:
@@ -93,8 +95,8 @@ class StoreItemBase:
         key is found, this will be ``None``.
         """
         for meta in self._meta_info:
-            if meta['key'] == 'EncryptionKey':
-                return meta['value']
+            if meta["key"] == "EncryptionKey":
+                return meta["value"]
 
     @property
     def gifts_enabled(self) -> bool:
@@ -160,12 +162,10 @@ class StoreItemBase:
         """
         grants = []
         for item in self._items_grants:
-            _type, _asset = item['templateId'].split(':')
-            grants.append({
-                'quantity': item['quantity'],
-                'type': _type,
-                'asset': _asset
-            })
+            _type, _asset = item["templateId"].split(":")
+            grants.append(
+                {"quantity": item["quantity"], "type": _type, "asset": _asset}
+            )
         return grants
 
     @property
@@ -174,7 +174,7 @@ class StoreItemBase:
         the first time, else ``False``.
         """
         for meta in self._meta_info:
-            if meta['value'].lower() == 'new':
+            if meta["value"].lower() == "new":
                 return True
         return False
 
@@ -184,20 +184,23 @@ class StoreItemBase:
         red tag at the top of an item in the shop. Will be ``None``
         if no violator is found for this item.
         """
-        unfixed = self._meta.get('BannerOverride')
+        unfixed = self._meta.get("BannerOverride")
         if unfixed:
-            return ' '.join(re.findall(r'[A-Z][^A-Z]*', unfixed))
+            return " ".join(re.findall(r"[A-Z][^A-Z]*", unfixed))
 
 
 class FeaturedStoreItem(StoreItemBase):
     """Featured store item."""
+
     def __init__(self, data: dict) -> None:
         super().__init__(data)
-        self._panel = int((data['categories'][0].split(' '))[1])
+        self._panel = int((data["categories"][0].split(" "))[1])
 
     def __repr__(self) -> str:
-        return ('<FeaturedStoreItem dev_name={0.dev_name!r} asset={0.asset!r} '
-                'price={0.price!r}>'.format(self))
+        return (
+            "<FeaturedStoreItem dev_name={0.dev_name!r} asset={0.asset!r} "
+            "price={0.price!r}>".format(self)
+        )
 
     @property
     def panel(self) -> int:
@@ -209,12 +212,15 @@ class FeaturedStoreItem(StoreItemBase):
 
 class DailyStoreItem(StoreItemBase):
     """Daily store item."""
+
     def __init__(self, data: dict) -> None:
         super().__init__(data)
 
     def __repr__(self) -> str:
-        return ('<DailyStoreItem dev_name={0.dev_name!r} asset={0.asset!r} '
-                'price={0.price!r}>'.format(self))
+        return (
+            "<DailyStoreItem dev_name={0.dev_name!r} asset={0.asset!r} "
+            "price={0.price!r}>".format(self)
+        )
 
 
 class Store:
@@ -225,32 +231,27 @@ class Store:
     client: :class:`Client`
         The client.
     """
-    def __init__(self, client: 'Client', data: dict) -> None:
-        self.client = client
-        self._daily_purchase_hours = data['dailyPurchaseHrs']
-        self._refresh_interval_hours = data['refreshIntervalHrs']
-        self._expires_at = from_iso(data['expiration'])
 
-        self._featured_items = self._create_featured_items(
-            'BRWeeklyStorefront',
-            data
-        )
-        self._daily_items = self._create_daily_items(
-            'BRDailyStorefront',
-            data
-        )
+    def __init__(self, client: "Client", data: dict) -> None:
+        self.client = client
+        self._daily_purchase_hours = data["dailyPurchaseHrs"]
+        self._refresh_interval_hours = data["refreshIntervalHrs"]
+        self._expires_at = from_iso(data["expiration"])
+
+        self._featured_items = self._create_featured_items("BRWeeklyStorefront", data)
+        self._daily_items = self._create_daily_items("BRDailyStorefront", data)
         self._special_featured_items = self._create_featured_items(
-            'BRSpecialFeatured',
-            data
+            "BRSpecialFeatured", data
         )
         self._special_daily_items = self._create_daily_items(
-            'BRSpecialDaily',
+            "BRSpecialDaily",
             data,
         )
 
     def __repr__(self) -> str:
-        return ('<Store created_at={0.created_at!r} '
-                'expires_at={0.expires_at!r}>'.format(self))
+        return "<Store created_at={0.created_at!r} expires_at={0.expires_at!r}>".format(
+            self
+        )
 
     @property
     def featured_items(self) -> List[FeaturedStoreItem]:
@@ -307,24 +308,24 @@ class Store:
         return self._expires_at
 
     def _find_storefront(self, data: dict, key: str) -> Optional[dict]:
-        for storefront in data['storefronts']:
-            if storefront['name'] == key:
+        for storefront in data["storefronts"]:
+            if storefront["name"] == key:
                 return storefront
 
-    def _create_featured_items(self, storefront: str,
-                               data: dict) -> List[FeaturedStoreItem]:
+    def _create_featured_items(
+        self, storefront: str, data: dict
+    ) -> List[FeaturedStoreItem]:
         storefront = self._find_storefront(data, storefront)
 
         res = []
-        for item in storefront['catalogEntries']:
+        for item in storefront["catalogEntries"]:
             res.append(FeaturedStoreItem(item))
         return res
 
-    def _create_daily_items(self, storefront: str,
-                            data: dict) -> List[DailyStoreItem]:
+    def _create_daily_items(self, storefront: str, data: dict) -> List[DailyStoreItem]:
         storefront = self._find_storefront(data, storefront)
 
         res = []
-        for item in storefront['catalogEntries']:
+        for item in storefront["catalogEntries"]:
             res.append(DailyStoreItem(item))
         return res

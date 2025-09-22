@@ -5,14 +5,14 @@ class Avatar:
     """Represents a friend's avatar. This is always related to the outfit
     the friend has equipped."""
 
-    __slots__ = ('_namespace', '_asset_type', '_asset')
+    __slots__ = ("_namespace", "_asset_type", "_asset")
 
     def __init__(self, data: Dict[str, str]) -> None:
-        self._namespace = data['namespace']
+        self._namespace = data["namespace"]
 
-        avatar_id = data['avatarId']
+        avatar_id = data["avatarId"]
         if avatar_id:
-            split = avatar_id.split(':')
+            split = avatar_id.split(":")
             self._asset_type = split[0]
             self._asset = split[1]
         else:
@@ -20,14 +20,15 @@ class Avatar:
             self._asset = None
 
     def __repr__(self) -> str:
-        return ('<Avatar asset={0.asset!r} '
-                'asset_type={0.asset_type!r}>'.format(self))
+        return "<Avatar asset={0.asset!r} asset_type={0.asset_type!r}>".format(self)
 
     def __eq__(self, other) -> bool:
-        return isinstance(other, Avatar) and \
-            other.namespace == self.namespace and \
-            other.asset_type == self.asset_type and \
-            other.asset == self.asset
+        return (
+            isinstance(other, Avatar)
+            and other.namespace == self.namespace
+            and other.asset_type == self.asset_type
+            and other.asset == self.asset
+        )
 
     def __ne__(self, other) -> bool:
         return not self.__eq__(other)

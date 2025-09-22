@@ -22,12 +22,10 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-
 import inspect
 import asyncio
 
-from typing import (TYPE_CHECKING, Union, Awaitable, Any, List, Dict, Iterable,
-                    Optional)
+from typing import TYPE_CHECKING, Union, Awaitable, Any, List, Dict, Iterable, Optional
 from fortnitepy.typedefs import MaybeCoro
 
 from ._types import _BaseCommand
@@ -38,8 +36,8 @@ if TYPE_CHECKING:
 
 
 __all__ = (
-    'CogMeta',
-    'Cog',
+    "CogMeta",
+    "Cog",
 )
 
 
@@ -87,7 +85,7 @@ class CogMeta(type):
 
     def __new__(cls, *args: list, **kwargs: dict) -> None:
         name, bases, attrs = args
-        attrs['__cog_name__'] = cog_name = kwargs.pop('name', name)
+        attrs["__cog_name__"] = cog_name = kwargs.pop("name", name)
 
         last = cog_name.split()[-1]
         try:
@@ -95,16 +93,20 @@ class CogMeta(type):
         except ValueError:
             pass
         else:
-            raise NameError('Cog names cannot end with a space followed by a '
-                            'number or solely consist of a number.')
+            raise NameError(
+                "Cog names cannot end with a space followed by a "
+                "number or solely consist of a number."
+            )
 
-        command_attrs = kwargs.pop('command_attrs', {})
-        attrs['__cog_settings__'] = command_attrs
+        command_attrs = kwargs.pop("command_attrs", {})
+        attrs["__cog_settings__"] = command_attrs
 
         commands = {}
         event_handlers = {}
-        no_bot_cog = ('Commands or listeners must not start with cog_ or bot_ '
-                      '(in method {0.__name__}.{1})')
+        no_bot_cog = (
+            "Commands or listeners must not start with cog_ or bot_ "
+            "(in method {0.__name__}.{1})"
+        )
 
         new_cls = super().__new__(cls, name, bases, attrs, **kwargs)
         for base in reversed(new_cls.__mro__):
@@ -121,19 +123,19 @@ class CogMeta(type):
                 if isinstance(value, _BaseCommand):
                     if is_static_method:
                         raise TypeError(
-                            'Command in method {0}.{1!r} must not be '
-                            'staticmethod.'.format(base, elem)
+                            "Command in method {0}.{1!r} must not be "
+                            "staticmethod.".format(base, elem)
                         )
 
                     commands[elem] = value
 
                 elif asyncio.iscoroutinefunction(value):
                     try:
-                        getattr(value, '__cog_event_handler__')
+                        getattr(value, "__cog_event_handler__")
                     except AttributeError:
                         pass
                     else:
-                        if elem.startswith(('cog_', 'bot_')):
+                        if elem.startswith(("cog_", "bot_")):
                             raise TypeError(no_bot_cog.format(base, elem))
                         event_handlers[elem] = value
 
@@ -142,11 +144,7 @@ class CogMeta(type):
         event_handlers_as_list = []
         for handler in event_handlers.values():
             for handler_name, was_def in handler.__cog_event_handler_names__:
-                event_handlers_as_list.append((
-                    handler_name,
-                    handler.__name__,
-                    was_def
-                ))
+                event_handlers_as_list.append((handler_name, handler.__name__, was_def))
 
         new_cls.__cog_event_handlers__ = event_handlers_as_list
         return new_cls
@@ -183,9 +181,7 @@ class Cog(metaclass=CogMeta):
             c._update_copy(cmd_attrs) for c in cls.__cog_commands__
         )
 
-        lookup = {
-            cmd.qualified_name: cmd for cmd in self.__cog_commands__
-        }
+        lookup = {cmd.qualified_name: cmd for cmd in self.__cog_commands__}
 
         for command in self.__cog_commands__:
             setattr(self, command.callback.__name__, command)
@@ -245,8 +241,7 @@ class Cog(metaclass=CogMeta):
         """
         return {
             name: getattr(self, method_name)
-            for name, method_name, _
-            in self.__cog_event_handlers__
+            for name, method_name, _ in self.__cog_event_handlers__
         }
 
     @classmethod
@@ -254,7 +249,7 @@ class Cog(metaclass=CogMeta):
         """Return None if the method is not overridden. Otherwise returns the
         overridden method.
         """
-        return getattr(method.__func__, '__cog_special_method__', method)
+        return getattr(method.__func__, "__cog_special_method__", method)
 
     @classmethod
     def event(cls, event: Union[str, Awaitable[Any]] = None) -> Awaitable:
@@ -285,7 +280,7 @@ class Cog(metaclass=CogMeta):
                 coro = coro.__func__
 
             if not asyncio.iscoroutinefunction(coro):
-                raise TypeError('the decorated function must be a coroutine')
+                raise TypeError("the decorated function must be a coroutine")
 
             if is_coro or event is None:
                 name = coro.__name__
@@ -302,9 +297,10 @@ class Cog(metaclass=CogMeta):
                 coro.__cog_event_handler_names__ = [(name, name_defined)]
 
             return coro
+
         return pred(event) if is_coro else pred
 
-    def _inject(self, bot: 'Bot') -> 'Cog':
+    def _inject(self, bot: "Bot") -> "Cog":
         cls = self.__class__
 
         for index, command in enumerate(self.__cog_commands__):
@@ -330,7 +326,7 @@ class Cog(metaclass=CogMeta):
         for name, method, name_was_defined in self.__cog_event_handlers__:
             if not name_was_defined:
                 if name.startswith(bot.event_prefix):
-                    name = name[len(bot.event_prefix):]
+                    name = name[len(bot.event_prefix) :]
 
             new.append((name, method, name_was_defined))
 
@@ -341,7 +337,7 @@ class Cog(metaclass=CogMeta):
 
         return self
 
-    def _eject(self, bot: 'Bot') -> None:
+    def _eject(self, bot: "Bot") -> None:
         cls = self.__class__
 
         try:
@@ -373,7 +369,7 @@ class Cog(metaclass=CogMeta):
         pass
 
     @_cog_special_method
-    def bot_check_once(self, ctx: 'Context') -> bool:
+    def bot_check_once(self, ctx: "Context") -> bool:
         """A special method that registers as a :meth:`.Bot.check_once`
         check.
 
@@ -383,7 +379,7 @@ class Cog(metaclass=CogMeta):
         return True
 
     @_cog_special_method
-    def bot_check(self, ctx: 'Context') -> bool:
+    def bot_check(self, ctx: "Context") -> bool:
         """A special method that registers as a :meth:`.Bot.check`
         check.
 
@@ -393,7 +389,7 @@ class Cog(metaclass=CogMeta):
         return True
 
     @_cog_special_method
-    def cog_check(self, ctx: 'Context') -> bool:
+    def cog_check(self, ctx: "Context") -> bool:
         """A special method that registers as a :func:`commands.check`
         for every command and subcommand in this cog.
 
@@ -403,8 +399,7 @@ class Cog(metaclass=CogMeta):
         return True
 
     @_cog_special_method
-    def cog_command_error(self, ctx: 'Context',
-                          error: Exception) -> Optional[bool]:
+    def cog_command_error(self, ctx: "Context", error: Exception) -> Optional[bool]:
         """A special method that is called whenever an error
         is dispatched inside this cog.
 
@@ -435,7 +430,7 @@ class Cog(metaclass=CogMeta):
         return False
 
     @_cog_special_method
-    async def cog_before_invoke(self, ctx: 'Context') -> None:
+    async def cog_before_invoke(self, ctx: "Context") -> None:
         """A special method that acts as a cog local pre-invoke hook.
 
         This is similar to :meth:`.Command.before_invoke`.

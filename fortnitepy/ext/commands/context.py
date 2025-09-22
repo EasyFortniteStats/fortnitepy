@@ -22,7 +22,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-
 from typing import Any, Optional, Union
 from fortnitepy.party import ClientParty, PartyMember, ClientPartyMember
 from fortnitepy.friend import Friend
@@ -73,17 +72,17 @@ class Context:
     """
 
     def __init__(self, **attrs: dict) -> None:
-        self.message = attrs.pop('message', None)
-        self.bot = attrs.pop('bot', None)
-        self.args = attrs.pop('args', [])
-        self.kwargs = attrs.pop('kwargs', {})
-        self.prefix = attrs.pop('prefix')
-        self.command = attrs.pop('command', None)
-        self.view = attrs.pop('view', None)
-        self.invoked_with = attrs.pop('invoked_with', None)
-        self.invoked_subcommand = attrs.pop('invoked_subcommand', None)
-        self.subcommand_passed = attrs.pop('subcommand_passed', None)
-        self.command_failed = attrs.pop('command_failed', False)
+        self.message = attrs.pop("message", None)
+        self.bot = attrs.pop("bot", None)
+        self.args = attrs.pop("args", [])
+        self.kwargs = attrs.pop("kwargs", {})
+        self.prefix = attrs.pop("prefix")
+        self.command = attrs.pop("command", None)
+        self.view = attrs.pop("view", None)
+        self.invoked_with = attrs.pop("invoked_with", None)
+        self.invoked_subcommand = attrs.pop("invoked_subcommand", None)
+        self.subcommand_passed = attrs.pop("subcommand_passed", None)
+        self.command_failed = attrs.pop("command_failed", False)
 
     async def invoke(self, *args: list, **kwargs: dict) -> Any:
         r"""|coro|
@@ -119,7 +118,7 @@ class Context:
         try:
             command = args[0]
         except IndexError:
-            raise TypeError('Missing command to invoke.') from None
+            raise TypeError("Missing command to invoke.") from None
 
         arguments = []
         if command.cog is not None:
@@ -131,8 +130,7 @@ class Context:
         ret = await command.callback(*args, **kwargs)
         return ret
 
-    async def reinvoke(self, *, call_hooks: bool = False,
-                       restart: bool = True) -> None:
+    async def reinvoke(self, *, call_hooks: bool = False, restart: bool = True) -> None:
         """|coro|
 
         Calls the command again.
@@ -160,7 +158,7 @@ class Context:
         cmd = self.command
         view = self.view
         if cmd is None:
-            raise ValueError('This context is not valid.')
+            raise ValueError("This context is not valid.")
 
         index, previous = view.index, view.previous
         invoked_with = self.invoked_with
@@ -193,7 +191,7 @@ class Context:
         return self.prefix is not None and self.command is not None
 
     @property
-    def cog(self) -> Optional['Cog']:
+    def cog(self) -> Optional["Cog"]:
         """Optional[:class:`.Cog`]: Returns the cog associated with this
         context's command. ``None`` if it does not exist.
         """
@@ -208,7 +206,7 @@ class Context:
         """Optional[:class:`fortnitepy.ClientParty`]: The party this message
         was sent from. ``None`` if the message was not sent from a party.
         """
-        return getattr(self.message, 'party', None)
+        return getattr(self.message, "party", None)
 
     @property
     def author(self) -> Union[Friend, PartyMember]:
@@ -303,13 +301,13 @@ class Context:
         if isinstance(entity, str):
             entity = bot.get_cog(entity) or bot.get_command(entity)
 
-        if not hasattr(entity, 'qualified_name'):
+        if not hasattr(entity, "qualified_name"):
             return None
 
         await cmd.prepare_help_command(self, entity.qualified_name)
 
         try:
-            if hasattr(entity, '__cog_commands__'):
+            if hasattr(entity, "__cog_commands__"):
                 injected = wrap_callback(cmd.send_cog_help)
                 return await injected(entity, page=page)
             elif isinstance(entity, Group):

@@ -39,50 +39,52 @@ class attributetable_item(nodes.Part, nodes.Element):
 
 
 def visit_attributetable_node(self, node):
-    self.body.append('<div class="py-attribute-table" data-move-to-id="%s">' % node['python-class'])
+    self.body.append(
+        '<div class="py-attribute-table" data-move-to-id="%s">' % node["python-class"]
+    )
 
 
 def visit_attributetablecolumn_node(self, node):
-    self.body.append(self.starttag(node, 'div', CLASS='py-attribute-table-column'))
+    self.body.append(self.starttag(node, "div", CLASS="py-attribute-table-column"))
 
 
 def visit_attributetabletitle_node(self, node):
-    self.body.append(self.starttag(node, 'span'))
+    self.body.append(self.starttag(node, "span"))
 
 
 def visit_attributetablebadge_node(self, node):
     attributes = {
-        'class': 'py-attribute-table-badge',
-        'title': node['badge-type'],
+        "class": "py-attribute-table-badge",
+        "title": node["badge-type"],
     }
-    self.body.append(self.starttag(node, 'span', **attributes))
+    self.body.append(self.starttag(node, "span", **attributes))
 
 
 def visit_attributetable_item_node(self, node):
-    self.body.append(self.starttag(node, 'li', CLASS='py-attribute-table-entry'))
+    self.body.append(self.starttag(node, "li", CLASS="py-attribute-table-entry"))
 
 
 def depart_attributetable_node(self, node):
-    self.body.append('</div>')
+    self.body.append("</div>")
 
 
 def depart_attributetablecolumn_node(self, node):
-    self.body.append('</div>')
+    self.body.append("</div>")
 
 
 def depart_attributetabletitle_node(self, node):
-    self.body.append('</span>')
+    self.body.append("</span>")
 
 
 def depart_attributetablebadge_node(self, node):
-    self.body.append('</span>')
+    self.body.append("</span>")
 
 
 def depart_attributetable_item_node(self, node):
-    self.body.append('</li>')
+    self.body.append("</li>")
 
 
-_name_parser_regex = re.compile(r'(?P<module>[\w.]+\.)?(?P<name>\w+)')
+_name_parser_regex = re.compile(r"(?P<module>[\w.]+\.)?(?P<name>\w+)")
 
 
 class PyAttributeTable(SphinxDirective):
@@ -95,13 +97,15 @@ class PyAttributeTable(SphinxDirective):
     def parse_name(self, content):
         path, name = _name_parser_regex.match(content).groups()
         if path:
-            modulename = path.rstrip('.')
+            modulename = path.rstrip(".")
         else:
-            modulename = self.env.temp_data.get('autodoc:module')
+            modulename = self.env.temp_data.get("autodoc:module")
             if not modulename:
-                modulename = self.env.ref_context.get('py:module')
+                modulename = self.env.ref_context.get("py:module")
         if modulename is None:
-            raise RuntimeError('modulename somehow None for %s in %s.' % (content, self.env.docname))
+            raise RuntimeError(
+                "modulename somehow None for %s in %s." % (content, self.env.docname)
+            )
 
         return modulename, name
 
@@ -131,11 +135,11 @@ class PyAttributeTable(SphinxDirective):
         replaced.
         """
         content = self.arguments[0].strip()
-        node = attributetableplaceholder('')
+        node = attributetableplaceholder("")
         modulename, name = self.parse_name(content)
-        node['python-module'] = modulename
-        node['python-class'] = name
-        node['python-full-name'] = '%s.%s' % (modulename, name)
+        node["python-module"] = modulename
+        node["python-class"] = name
+        node["python-full-name"] = "%s.%s" % (modulename, name)
         return [node]
 
 
@@ -143,17 +147,20 @@ def build_lookup_table(env):
     # Given an environment, load up a lookup table of
     # full-class-name: objects
     result = {}
-    domain = env.domains['py']
+    domain = env.domains["py"]
 
     ignored = {
-        'data', 'exception', 'module', 'class',
+        "data",
+        "exception",
+        "module",
+        "class",
     }
 
-    for (fullname, _, objtype, docname, _, _) in domain.get_objects():
+    for fullname, _, objtype, docname, _, _ in domain.get_objects():
         if objtype in ignored:
             continue
 
-        classname, _, child = fullname.rpartition('.')
+        classname, _, child = fullname.rpartition(".")
         try:
             result[classname].append(child)
         except KeyError:
@@ -162,7 +169,7 @@ def build_lookup_table(env):
     return result
 
 
-TableElement = namedtuple('TableElement', 'fullname label badge')
+TableElement = namedtuple("TableElement", "fullname label badge")
 
 
 def process_attributetable(app, doctree, fromdocname):
@@ -170,15 +177,28 @@ def process_attributetable(app, doctree, fromdocname):
 
     lookup = build_lookup_table(env)
     for node in doctree.traverse(attributetableplaceholder):
-        modulename, classname, fullname = node['python-module'], node['python-class'], node['python-full-name']
+        modulename, classname, fullname = (
+            node["python-module"],
+            node["python-class"],
+            node["python-full-name"],
+        )
         groups = get_class_results(lookup, modulename, classname, fullname)
-        table = attributetable('')
+        table = attributetable("")
         for label, subitems in groups.items():
             if not subitems:
                 continue
-            table.append(class_results_to_node(label, sorted(subitems, key=lambda c: (getattr(c.badge, 'rawsource', None) or 'aa') + c.label)))
+            table.append(
+                class_results_to_node(
+                    label,
+                    sorted(
+                        subitems,
+                        key=lambda c: (getattr(c.badge, "rawsource", None) or "aa")
+                        + c.label,
+                    ),
+                )
+            )
 
-        table['python-class'] = fullname
+        table["python-class"] = fullname
 
         if not table:
             node.replace_self([])
@@ -190,11 +210,13 @@ def get_class_results(lookup, modulename, name, fullname):
     module = importlib.import_module(modulename)
     cls = getattr(module, name)
 
-    groups = OrderedDict([
-        (_('Attributes'), []),
-        (_('Methods'), []),
-    ])
-    methods_key = _('Methods')
+    groups = OrderedDict(
+        [
+            (_("Attributes"), []),
+            (_("Methods"), []),
+        ]
+    )
+    methods_key = _("Methods")
 
     try:
         members = lookup[fullname]
@@ -202,35 +224,35 @@ def get_class_results(lookup, modulename, name, fullname):
         return groups
 
     for attr in members:
-        attrlookup = '%s.%s' % (fullname, attr)
-        key = _('Attributes')
+        attrlookup = "%s.%s" % (fullname, attr)
+        key = _("Attributes")
         badge = None
         label = attr
 
         value = getattr(cls, attr, None)
         if value is not None:
-            doc = value.__doc__ or ''
-            if inspect.iscoroutinefunction(value) or doc.startswith('|coro|'):
-                key = _('Methods')
-                badge = attributetablebadge('await', 'await')
+            doc = value.__doc__ or ""
+            if inspect.iscoroutinefunction(value) or doc.startswith("|coro|"):
+                key = _("Methods")
+                badge = attributetablebadge("await", "await")
                 # raise TypeError(str(inspect.getmembers(badge)))
-                badge['badge-type'] = _('coroutine')
+                badge["badge-type"] = _("coroutine")
             elif isinstance(value, classmethod):
-                key = _('Methods')
-                label = '%s.%s' % (name, attr)
-                badge = attributetablebadge('cls', 'cls')
-                badge['badge-type'] = _('classmethod')
+                key = _("Methods")
+                label = "%s.%s" % (name, attr)
+                badge = attributetablebadge("cls", "cls")
+                badge["badge-type"] = _("classmethod")
             elif inspect.isfunction(value):
-                if doc.startswith(('A decorator', 'A shortcut decorator')):
+                if doc.startswith(("A decorator", "A shortcut decorator")):
                     # finicky but surprisingly consistent
-                    badge = attributetablebadge('@', '@')
-                    badge['badge-type'] = _('decorator')
-                    key = _('Methods')
+                    badge = attributetablebadge("@", "@")
+                    badge["badge-type"] = _("decorator")
+                    key = _("Methods")
                 else:
-                    key = _('Methods')
+                    key = _("Methods")
 
         if key == methods_key:
-            label += '()'
+            label += "()"
 
         groups[key].append(TableElement(fullname=attrlookup, label=label, badge=badge))
 
@@ -242,29 +264,47 @@ def get_class_results(lookup, modulename, name, fullname):
 
 def class_results_to_node(key, elements):
     title = attributetabletitle(key, key)
-    ul = nodes.bullet_list('')
+    ul = nodes.bullet_list("")
     for element in elements:
-        ref = nodes.reference('', '', internal=True,
-                                      refuri='#' + element.fullname,
-                                      anchorname='',
-                                      *[nodes.Text(element.label)],
-                                      classes=['py-attribute-table-name'])
-        para = addnodes.compact_paragraph('', '', ref)
+        ref = nodes.reference(
+            "",
+            "",
+            internal=True,
+            refuri="#" + element.fullname,
+            anchorname="",
+            *[nodes.Text(element.label)],
+            classes=["py-attribute-table-name"],
+        )
+        para = addnodes.compact_paragraph("", "", ref)
         if element.badge is not None:
-            ul.append(attributetable_item('', element.badge, para))
+            ul.append(attributetable_item("", element.badge, para))
         else:
-            ul.append(attributetable_item('', para))
+            ul.append(attributetable_item("", para))
 
-    return attributetablecolumn('', title, ul)
+    return attributetablecolumn("", title, ul)
 
 
 def setup(app):
-    print('Setting up attributetable')
-    app.add_directive('attributetable', PyAttributeTable)
-    app.add_node(attributetable, html=(visit_attributetable_node, depart_attributetable_node))
-    app.add_node(attributetablecolumn, html=(visit_attributetablecolumn_node, depart_attributetablecolumn_node))
-    app.add_node(attributetabletitle, html=(visit_attributetabletitle_node, depart_attributetabletitle_node))
-    app.add_node(attributetablebadge, html=(visit_attributetablebadge_node, depart_attributetablebadge_node))
-    app.add_node(attributetable_item, html=(visit_attributetable_item_node, depart_attributetable_item_node))
+    print("Setting up attributetable")
+    app.add_directive("attributetable", PyAttributeTable)
+    app.add_node(
+        attributetable, html=(visit_attributetable_node, depart_attributetable_node)
+    )
+    app.add_node(
+        attributetablecolumn,
+        html=(visit_attributetablecolumn_node, depart_attributetablecolumn_node),
+    )
+    app.add_node(
+        attributetabletitle,
+        html=(visit_attributetabletitle_node, depart_attributetabletitle_node),
+    )
+    app.add_node(
+        attributetablebadge,
+        html=(visit_attributetablebadge_node, depart_attributetablebadge_node),
+    )
+    app.add_node(
+        attributetable_item,
+        html=(visit_attributetable_item_node, depart_attributetable_item_node),
+    )
     app.add_node(attributetableplaceholder)
-    app.connect('doctree-resolved', process_attributetable) 
+    app.connect("doctree-resolved", process_attributetable)

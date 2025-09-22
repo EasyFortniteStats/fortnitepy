@@ -22,7 +22,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-
 import time
 import asyncio
 
@@ -34,10 +33,10 @@ from .typedefs import Message
 from .errors import MaxConcurrencyReached
 
 __all__ = (
-    'BucketType',
-    'Cooldown',
-    'CooldownMapping',
-    'MaxConcurrency',
+    "BucketType",
+    "Cooldown",
+    "CooldownMapping",
+    "MaxConcurrency",
 )
 
 
@@ -51,7 +50,7 @@ class BucketType(Enum):
 
 
 class Cooldown:
-    __slots__ = ('rate', 'per', 'type', '_window', '_tokens', '_last')
+    __slots__ = ("rate", "per", "type", "_window", "_tokens", "_last")
 
     def __init__(self, rate: int, per: float, type: BucketType) -> None:
         self.rate = int(rate)
@@ -62,7 +61,7 @@ class Cooldown:
         self._last = 0.0
 
         if not isinstance(self.type, BucketType):
-            raise TypeError('Cooldown type must be a BucketType')
+            raise TypeError("Cooldown type must be a BucketType")
 
     def get_tokens(self, current: Optional[float] = None) -> int:
         if not current:
@@ -74,8 +73,7 @@ class Cooldown:
             tokens = self.rate
         return tokens
 
-    def update_rate_limit(self,
-                          current: Optional[float] = None) -> Optional[float]:
+    def update_rate_limit(self, current: Optional[float] = None) -> Optional[float]:
         current = current or time.time()
         self._last = current
 
@@ -101,12 +99,14 @@ class Cooldown:
         self._tokens = self.rate
         self._last = 0.0
 
-    def copy(self) -> 'Cooldown':
+    def copy(self) -> "Cooldown":
         return Cooldown(self.rate, self.per, self.type)
 
     def __repr__(self) -> str:
-        return ('<Cooldown rate: {0.rate} per: {0.per} window: {0._window} '
-                'tokens: {0._tokens}>'.format(self))
+        return (
+            "<Cooldown rate: {0.rate} per: {0.per} window: {0._window} "
+            "tokens: {0._tokens}>".format(self)
+        )
 
 
 class CooldownMapping:
@@ -114,7 +114,7 @@ class CooldownMapping:
         self._cache = {}
         self._cooldown = original
 
-    def copy(self) -> 'CooldownMapping':
+    def copy(self) -> "CooldownMapping":
         ret = CooldownMapping(self._cooldown)
         ret._cache = self._cache.copy()
         return ret
@@ -124,9 +124,9 @@ class CooldownMapping:
         return self._cooldown is not None
 
     @classmethod
-    def from_cooldown(cls, rate: int,
-                      per: float,
-                      type: BucketType) -> 'CooldownMapping':
+    def from_cooldown(
+        cls, rate: int, per: float, type: BucketType
+    ) -> "CooldownMapping":
         return cls(Cooldown(rate, per, type))
 
     def _bucket_key(self, msg: Message) -> Any:
@@ -138,13 +138,11 @@ class CooldownMapping:
         # cooldown of 60s and it has not been used in 60s then that key should
         # be deleted
         current = current or time.time()
-        dead_keys = [k for k, v in self._cache.items()
-                     if current > v._last + v.per]
+        dead_keys = [k for k, v in self._cache.items() if current > v._last + v.per]
         for k in dead_keys:
             del self._cache[k]
 
-    def get_bucket(self, message: Message,
-                   current: Optional[float] = None) -> Cooldown:
+    def get_bucket(self, message: Message, current: Optional[float] = None) -> Cooldown:
         if self._cooldown.type is BucketType.default:
             return self._cooldown
 
@@ -158,14 +156,15 @@ class CooldownMapping:
 
         return bucket
 
-    def update_rate_limit(self, message: Message,
-                          current: Optional[float] = None) -> Optional[float]:
+    def update_rate_limit(
+        self, message: Message, current: Optional[float] = None
+    ) -> Optional[float]:
         bucket = self.get_bucket(message, current)
         return bucket.update_rate_limit(current)
 
 
 class _Semaphore:
-    __slots__ = ('value', 'loop', '_waiters')
+    __slots__ = ("value", "loop", "_waiters")
 
     def __init__(self, number: int) -> None:
         self.value = number
@@ -173,8 +172,9 @@ class _Semaphore:
         self._waiters = deque()
 
     def __repr__(self) -> str:
-        return ('<_Semaphore value={0.value} waiters={1}>'
-                ''.format(self, len(self._waiters)))
+        return "<_Semaphore value={0.value} waiters={1}>".format(
+            self, len(self._waiters)
+        )
 
     def locked(self) -> bool:
         return self.value == 0
@@ -214,7 +214,7 @@ class _Semaphore:
 
 
 class MaxConcurrency:
-    __slots__ = ('number', 'per', 'wait', '_mapping')
+    __slots__ = ("number", "per", "wait", "_mapping")
 
     def __init__(self, number: int, *, per: BucketType, wait: bool) -> None:
         self._mapping = {}
@@ -223,19 +223,20 @@ class MaxConcurrency:
         self.wait = wait
 
         if number <= 0:
-            raise ValueError('max_concurrency \'number\' cannot be less '
-                             'than 1')
+            raise ValueError("max_concurrency 'number' cannot be less than 1")
 
         if not isinstance(per, BucketType):
-            raise TypeError('max_concurrency \'per\' must be of type '
-                            'BucketType not %r' % type(per))
+            raise TypeError(
+                "max_concurrency 'per' must be of type BucketType not %r" % type(per)
+            )
 
-    def copy(self) -> 'MaxConcurrency':
+    def copy(self) -> "MaxConcurrency":
         return self.__class__(self.number, per=self.per, wait=self.wait)
 
     def __repr__(self) -> str:
-        return ('<MaxConcurrency per={0.per!r} number={0.number} '
-                'wait={0.wait}>'.format(self))
+        return "<MaxConcurrency per={0.per!r} number={0.number} wait={0.wait}>".format(
+            self
+        )
 
     def get_key(self, message: Message) -> Any:
         return self.per.get_key(message)

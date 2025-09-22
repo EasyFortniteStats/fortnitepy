@@ -29,23 +29,45 @@ import time
 
 from aioxmpp import JID
 from aiohttp import BaseConnector
-from typing import (Iterable, Union, Optional, Any, Awaitable, Callable, Dict,
-                    List, Tuple)
+from typing import (
+    Iterable,
+    Union,
+    Optional,
+    Any,
+    Awaitable,
+    Callable,
+    Dict,
+    List,
+    Tuple,
+)
 
-from .errors import (PartyError, HTTPException, NotFound, Forbidden,
-                     DuplicateFriendship, FriendshipRequestAlreadySent,
-                     MaxFriendshipsExceeded, InviteeMaxFriendshipsExceeded,
-                     InviteeMaxFriendshipRequestsExceeded, PartyIsFull)
+from .errors import (
+    PartyError,
+    HTTPException,
+    NotFound,
+    Forbidden,
+    DuplicateFriendship,
+    FriendshipRequestAlreadySent,
+    MaxFriendshipsExceeded,
+    InviteeMaxFriendshipsExceeded,
+    InviteeMaxFriendshipRequestsExceeded,
+    PartyIsFull,
+)
 from .xmpp import XMPPClient
 from .http import HTTPClient
-from .user import (ClientUser, User, BlockedUser, SacSearchEntryUser,
-                   UserSearchEntry)
+from .user import ClientUser, User, BlockedUser, SacSearchEntryUser, UserSearchEntry
 from .friend import Friend, IncomingPendingFriend, OutgoingPendingFriend
-from .enums import (Platform, Region, UserSearchPlatform, AwayStatus,
-                    SeasonStartTimestamp, SeasonEndTimestamp,
-                    BattlePassStat, StatsCollectionType)
-from .party import (DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty,
-                    Party)
+from .enums import (
+    Platform,
+    Region,
+    UserSearchPlatform,
+    AwayStatus,
+    SeasonStartTimestamp,
+    SeasonEndTimestamp,
+    BattlePassStat,
+    StatsCollectionType,
+)
+from .party import DefaultPartyConfig, DefaultPartyMemberConfig, ClientParty, Party
 from .stats import StatsV2, StatsCollection, _StatsBase
 from .store import Store
 from .news import BattleRoyaleNewsPost
@@ -60,8 +82,7 @@ log = logging.getLogger(__name__)
 
 
 class StartContext:
-    def __init__(self, client: 'BasicClient',
-                 dispatch_ready: bool = True) -> None:
+    def __init__(self, client: "BasicClient", dispatch_ready: bool = True) -> None:
         self.client = client
         self.dispatch_ready = dispatch_ready
 
@@ -93,16 +114,18 @@ class StartContext:
         return awaiter().__await__()
 
 
-async def _start_client(client: 'BasicClient', *,
-                        shutdown_on_error: bool = True,
-                        after: Optional[MaybeCoro] = None,
-                        error_after: Optional[MaybeCoro] = None,
-                        ) -> None:
+async def _start_client(
+    client: "BasicClient",
+    *,
+    shutdown_on_error: bool = True,
+    after: Optional[MaybeCoro] = None,
+    error_after: Optional[MaybeCoro] = None,
+) -> None:
     loop = asyncio.get_running_loop()
 
     if not isinstance(client, BasicClient):
         raise TypeError(
-            'client must be an instance derived from fortnitepy.BasicClient'
+            "client must be an instance derived from fortnitepy.BasicClient"
         )
 
     async def starter():
@@ -111,15 +134,9 @@ async def _start_client(client: 'BasicClient', *,
         except Exception as e:
             return e
 
-    tasks = (
-        loop.create_task(starter()),
-        loop.create_task(client.wait_until_ready())
-    )
+    tasks = (loop.create_task(starter()), loop.create_task(client.wait_until_ready()))
     try:
-        done, pending = await asyncio.wait(
-            tasks,
-            return_when=asyncio.FIRST_COMPLETED
-        )
+        done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
     except asyncio.CancelledError:
         for task in tasks:
             task.cancel()
@@ -133,7 +150,7 @@ async def _start_client(client: 'BasicClient', *,
 
             if shutdown_on_error:
                 if e.args:
-                    e.args = ('{0} - {1}'.format(identifier, e.args[0]),)
+                    e.args = ("{0} - {1}".format(identifier, e.args[0]),)
                 else:
                     e.args = (identifier,)
 
@@ -146,13 +163,12 @@ async def _start_client(client: 'BasicClient', *,
                         error_after(client, e)
                     return
 
-                message = ('An exception occured while running client '
-                           '{0}'.format(identifier))
-                return loop.call_exception_handler({
-                    'message': message,
-                    'exception': e,
-                    'task': done_task
-                })
+                message = "An exception occured while running client {0}".format(
+                    identifier
+                )
+                return loop.call_exception_handler(
+                    {"message": message, "exception": e, "task": done_task}
+                )
 
         if after:
             if asyncio.iscoroutinefunction(after):
@@ -182,15 +198,17 @@ def _before_event(callback):
     return processor
 
 
-async def start_multiple(clients: List['BasicClient'], *,
-                         gap_timeout: float = 0.2,
-                         shutdown_on_error: bool = True,
-                         ready_callback: Optional[MaybeCoro] = None,
-                         error_callback: Optional[MaybeCoro] = None,
-                         all_ready_callback: Optional[MaybeCoro] = None,
-                         before_start: Optional[Awaitable] = None,
-                         before_close: Optional[Awaitable] = None
-                         ) -> None:
+async def start_multiple(
+    clients: List["BasicClient"],
+    *,
+    gap_timeout: float = 0.2,
+    shutdown_on_error: bool = True,
+    ready_callback: Optional[MaybeCoro] = None,
+    error_callback: Optional[MaybeCoro] = None,
+    all_ready_callback: Optional[MaybeCoro] = None,
+    before_start: Optional[Awaitable] = None,
+    before_close: Optional[Awaitable] = None,
+) -> None:
     """|coro|
 
     Starts multiple clients at the same time.
@@ -215,7 +233,7 @@ async def start_multiple(clients: List['BasicClient'], *,
         If the function should cancel all other start tasks if one of the
         tasks fails. You can catch the error by try excepting.
     ready_callback: Optional[Union[Callable[:class:`BasicClient`], Awaitable[:class:`BasicClient`]]]
-        A callable/async callback taking a single parameter ``client``. 
+        A callable/async callback taking a single parameter ``client``.
         The callback is called whenever a client is ready.
     error_callback: Optional[Union[Callable[:class:`BasicClient`, Exception], Awaitable[:class:`BasicClient`, Exception]]]
         A callable/async callback taking two parameters, :class:`BasicClient`
@@ -255,23 +273,24 @@ async def start_multiple(clients: List['BasicClient'], *,
 
     async def waiter(client):
         _, pending = await asyncio.wait(
-            (loop.create_task(client.wait_until_ready()),
-             loop.create_task(client.wait_until_closed())),
-            return_when=asyncio.FIRST_COMPLETED
+            (
+                loop.create_task(client.wait_until_ready()),
+                loop.create_task(client.wait_until_closed()),
+            ),
+            return_when=asyncio.FIRST_COMPLETED,
         )
 
         for task in pending:
             task.cancel()
 
     async def all_ready_callback_runner():
-        tasks = [loop.create_task(waiter(client))
-                 for client in clients]
+        tasks = [loop.create_task(waiter(client)) for client in clients]
         await asyncio.gather(*tasks)
 
         if all(client.is_closed() for client in clients):
             return
 
-        log.info('All clients started.')
+        log.info("All clients started.")
 
         if all_ready_callback:
             if asyncio.iscoroutinefunction(all_ready_callback):
@@ -285,8 +304,8 @@ async def start_multiple(clients: List['BasicClient'], *,
         identifier = client.auth.identifier
         if identifier in identifiers:
             raise ValueError(
-                'Two or more clients with the same auth identifier was passed.'
-                ' Identifier = {}'.format(repr(identifier))
+                "Two or more clients with the same auth identifier was passed."
+                " Identifier = {}".format(repr(identifier))
             )
 
         identifiers.append(identifier)
@@ -300,37 +319,36 @@ async def start_multiple(clients: List['BasicClient'], *,
 
     tasks = {}
     for i, client in enumerate(clients, 1):
-        tasks[client] = loop.create_task(_start_client(
-            client,
-            shutdown_on_error=shutdown_on_error,
-            after=ready_callback,
-            error_after=error_callback
-        ))
+        tasks[client] = loop.create_task(
+            _start_client(
+                client,
+                shutdown_on_error=shutdown_on_error,
+                after=ready_callback,
+                error_after=error_callback,
+            )
+        )
 
         if before_start is not None:
-            client.add_event_handler('before_start', _before_start)
+            client.add_event_handler("before_start", _before_start)
         if before_close is not None:
-            client.add_event_handler('before_close', _before_close)
+            client.add_event_handler("before_close", _before_close)
 
         # sleeping between starting to avoid throttling
         if i < len(clients):
             await asyncio.sleep(gap_timeout)
 
-    log.debug('Starting all clients')
-    return_when = (asyncio.FIRST_EXCEPTION
-                   if shutdown_on_error
-                   else asyncio.ALL_COMPLETED)
-    done, pending = await asyncio.wait(
-        list(tasks.values()),
-        return_when=return_when
+    log.debug("Starting all clients")
+    return_when = (
+        asyncio.FIRST_EXCEPTION if shutdown_on_error else asyncio.ALL_COMPLETED
     )
+    done, pending = await asyncio.wait(list(tasks.values()), return_when=return_when)
 
     done_task = done.pop()
     if pending and done_task.exception() is not None:
         raise done_task.exception()
 
 
-async def close_multiple(clients: Iterable['BasicClient']) -> None:
+async def close_multiple(clients: Iterable["BasicClient"]) -> None:
     """|coro|
 
     Closes multiple clients at the same time by calling
@@ -345,21 +363,24 @@ async def close_multiple(clients: Iterable['BasicClient']) -> None:
     loop = asyncio.get_running_loop()
 
     tasks = [
-        loop.create_task(client.close()) for client in clients
+        loop.create_task(client.close())
+        for client in clients
         if not client._closing and not client.is_closed()
     ]
     await asyncio.gather(*tasks)
 
 
-def run_multiple(clients: List['BasicClient'], *,
-                 gap_timeout: float = 0.2,
-                 shutdown_on_error: bool = True,
-                 ready_callback: Optional[MaybeCoro] = None,
-                 error_callback: Optional[MaybeCoro] = None,
-                 all_ready_callback: Optional[MaybeCoro] = None,
-                 before_start: Optional[Awaitable] = None,
-                 before_close: Optional[Awaitable] = None
-                 ) -> None:
+def run_multiple(
+    clients: List["BasicClient"],
+    *,
+    gap_timeout: float = 0.2,
+    shutdown_on_error: bool = True,
+    ready_callback: Optional[MaybeCoro] = None,
+    error_callback: Optional[MaybeCoro] = None,
+    all_ready_callback: Optional[MaybeCoro] = None,
+    before_start: Optional[Awaitable] = None,
+    before_close: Optional[Awaitable] = None,
+) -> None:
     """This function sets up a loop and then calls :func:`start_multiple()`
     for you. If you already have a running event loop, you should start
     the clients with :func:`start_multiple()`. On shutdown, all clients
@@ -385,7 +406,7 @@ def run_multiple(clients: List['BasicClient'], *,
         If the function should cancel all other start tasks if one of the
         tasks fails. You can catch the error by try excepting.
     ready_callback: Optional[Union[Callable[:class:`BasicClient`], Awaitable[:class:`BasicClient`]]]
-        A callable/async callback taking a single parameter ``client``. 
+        A callable/async callback taking a single parameter ``client``.
         The callback is called whenever a client is ready.
     error_callback: Optional[Union[Callable[:class:`BasicClient`, Exception], Awaitable[:class:`BasicClient`, Exception]]]
         A callable/async callback taking two parameters, :class:`BasicClient`
@@ -417,6 +438,7 @@ def run_multiple(clients: List['BasicClient'], *,
     HTTPException
         A request error occured while logging in.
     """  # noqa
+
     async def runner():
         try:
             await start_multiple(
@@ -483,23 +505,22 @@ class BasicClient:
         The user the client is logged in as.
     """  # noqa
 
-    def __init__(self, auth: Auth,
-                 **kwargs: Any) -> None:
-        self.cache_users = kwargs.get('cache_users', True)
-        self.build = kwargs.get('build', '++Fortnite+Release-14.10-CL-14288110')  # noqa
-        self.os = kwargs.get('os', 'Windows/10.0.17134.1.768.64bit')
+    def __init__(self, auth: Auth, **kwargs: Any) -> None:
+        self.cache_users = kwargs.get("cache_users", True)
+        self.build = kwargs.get("build", "++Fortnite+Release-14.10-CL-14288110")  # noqa
+        self.os = kwargs.get("os", "Windows/10.0.17134.1.768.64bit")
 
         self.kill_other_sessions = True
         self.accept_eula = True
-        self.event_prefix = 'event_'
+        self.event_prefix = "event_"
 
         self.auth = auth
         self.http = HTTPClient(
             self,
-            connector=kwargs.get('http_connector'),
-            retry_config=kwargs.get('http_retry_config')
+            connector=kwargs.get("http_connector"),
+            retry_config=kwargs.get("http_retry_config"),
         )
-        self.http.add_header('Accept-Language', 'en-EN')
+        self.http.add_header("Accept-Language", "en-EN")
 
         self._listeners = {}
         self._events = {}
@@ -536,9 +557,9 @@ class BasicClient:
 
         self.auth.initialize(self)
 
-    def register_connectors(self,
-                            http_connector: Optional[BaseConnector] = None
-                            ) -> None:
+    def register_connectors(
+        self, http_connector: Optional[BaseConnector] = None
+    ) -> None:
         """This can be used to register a http connector after the client has
         already been initialized. It must however be called before
         :meth:`start()` has been called, or in :meth:`event_before_start()`.
@@ -555,13 +576,12 @@ class BasicClient:
         """
         if http_connector is not None:
             if self.http.connection_exists():
-                raise RuntimeError(
-                    'http_connector must be registered before startup.')
+                raise RuntimeError("http_connector must be registered before startup.")
 
             self.http.connector = http_connector
 
     def setup_internal(self) -> None:
-        logger = logging.getLogger('aioxmpp')
+        logger = logging.getLogger("aioxmpp")
         if logger.getEffectiveLevel() == 30:
             logger.setLevel(level=logging.ERROR)
 
@@ -569,7 +589,7 @@ class BasicClient:
         methods = (func for func in dir(self) if callable(getattr(self, func)))
         for method_name in methods:
             if method_name.startswith(self.event_prefix):
-                event = method_name[len(self.event_prefix):]
+                event = method_name[len(self.event_prefix) :]
                 func = getattr(self, method_name)
                 self.add_event_handler(event, func)
 
@@ -658,7 +678,7 @@ class BasicClient:
             self.register_methods()
 
             if dispatch_ready:
-                await self.dispatch_and_wait_event('before_start')
+                await self.dispatch_and_wait_event("before_start")
 
             # Do this after before_start() in case any connectors
             # are registered during the execution.
@@ -681,12 +701,11 @@ class BasicClient:
 
         self._set_ready()
         if dispatch_ready:
-            self.dispatch_event('ready')
+            self.dispatch_event("ready")
 
         async def waiter(task):
             done, _ = await asyncio.wait(
-                (task, self._exception_future),
-                return_when=asyncio.FIRST_COMPLETED
+                (task, self._exception_future), return_when=asyncio.FIRST_COMPLETED
             )
             try:
                 exc = done.pop().exception()
@@ -695,12 +714,11 @@ class BasicClient:
             else:
                 raise exc
 
-        self._refresh_task = self.loop.create_task(
-            self.auth.run_refresh_loop()
-        )
+        self._refresh_task = self.loop.create_task(self.auth.run_refresh_loop())
         await waiter(self._refresh_task)
 
         if not _started_while_restarting and self._restarting:
+
             async def runner():
                 await self.loop.create_future()
 
@@ -709,26 +727,20 @@ class BasicClient:
 
     async def _setup_client_user(self, priority: int = 0):
         tasks = [
-            self.http.account_get_by_user_id(
-                self.auth.account_id,
-                priority=priority
-            ),
-            self.http.account_graphql_get_clients_external_auths(
-                priority=priority
-            ),
+            self.http.account_get_by_user_id(self.auth.account_id, priority=priority),
+            self.http.account_graphql_get_clients_external_auths(priority=priority),
             self.http.account_get_external_auths_by_id(
-                self.auth.account_id,
-                priority=priority
+                self.auth.account_id, priority=priority
             ),
         ]
 
         data, ext_data, extra_ext_data, *_ = await asyncio.gather(*tasks)
-        data['externalAuths'] = ext_data['myAccount']['externalAuths'] or []
-        data['extraExternalAuths'] = extra_ext_data
+        data["externalAuths"] = ext_data["myAccount"]["externalAuths"] or []
+        data["extraExternalAuths"] = extra_ext_data
         self.user = ClientUser(self, data)
 
     async def _login(self, priority: int = 0) -> None:
-        log.debug('Running authenticating')
+        log.debug("Running authenticating")
         ret = await self.auth._authenticate(priority=priority)
         if ret is False:
             return False
@@ -736,10 +748,8 @@ class BasicClient:
         await self._setup_client_user(priority=priority)
 
         if self.auth.eula_check_needed() and self.accept_eula:
-            await self.auth.accept_eula(
-                priority=priority
-            )
-            log.debug('EULA accepted')
+            await self.auth.accept_eula(priority=priority)
+            log.debug("EULA accepted")
 
     async def _kill_tokens(self) -> None:
         async def killer(token):
@@ -757,18 +767,17 @@ class BasicClient:
 
         if not self._restarting:
             tasks = (
-                killer(getattr(self.auth, 'ios_access_token', None)),
-                killer(getattr(self.auth, 'access_token', None)),
+                killer(getattr(self.auth, "ios_access_token", None)),
+                killer(getattr(self.auth, "access_token", None)),
             )
             await asyncio.gather(*tasks)
 
     def _clear_caches(self) -> None:
         self._users.clear()
 
-    async def _close(self, *,
-                     close_http: bool = True,
-                     dispatch_close: bool = True,
-                     priority: int = 0) -> None:
+    async def _close(
+        self, *, close_http: bool = True, dispatch_close: bool = True, priority: int = 0
+    ) -> None:
         self._closing = True
 
         await self._kill_tokens()
@@ -785,8 +794,10 @@ class BasicClient:
             self._refresh_task.cancel()
 
         if not self._restarting:
-            if (self._start_runner_task is not None
-                    and not self._start_runner_task.cancelled()):
+            if (
+                self._start_runner_task is not None
+                and not self._start_runner_task.cancelled()
+            ):
                 self._start_runner_task.cancel()
 
         self._closing = False
@@ -794,11 +805,11 @@ class BasicClient:
         if dispatch_close and self._closed_event is not None:
             self._set_closed()
 
-        log.debug('Successfully logged out')
+        log.debug("Successfully logged out")
 
-    async def close(self, *,
-                    close_http: bool = True,
-                    dispatch_close: bool = True) -> None:
+    async def close(
+        self, *, close_http: bool = True, dispatch_close: bool = True
+    ) -> None:
         """|coro|
 
         Logs the user out and closes running services.
@@ -818,21 +829,18 @@ class BasicClient:
         """
         if dispatch_close:
             await asyncio.gather(
-                self.dispatch_and_wait_event('before_close'),
-                self.dispatch_and_wait_event('close'),
+                self.dispatch_and_wait_event("before_close"),
+                self.dispatch_and_wait_event("close"),
             )
 
-        await self._close(
-            close_http=close_http,
-            dispatch_close=dispatch_close
-        )
+        await self._close(close_http=close_http, dispatch_close=dispatch_close)
 
     def is_closed(self) -> bool:
         """:class:`bool`: Whether the client is running or not."""
         return self._closed
 
     def can_restart(self) -> bool:
-        return hasattr(self.auth, 'ios_refresh_token')
+        return hasattr(self.auth, "ios_refresh_token")
 
     async def restart(self) -> None:
         """|coro|
@@ -857,15 +865,9 @@ class BasicClient:
             ios_refresh_token = self.auth.ios_refresh_token
 
             self.recover_events()
-            await self._close(
-                close_http=False,
-                dispatch_close=False,
-                priority=priority
-            )
+            await self._close(close_http=False, dispatch_close=False, priority=priority)
 
-            auth = RefreshTokenAuth(
-                refresh_token=ios_refresh_token
-            )
+            auth = RefreshTokenAuth(refresh_token=ios_refresh_token)
             auth.initialize(self)
             self.auth = auth
 
@@ -879,19 +881,16 @@ class BasicClient:
                 self.loop.create_task(runner()),
                 self.loop.create_task(self.wait_until_ready()),
             )
-            d, p = await asyncio.wait(
-                tasks,
-                return_when=asyncio.FIRST_COMPLETED
-            )
+            d, p = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
 
             done_task = d.pop()
             if done_task.result() is not None:
                 p.pop().cancel()
                 raise done_task.result()
 
-            self.dispatch_event('restart')
+            self.dispatch_event("restart")
             self._restarting = False
-            log.debug('Successully restarted the client.')
+            log.debug("Successully restarted the client.")
 
     def recover_events(self) -> None:
         pass
@@ -921,8 +920,8 @@ class BasicClient:
             await self._ready_event.wait()
         else:
             raise RuntimeError(
-                'The client has not been fully initialized. Make sure '
-                'Client.init() has been called before using this method.'
+                "The client has not been fully initialized. Make sure "
+                "Client.init() has been called before using this method."
             )
 
     async def wait_until_closed(self) -> None:
@@ -934,14 +933,13 @@ class BasicClient:
             await self._closed_event.wait()
         else:
             raise RuntimeError(
-                'The client has not been fully initialized. Make sure '
-                'Client.init() has been called before using this method.'
+                "The client has not been fully initialized. Make sure "
+                "Client.init() has been called before using this method."
             )
 
-    async def fetch_user_by_display_name(self, display_name: str, *,
-                                         cache: bool = False,
-                                         raw: bool = False
-                                         ) -> Optional[User]:
+    async def fetch_user_by_display_name(
+        self, display_name: str, *, cache: bool = False, raw: bool = False
+    ) -> Optional[User]:
         """|coro|
 
         Fetches a user from the passed display name.
@@ -988,7 +986,7 @@ class BasicClient:
         try:
             data = await self.http.account_get_by_display_name(display_name)
         except HTTPException as e:
-            error_code = 'errors.com.epicgames.account.account_not_found'
+            error_code = "errors.com.epicgames.account.account_not_found"
             if e.message_code == error_code:
                 return None
             raise
@@ -997,9 +995,9 @@ class BasicClient:
             return data
         return self.store_user(data, try_cache=cache)
 
-    async def fetch_users_by_display_name(self, display_name: str, *,
-                                          raw: bool = False
-                                          ) -> Optional[User]:
+    async def fetch_users_by_display_name(
+        self, display_name: str, *, raw: bool = False
+    ) -> Optional[User]:
         """|coro|
 
         Fetches all users including external users (accounts from other
@@ -1031,14 +1029,13 @@ class BasicClient:
         """
         res = await self.http.account_graphql_get_by_display_name(display_name)
         if raw:
-            return res['account']
+            return res["account"]
 
-        return [User(self, account) for account in res['account']]
+        return [User(self, account) for account in res["account"]]
 
-    async def fetch_user(self, user, *,
-                         cache: bool = False,
-                         raw: bool = False
-                         ) -> Optional[User]:
+    async def fetch_user(
+        self, user, *, cache: bool = False, raw: bool = False
+    ) -> Optional[User]:
         """|coro|
 
         Fetches a single user by the given id/displayname.
@@ -1079,9 +1076,9 @@ class BasicClient:
         except IndexError:
             return None
 
-    async def fetch_users(self, users: Iterable[str], *,
-                          cache: bool = False,
-                          raw: bool = False) -> List[User]:
+    async def fetch_users(
+        self, users: Iterable[str], *, cache: bool = False, raw: bool = False
+    ) -> List[User]:
         """|coro|
 
         Fetches multiple users at once by the given ids/displaynames.
@@ -1154,10 +1151,10 @@ class BasicClient:
         if len(tasks) > 0:
             pfs = await asyncio.gather(*tasks)
             for account_data in pfs:
-                new.append(account_data['id'])
+                new.append(account_data["id"])
 
         chunk_tasks = []
-        chunks = (new[i:i + 100] for i in range(0, len(new), 100))
+        chunks = (new[i : i + 100] for i in range(0, len(new), 100))
         for chunk in chunks:
             task = self.http.account_get_multiple_by_user_id(chunk)  # noqa
             chunk_tasks.append(task)
@@ -1173,9 +1170,9 @@ class BasicClient:
                         _users.append(u)
         return _users
 
-    async def fetch_user_by_email(self, email, *,
-                                  cache: bool = False,
-                                  raw: bool = False) -> Optional[User]:
+    async def fetch_user_by_email(
+        self, email, *, cache: bool = False, raw: bool = False
+    ) -> Optional[User]:
         """|coro|
 
         Fetches a single user by the email.
@@ -1222,17 +1219,17 @@ class BasicClient:
         try:
             res = await self.http.account_get_by_email(email)
         except HTTPException as e:
-            m = 'errors.com.epicgames.account.account_not_found'
+            m = "errors.com.epicgames.account.account_not_found"
             if e.message_code == m:
                 return None
             raise
 
-        account_id = res['id']
+        account_id = res["id"]
         return await self.fetch_user(account_id, cache=cache, raw=raw)
 
-    async def search_users(self, prefix: str,
-                           platform: UserSearchPlatform
-                           ) -> List[UserSearchEntry]:
+    async def search_users(
+        self, prefix: str, platform: UserSearchPlatform
+    ) -> List[UserSearchEntry]:
         """|coro|
 
         Searches after users by a prefix and returns up to 100 matches.
@@ -1265,23 +1262,21 @@ class BasicClient:
         """
         if not isinstance(platform, UserSearchPlatform):
             raise TypeError(
-                'The platform passed must be a constant from '
-                'fortnitepy.UserSearchPlatform'
+                "The platform passed must be a constant from "
+                "fortnitepy.UserSearchPlatform"
             )
 
         res = await self.http.user_search_by_prefix(
-            self.user.id,
-            prefix,
-            platform.value
+            self.user.id, prefix, platform.value
         )
 
-        user_ids = (d['accountId'] for d in res)
+        user_ids = (d["accountId"] for d in res)
         users = await self.fetch_users(user_ids, raw=True)
-        lookup = {p['id']: p for p in users}
+        lookup = {p["id"]: p for p in users}
 
         entries = []
         for data in res:
-            user_data = lookup.get(data['accountId'])
+            user_data = lookup.get(data["accountId"])
             if user_data is None:
                 continue
 
@@ -1315,7 +1310,7 @@ class BasicClient:
             A dict containing avatars mapped to their user id.
         """
         chunk_tasks = []
-        chunks = (users[i:i + 100] for i in range(0, len(users), 100))
+        chunks = (users[i : i + 100] for i in range(0, len(users), 100))
         for chunk in chunks:
             task = self.http.avatar_get_multiple_by_user_id(chunk)
             chunk_tasks.append(task)
@@ -1325,7 +1320,7 @@ class BasicClient:
             d = await asyncio.gather(*chunk_tasks)
             for chunk_results in d:
                 for avatar_data in chunk_results:
-                    results[avatar_data['accountId']] = Avatar(avatar_data)
+                    results[avatar_data["accountId"]] = Avatar(avatar_data)
 
         return results
 
@@ -1352,16 +1347,13 @@ class BasicClient:
         """
         res = await self.http.payment_website_search_sac_by_slug(slug)
 
-        user_ids = (e['id'] for e in res)
-        users = await self.fetch_users(
-            user_ids,
-            raw=True
-        )
-        lookup = {p['id']: p for p in users}
+        user_ids = (e["id"] for e in res)
+        users = await self.fetch_users(user_ids, raw=True)
+        lookup = {p["id"]: p for p in users}
 
         entries = []
         for data in res:
-            user_data = lookup.get(data['id'])
+            user_data = lookup.get(data["id"])
             if user_data is None:
                 continue
 
@@ -1372,10 +1364,7 @@ class BasicClient:
 
     def store_user(self, data: dict, *, try_cache: bool = True) -> User:
         try:
-            user_id = data.get(
-                'accountId',
-                data.get('id', data.get('account_id'))
-            )
+            user_id = data.get("accountId", data.get("id", data.get("account_id")))
 
             if try_cache:
                 return self._users[user_id]
@@ -1492,43 +1481,41 @@ class BasicClient:
         try:
             await self.http.friends_add_or_accept(user_id)
         except HTTPException as exc:
-            m = 'errors.com.epicgames.friends.account_not_found'
+            m = "errors.com.epicgames.friends.account_not_found"
             if exc.message_code == m:
-                raise NotFound('The specified account does not exist.')
+                raise NotFound("The specified account does not exist.")
 
-            m = 'errors.com.epicgames.friends.duplicate_friendship'
+            m = "errors.com.epicgames.friends.duplicate_friendship"
             if exc.message_code == m:
-                raise DuplicateFriendship('This friendship already exists.')
+                raise DuplicateFriendship("This friendship already exists.")
 
-            m = 'errors.com.epicgames.friends.friend_request_already_sent'
+            m = "errors.com.epicgames.friends.friend_request_already_sent"
             if exc.message_code == m:
                 raise FriendshipRequestAlreadySent(
-                    'A friendship request already exists for this user.'
+                    "A friendship request already exists for this user."
                 )
 
-            m = 'errors.com.epicgames.friends.inviter_friendships_limit_exceeded'  # noqa
+            m = "errors.com.epicgames.friends.inviter_friendships_limit_exceeded"  # noqa
             if exc.message_code == m:
                 raise MaxFriendshipsExceeded(
-                    'The client has hit the friendships limit.'
+                    "The client has hit the friendships limit."
                 )
 
-            m = 'errors.com.epicgames.friends.invitee_friendships_limit_exceeded'  # noqa
+            m = "errors.com.epicgames.friends.invitee_friendships_limit_exceeded"  # noqa
             if exc.message_code == m:
                 raise InviteeMaxFriendshipsExceeded(
-                    'The user has hit the friendships limit.'
+                    "The user has hit the friendships limit."
                 )
 
-            m = 'errors.com.epicgames.friends.incoming_friendships_limit_exceeded'  # noqa
+            m = "errors.com.epicgames.friends.incoming_friendships_limit_exceeded"  # noqa
             if exc.message_code == m:
                 raise InviteeMaxFriendshipRequestsExceeded(
-                    'The user has hit the incoming friendship requests limit.'
+                    "The user has hit the incoming friendship requests limit."
                 )
 
-            m = ('errors.com.epicgames.friends.'
-                 'cannot_friend_due_to_target_settings')
+            m = "errors.com.epicgames.friends.cannot_friend_due_to_target_settings"
             if exc.message_code == m:
-                raise Forbidden('You cannot send friendship requests to '
-                                'this user.')
+                raise Forbidden("You cannot send friendship requests to this user.")
 
             raise
 
@@ -1576,25 +1563,20 @@ class BasicClient:
         """
         await self.http.friends_remove_or_decline(user_id)
 
-    async def dispatch_and_wait_event(self, event: str,
-                                      *args: Any,
-                                      **kwargs: Any) -> None:
+    async def dispatch_and_wait_event(
+        self, event: str, *args: Any, **kwargs: Any
+    ) -> None:
         coros = self._events.get(event, [])
         tasks = [asyncio.create_task(coro()) for coro in coros]
         if tasks:
-            await asyncio.wait(
-                tasks,
-                return_when=asyncio.ALL_COMPLETED
-            )
+            await asyncio.wait(tasks, return_when=asyncio.ALL_COMPLETED)
 
-    def _dispatcher(self, coro: Awaitable,
-                    *args: Any,
-                    **kwargs: Any) -> asyncio.Future:
+    def _dispatcher(self, coro: Awaitable, *args: Any, **kwargs: Any) -> asyncio.Future:
         return asyncio.ensure_future(coro(*args, **kwargs))
 
-    def dispatch_event(self, event: str,
-                       *args: Any,
-                       **kwargs: Any) -> List[asyncio.Future]:
+    def dispatch_event(
+        self, event: str, *args: Any, **kwargs: Any
+    ) -> List[asyncio.Future]:
         listeners = self._listeners.get(event)
         if listeners:
             removed = []
@@ -1632,9 +1614,9 @@ class BasicClient:
 
         return tasks
 
-    def wait_for(self, event: str, *,
-                 check: Callable = None,
-                 timeout: Optional[int] = None) -> Any:
+    def wait_for(
+        self, event: str, *, check: Callable = None, timeout: Optional[int] = None
+    ) -> Any:
         """|coro|
 
         Waits for an event to be dispatch.
@@ -1680,7 +1662,7 @@ class BasicClient:
         Parameters
         ----------
         event: :class:`str`
-            The name of the event. 
+            The name of the event.
 
             .. note::
 
@@ -1714,11 +1696,13 @@ class BasicClient:
         """  # noqa
         future = self.loop.create_future()
         if check is None:
+
             def _check(*args):
                 return True
+
             check = _check
 
-        ev = (event.lower()).replace(self.event_prefix, '')
+        ev = (event.lower()).replace(self.event_prefix, "")
         try:
             listeners = self._listeners[ev]
         except KeyError:
@@ -1756,10 +1740,10 @@ class BasicClient:
             The function passed to coro is not a coroutine.
         """
         if not asyncio.iscoroutinefunction(coro):
-            raise TypeError('event registered must be a coroutine function')
+            raise TypeError("event registered must be a coroutine function")
 
         if event.startswith(self.event_prefix):
-            event = event[len(self.event_prefix):]
+            event = event[len(self.event_prefix) :]
 
         if event not in self._events:
             self._events[event] = []
@@ -1781,8 +1765,7 @@ class BasicClient:
 
         self._events[event] = [c for c in self._events[event] if c != coro]
 
-    def event(self,
-              event_or_coro: Union[str, Awaitable[Any]] = None) -> Awaitable:
+    def event(self, event_or_coro: Union[str, Awaitable[Any]] = None) -> Awaitable:
         """A decorator to register an event.
 
         .. note::
@@ -1816,27 +1799,35 @@ class BasicClient:
                 coro = coro.__func__
 
             if not asyncio.iscoroutinefunction(coro):
-                raise TypeError('the decorated function must be a coroutine')
+                raise TypeError("the decorated function must be a coroutine")
 
             if is_coro or event_or_coro is None:
                 if not coro.__name__.startswith(self.event_prefix):
-                    raise TypeError('non specified events must follow '
-                                    'this function name format: '
-                                    '"{}<event>"'.format(self.event_prefix))
+                    raise TypeError(
+                        "non specified events must follow "
+                        "this function name format: "
+                        '"{}<event>"'.format(self.event_prefix)
+                    )
 
-                name = coro.__name__[len(self.event_prefix):]
+                name = coro.__name__[len(self.event_prefix) :]
             else:
                 name = event_or_coro
 
             self.add_event_handler(name, coro)
-            log.debug('{} has been registered as a handler for the '
-                      'event {}'.format(coro.__name__, name))
+            log.debug(
+                "{} has been registered as a handler for the event {}".format(
+                    coro.__name__, name
+                )
+            )
             return coro
+
         return pred(event_or_coro) if is_coro else pred
 
-    def _process_stats_times(self, start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
-                             end_time: Optional[DatetimeOrTimestamp] = None
-                             ) -> Tuple[Optional[int], Optional[int]]:
+    def _process_stats_times(
+        self,
+        start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+        end_time: Optional[DatetimeOrTimestamp] = None,
+    ) -> Tuple[Optional[int], Optional[int]]:
         epoch = datetime.datetime.utcfromtimestamp(0)
         if isinstance(start_time, datetime.datetime):
             start_time = int((start_time - epoch).total_seconds())
@@ -1850,10 +1841,13 @@ class BasicClient:
 
         return start_time, end_time
 
-    async def fetch_br_stats(self, user_id: str, *,
-                             start_time: Optional[DatetimeOrTimestamp] = None,
-                             end_time: Optional[DatetimeOrTimestamp] = None
-                             ) -> StatsV2:
+    async def fetch_br_stats(
+        self,
+        user_id: str,
+        *,
+        start_time: Optional[DatetimeOrTimestamp] = None,
+        end_time: Optional[DatetimeOrTimestamp] = None,
+    ) -> StatsV2:
         """|coro|
 
         Gets Battle Royale stats the specified user.
@@ -1891,49 +1885,52 @@ class BasicClient:
 
         tasks = [
             self.fetch_user(user_id, cache=True),
-            self.http.stats_get_v2(
-                user_id,
-                start_time=start_time,
-                end_time=end_time
-            )
+            self.http.stats_get_v2(user_id, start_time=start_time, end_time=end_time),
         ]
         results = await asyncio.gather(*tasks)
-        if results[1] == '':
-            raise Forbidden('This user has chosen to be hidden '
-                            'from public stats.')
+        if results[1] == "":
+            raise Forbidden("This user has chosen to be hidden from public stats.")
 
         return StatsV2(*results) if results[0] is not None else None
 
-    async def _multiple_stats_chunk_requester(self, user_ids: List[str], stats: List[str], *,  # noqa
-                                              collection: Optional[str] = None,
-                                              start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
-                                              end_time: Optional[DatetimeOrTimestamp] = None  # noqa
-                                              ) -> List[dict]:
-        chunks = [user_ids[i:i+51] for i in range(0, len(user_ids), 51)]
-        stats_chunks = [stats[i:i+20] for i in range(0, len(stats), 20)]
+    async def _multiple_stats_chunk_requester(
+        self,
+        user_ids: List[str],
+        stats: List[str],
+        *,  # noqa
+        collection: Optional[str] = None,
+        start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+        end_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+    ) -> List[dict]:
+        chunks = [user_ids[i : i + 51] for i in range(0, len(user_ids), 51)]
+        stats_chunks = [stats[i : i + 20] for i in range(0, len(stats), 20)]
 
         tasks = []
         for chunk in chunks:
             for stats_chunk in stats_chunks:
-                tasks.append(self.http.stats_get_multiple_v2(
-                    chunk,
-                    stats_chunk,
-                    category=collection,
-                    start_time=start_time,
-                    end_time=end_time
-                ))
+                tasks.append(
+                    self.http.stats_get_multiple_v2(
+                        chunk,
+                        stats_chunk,
+                        category=collection,
+                        start_time=start_time,
+                        end_time=end_time,
+                    )
+                )
 
         results = await asyncio.gather(*tasks)
         return [item for sub in results for item in sub]
 
-    async def _fetch_multiple_br_stats(self, cls: _StatsBase,
-                                       user_ids: List[str],
-                                       stats: List[str],
-                                       *,
-                                       collection: Optional[str] = None,  # noqa
-                                       start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
-                                       end_time: Optional[DatetimeOrTimestamp] = None,  # noqa
-                                       ) -> Dict[str, StatsV2]:
+    async def _fetch_multiple_br_stats(
+        self,
+        cls: _StatsBase,
+        user_ids: List[str],
+        stats: List[str],
+        *,
+        collection: Optional[str] = None,  # noqa
+        start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+        end_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+    ) -> Dict[str, StatsV2]:
         start_time, end_time = self._process_stats_times(start_time, end_time)
 
         tasks = [
@@ -1943,8 +1940,8 @@ class BasicClient:
                 stats,
                 collection=collection,
                 start_time=start_time,
-                end_time=end_time
-            )
+                end_time=end_time,
+            ),
         ]
         results = await asyncio.gather(*tasks)
         if len(results[0]) > 0 and isinstance(results[0][0], dict):
@@ -1952,22 +1949,23 @@ class BasicClient:
 
         res = {}
         for udata in results[1]:
-            if udata['accountId'] in res and res[udata['accountId']] is not None:  # noqa
-                res[udata['accountId']].raw['stats'].update(udata['stats'])
+            if udata["accountId"] in res and res[udata["accountId"]] is not None:  # noqa
+                res[udata["accountId"]].raw["stats"].update(udata["stats"])
                 continue
 
-            r = [x for x in results[0] if x.id == udata['accountId']]
+            r = [x for x in results[0] if x.id == udata["accountId"]]
             user = r[0] if len(r) != 0 else None
-            res[udata['accountId']] = (cls(user, udata)
-                                       if user is not None else None)
+            res[udata["accountId"]] = cls(user, udata) if user is not None else None
         return res
 
-    async def fetch_multiple_br_stats(self, user_ids: List[str],
-                                      stats: List[str],
-                                      *,
-                                      start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
-                                      end_time: Optional[DatetimeOrTimestamp] = None  # noqa
-                                      ) -> Dict[str, Optional[StatsV2]]:
+    async def fetch_multiple_br_stats(
+        self,
+        user_ids: List[str],
+        stats: List[str],
+        *,
+        start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+        end_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+    ) -> Dict[str, Optional[StatsV2]]:
         """|coro|
 
         Gets Battle Royale stats for multiple users at the same time.
@@ -2058,12 +2056,14 @@ class BasicClient:
         )
         return res
 
-    async def fetch_multiple_br_stats_collections(self, user_ids: List[str],
-                                                  collection: Optional[StatsCollectionType] = None,  # noqa
-                                                  *,
-                                                  start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
-                                                  end_time: Optional[DatetimeOrTimestamp] = None  # noqa
-                                                  ) -> Dict[str, Optional[StatsCollection]]:  # noqa
+    async def fetch_multiple_br_stats_collections(
+        self,
+        user_ids: List[str],
+        collection: Optional[StatsCollectionType] = None,  # noqa
+        *,
+        start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+        end_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+    ) -> Dict[str, Optional[StatsCollection]]:  # noqa
         """|coro|
 
         Gets Battle Royale stats collections for multiple users at the same time.
@@ -2074,7 +2074,7 @@ class BasicClient:
             A list of ids you are requesting the stats for.
         collection: :class:`StatsCollectionType`
             The collection to receive. Collections are predefined
-            stats that it attempts to request. 
+            stats that it attempts to request.
         start_time: Optional[Union[:class:`int`, :class:`datetime.datetime`, :class:`SeasonStartTimestamp`]]
             The UTC start time of the time period to get stats from.
             *Must be seconds since epoch, :class:`datetime.datetime` or a constant from SeasonEndTimestamp*
@@ -2113,13 +2113,14 @@ class BasicClient:
         )
         return res
 
-    async def fetch_multiple_battlepass_levels(self,
-                                               users: List[str],
-                                               season: int,
-                                               *,
-                                               start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
-                                               end_time: Optional[DatetimeOrTimestamp] = None  # noqa
-                                               ) -> Dict[str, float]:
+    async def fetch_multiple_battlepass_levels(
+        self,
+        users: List[str],
+        season: int,
+        *,
+        start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+        end_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+    ) -> Dict[str, float]:
         """|coro|
 
         Fetches multiple users battlepass level.
@@ -2173,25 +2174,22 @@ class BasicClient:
         start_time, end_time = self._process_stats_times(start_time, end_time)
 
         if end_time is not None:
-            e = getattr(SeasonStartTimestamp, 'SEASON_{}'.format(season), None)
+            e = getattr(SeasonStartTimestamp, "SEASON_{}".format(season), None)
             if e is not None and end_time < e.value:
                 raise ValueError(
-                    'end_time can\'t be lower than the seasons start timestamp'
+                    "end_time can't be lower than the seasons start timestamp"
                 )
 
-        e = getattr(BattlePassStat, 'SEASON_{}'.format(season), None)
+        e = getattr(BattlePassStat, "SEASON_{}".format(season), None)
         if e is not None:
             info = e.value
             stats = info[0] if isinstance(info[0], tuple) else (info[0],)
             end_time = end_time if end_time is not None else info[1]
         else:
-            stats = ('s{0}_social_bp_level'.format(season),)
+            stats = ("s{0}_social_bp_level".format(season),)
 
         data = await self._multiple_stats_chunk_requester(
-            users,
-            stats,
-            start_time=start_time,
-            end_time=end_time
+            users, stats, start_time=start_time, end_time=end_time
         )
 
         def get_stat(user_data):
@@ -2200,13 +2198,16 @@ class BasicClient:
                 if value is not None:
                     return value / 100
 
-        return {e['accountId']: get_stat(e['stats']) for e in data}
+        return {e["accountId"]: get_stat(e["stats"]) for e in data}
 
-    async def fetch_battlepass_level(self, user_id: str, *,
-                                     season: int,
-                                     start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
-                                     end_time: Optional[DatetimeOrTimestamp] = None  # noqa
-                                     ) -> float:
+    async def fetch_battlepass_level(
+        self,
+        user_id: str,
+        *,
+        season: int,
+        start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+        end_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+    ) -> float:
         """|coro|
 
         Fetches a users battlepass level.
@@ -2251,13 +2252,10 @@ class BasicClient:
                 E.g. ``208.63`` -> ``Level 208 and 63% on the way to 209.``
         """  # noqa
         data = await self.fetch_multiple_battlepass_levels(
-            (user_id,),
-            season=season,
-            start_time=start_time,
-            end_time=end_time
+            (user_id,), season=season, start_time=start_time, end_time=end_time
         )
         if user_id not in data:
-            raise Forbidden('User has private career board.')
+            raise Forbidden("User has private career board.")
 
         return data[user_id]
 
@@ -2311,10 +2309,10 @@ class BasicClient:
         """
         data = await self.http.stats_get_leaderboard_v2(stat)
 
-        if len(data['entries']) == 0:
-            raise ValueError('{0} is not a valid stat'.format(stat))
+        if len(data["entries"]) == 0:
+            raise ValueError("{0} is not a valid stat".format(stat))
 
-        return data['entries']
+        return data["entries"]
 
     async def fetch_party(self, party_id: str) -> Party:
         """|coro|
@@ -2339,23 +2337,22 @@ class BasicClient:
         try:
             data = await self.http.party_lookup(party_id)
         except HTTPException as exc:
-            m = 'errors.com.epicgames.social.party.party_not_found'
+            m = "errors.com.epicgames.social.party.party_not_found"
             if exc.message_code == m:
                 return None
 
-            m = 'errors.com.epicgames.social.party.party_query_forbidden'
+            m = "errors.com.epicgames.social.party.party_query_forbidden"
             if exc.message_code == m:
-                raise Forbidden('You are not allowed to lookup this party.')
+                raise Forbidden("You are not allowed to lookup this party.")
 
             raise
 
         party = Party(self, data)
-        await party._update_members(members=data['members'])
+        await party._update_members(members=data["members"])
 
         return party
 
-    async def fetch_lightswitch_status(self,
-                                       service_id: str = 'Fortnite') -> bool:
+    async def fetch_lightswitch_status(self, service_id: str = "Fortnite") -> bool:
         """|coro|
 
         Fetches the lightswitch status of an epicgames service.
@@ -2380,8 +2377,8 @@ class BasicClient:
         """
         status = await self.http.lightswitch_get_status(service_id=service_id)
         if len(status) == 0:
-            raise ValueError('emtpy lightswitch response')
-        return True if status[0].get('status') == 'UP' else False
+            raise ValueError("emtpy lightswitch response")
+        return True if status[0].get("status") == "UP" else False
 
     async def fetch_item_shop(self) -> Store:
         """|coro|
@@ -2433,11 +2430,11 @@ class BasicClient:
         data = await self.http.fortnitecontent_get()
 
         res = []
-        msg = data['battleroyalenews']['news'].get('message')
+        msg = data["battleroyalenews"]["news"].get("message")
         if msg is not None:
             res.append(BattleRoyaleNewsPost(msg))
         else:
-            msgs = data['battleroyalenews']['news']['messages']
+            msgs = data["battleroyalenews"]["news"]["messages"]
             for msg in msgs:
                 res.append(BattleRoyaleNewsPost(msg))
         return res
@@ -2460,7 +2457,7 @@ class BasicClient:
         """
         data = await self.http.fortnitecontent_get()
 
-        raw = data['playlistinformation']['playlist_info']['playlists']
+        raw = data["playlistinformation"]["playlist_info"]["playlists"]
         playlists = []
         for playlist in raw:
             try:
@@ -2493,15 +2490,12 @@ class BasicClient:
         """
         data = await self.http.fortnite_get_timeline()
 
-        states = data['channels']['client-matchmaking']['states']
-        region_data = states[len(states) - 1]['state']['region'].get(
-            region.value, {})
-        return region_data.get('eventFlagsForcedOn', [])
+        states = data["channels"]["client-matchmaking"]["states"]
+        region_data = states[len(states) - 1]["state"]["region"].get(region.value, {})
+        return region_data.get("eventFlagsForcedOn", [])
 
     async def join_party(self, party_id: str) -> None:
-        raise NotImplementedError(
-            'BasicClient does not support party actions.'
-        )
+        raise NotImplementedError("BasicClient does not support party actions.")
 
 
 class Client(BasicClient):
@@ -2595,26 +2589,35 @@ class Client(BasicClient):
         The party the client is currently connected to.
     """  # noqa
 
-    def __init__(self, auth: Auth,
-                 **kwargs: Any) -> None:
+    def __init__(self, auth: Auth, **kwargs: Any) -> None:
         super().__init__(auth=auth, **kwargs)
 
-        self.status = kwargs.get('status', 'Battle Royale Lobby - {party_size} / {party_max_size}')  # noqa
-        self.away = kwargs.get('away', AwayStatus.ONLINE)
-        self.platform = kwargs.get('platform', Platform.WINDOWS)
-        self.net_cl = kwargs.get('net_cl', '')
-        self.party_version = kwargs.get('party_version', 3)
-        self.party_build_id = '1:{0.party_version}:{0.net_cl}'.format(self)
-        self.default_party_config = kwargs.get('default_party_config', DefaultPartyConfig())  # noqa
-        self.default_party_member_config = kwargs.get('default_party_member_config', DefaultPartyMemberConfig())  # noqa
-        self.service_host = kwargs.get('xmpp_host', 'prod.ol.epicgames.com')
-        self.service_domain = kwargs.get('xmpp_domain', 'xmpp-service-prod.ol.epicgames.com')  # noqa
-        self.service_port = kwargs.get('xmpp_port', 5222)
-        self.fetch_user_data_in_events = kwargs.get('fetch_user_data_in_events', True)  # noqa
-        self.wait_for_member_meta_in_events = kwargs.get('wait_for_member_meta_in_events', True)  # noqa
-        self.leave_party_at_shutdown = kwargs.get('leave_party_at_shutdown', True)  # noqa
+        self.status = kwargs.get(
+            "status", "Battle Royale Lobby - {party_size} / {party_max_size}"
+        )  # noqa
+        self.away = kwargs.get("away", AwayStatus.ONLINE)
+        self.platform = kwargs.get("platform", Platform.WINDOWS)
+        self.net_cl = kwargs.get("net_cl", "")
+        self.party_version = kwargs.get("party_version", 3)
+        self.party_build_id = "1:{0.party_version}:{0.net_cl}".format(self)
+        self.default_party_config = kwargs.get(
+            "default_party_config", DefaultPartyConfig()
+        )  # noqa
+        self.default_party_member_config = kwargs.get(
+            "default_party_member_config", DefaultPartyMemberConfig()
+        )  # noqa
+        self.service_host = kwargs.get("xmpp_host", "prod.ol.epicgames.com")
+        self.service_domain = kwargs.get(
+            "xmpp_domain", "xmpp-service-prod.ol.epicgames.com"
+        )  # noqa
+        self.service_port = kwargs.get("xmpp_port", 5222)
+        self.fetch_user_data_in_events = kwargs.get("fetch_user_data_in_events", True)  # noqa
+        self.wait_for_member_meta_in_events = kwargs.get(
+            "wait_for_member_meta_in_events", True
+        )  # noqa
+        self.leave_party_at_shutdown = kwargs.get("leave_party_at_shutdown", True)  # noqa
 
-        self.xmpp = XMPPClient(self, ws_connector=kwargs.get('ws_connector'))
+        self.xmpp = XMPPClient(self, ws_connector=kwargs.get("ws_connector"))
         self.party = None
 
         self._listeners = {}
@@ -2648,10 +2651,11 @@ class Client(BasicClient):
 
         self.auth.initialize(self)
 
-    def register_connectors(self,
-                            http_connector: Optional[BaseConnector] = None,
-                            ws_connector: Optional[BaseConnector] = None
-                            ) -> None:
+    def register_connectors(
+        self,
+        http_connector: Optional[BaseConnector] = None,
+        ws_connector: Optional[BaseConnector] = None,
+    ) -> None:
         """This can be used to register connectors after the client has
         already been initialized. It must however be called before
         :meth:`start()` has been called, or in :meth:`event_before_start()`.
@@ -2672,8 +2676,7 @@ class Client(BasicClient):
 
         if ws_connector is not None:
             if self.xmpp.xmpp_client is not None:
-                raise RuntimeError(
-                    'ws_connector must be registered before startup')
+                raise RuntimeError("ws_connector must be registered before startup")
 
             self.xmpp.ws_connector = ws_connector
 
@@ -2705,8 +2708,9 @@ class Client(BasicClient):
         return len(self._friends)
 
     @property
-    def pending_friends(self) -> List[Union[IncomingPendingFriend,
-                                            OutgoingPendingFriend]]:
+    def pending_friends(
+        self,
+    ) -> List[Union[IncomingPendingFriend, OutgoingPendingFriend]]:
         """List[Union[:class:`IncomingPendingFriend`,
         :class:`OutgoingPendingFriend`]]: A list of all of the clients
         pending friends.
@@ -2722,8 +2726,7 @@ class Client(BasicClient):
 
     @property
     def pending_friend_count(self) -> int:
-        """:class:`int`: The amount of pending friends the bot currently has.
-        """
+        """:class:`int`: The amount of pending friends the bot currently has."""
         return len(self._pending_friends)
 
     @property
@@ -2773,11 +2776,11 @@ class Client(BasicClient):
         return list(self._presences.values())
 
     def _check_party_confirmation(self) -> None:
-        k = 'party_member_confirm'
+        k = "party_member_confirm"
         val = k in self._events and len(self._events[k]) > 0
         if val != self._join_confirmation:
             self._join_confirmation = val
-            self.default_party_config.update({'join_confirmation': val})
+            self.default_party_config.update({"join_confirmation": val})
 
     def register_methods(self) -> None:
         super().register_methods()
@@ -2786,7 +2789,7 @@ class Client(BasicClient):
 
     async def internal_auth_refresh_handler(self):
         try:
-            log.debug('Refreshing xmpp session')
+            log.debug("Refreshing xmpp session")
             await self.xmpp.close()
             await self.xmpp.run()
 
@@ -2797,8 +2800,7 @@ class Client(BasicClient):
     async def _start(self, dispatch_ready: bool = True) -> None:
         if self._first_start:
             self.add_event_handler(
-                'internal_auth_refresh',
-                self.internal_auth_refresh_handler
+                "internal_auth_refresh", self.internal_auth_refresh_handler
             )
 
         return await super()._start(dispatch_ready=dispatch_ready)
@@ -2809,13 +2811,13 @@ class Client(BasicClient):
             return res
 
         await self.refresh_caches(priority=priority)
-        log.debug('Successfully set up caches')
+        log.debug("Successfully set up caches")
 
         await self.xmpp.run()
-        log.debug('Connected to XMPP')
+        log.debug("Connected to XMPP")
 
         await self.initialize_party(priority=priority)
-        log.debug('Party created')
+        log.debug("Party created")
 
     def _clear_caches(self) -> None:
         super()._clear_caches()
@@ -2825,10 +2827,9 @@ class Client(BasicClient):
         self._blocked_users.clear()
         self._presences.clear()
 
-    async def _close(self, *,
-                     close_http: bool = True,
-                     dispatch_close: bool = True,
-                     priority: int = 0) -> None:
+    async def _close(
+        self, *, close_http: bool = True, dispatch_close: bool = True, priority: int = 0
+    ) -> None:
         self._closing = True
 
         if self.leave_party_at_shutdown:
@@ -2852,77 +2853,77 @@ class Client(BasicClient):
     def recover_events(self) -> asyncio.Task:
         return asyncio.create_task(self._recover_events())
 
-    async def _recover_events(self, *,
-                              refresh_caches: bool = False,
-                              wait_for_close: bool = True) -> None:
+    async def _recover_events(
+        self, *, refresh_caches: bool = False, wait_for_close: bool = True
+    ) -> None:
         if wait_for_close:
-            await self.wait_for('xmpp_session_close')
+            await self.wait_for("xmpp_session_close")
 
         pre_friends = self.friends
         pre_pending = self.pending_friends
-        await self.wait_for('xmpp_session_establish')
+        await self.wait_for("xmpp_session_establish")
 
         if refresh_caches:
             await self.refresh_caches()
 
         for friend in pre_friends:
             if friend not in self._friends.values():
-                self.dispatch_event('friend_remove', friend)
+                self.dispatch_event("friend_remove", friend)
 
         added_friends = []
         for friend in self._friends.values():
             if friend not in pre_friends:
                 added_friends.append(friend)
-                self.dispatch_event('friend_add', friend)
+                self.dispatch_event("friend_add", friend)
 
         for pending in pre_pending:
-            if (pending not in self._pending_friends.values()
-                    and pending not in added_friends):
-                self.dispatch_event('friend_request_abort', pending)
+            if (
+                pending not in self._pending_friends.values()
+                and pending not in added_friends
+            ):
+                self.dispatch_event("friend_request_abort", pending)
 
         for pending in self._pending_friends.values():
             if pending not in pre_pending:
-                self.dispatch_event('friend_request', pending)
+                self.dispatch_event("friend_request", pending)
 
-    def construct_party(self, data: dict, *,
-                        cls: Optional[ClientParty] = None) -> ClientParty:
+    def construct_party(
+        self, data: dict, *, cls: Optional[ClientParty] = None
+    ) -> ClientParty:
         clazz = cls or self.default_party_config.cls
         return clazz(self, data)
 
     async def initialize_party(self, priority: int = 0) -> None:
-        data = await self.http.party_lookup_user(
-            self.user.id,
-            priority=priority
-        )
-        if len(data['current']) > 0:
+        data = await self.http.party_lookup_user(self.user.id, priority=priority)
+        if len(data["current"]) > 0:
             if not self.leave_party_at_shutdown:
-                current = data['current'][0]
+                current = data["current"][0]
 
                 member_d = None
-                for member_data in current['members']:
-                    if member_data['account_id'] == self.auth.account_id:
+                for member_data in current["members"]:
+                    if member_data["account_id"] == self.auth.account_id:
                         member_d = member_data
                         break
 
                 if member_d is not None:
                     newest_conn = max(
-                        member_data['connections'],
-                        key=lambda o: from_iso(o['connected_at']),
+                        member_data["connections"],
+                        key=lambda o: from_iso(o["connected_at"]),
                     )
 
                     try:
-                        disc_at = from_iso(newest_conn['disconnected_at'])
+                        disc_at = from_iso(newest_conn["disconnected_at"])
                     except KeyError:
                         pass
                     else:
                         now = datetime.datetime.utcnow()
                         total_seconds = (now - disc_at).total_seconds()
-                        if total_seconds < newest_conn.get('offline_ttl', 30):
+                        if total_seconds < newest_conn.get("offline_ttl", 30):
                             return await self._reconnect_to_party(data=data)
 
-            party = self.construct_party(data['current'][0])
+            party = self.construct_party(data["current"][0])
             await party._leave(priority=priority)
-            log.debug('Left old party')
+            log.debug("Left old party")
 
         await self._create_party(priority=priority)
 
@@ -2932,24 +2933,18 @@ class Client(BasicClient):
         self._blocked_users.clear()
 
         tasks = (
-            self.http.friends_get_all(
-                include_pending=True,
-                priority=priority
-            ),
+            self.http.friends_get_all(include_pending=True, priority=priority),
             self.http.friends_get_summary(priority=priority),
             self.http.presence_get_last_online(priority=priority),
         )
         raw_friends, raw_summary, raw_presences = await asyncio.gather(*tasks)
 
-        ids = [r['accountId'] for r in raw_friends + raw_summary['blocklist']]
-        chunks = (ids[i:i + 100] for i in range(0, len(ids), 100))
+        ids = [r["accountId"] for r in raw_friends + raw_summary["blocklist"]]
+        chunks = (ids[i : i + 100] for i in range(0, len(ids), 100))
 
         users = {}
         tasks = [
-            self.http.account_get_multiple_by_user_id(
-                chunk,
-                priority=priority
-            )
+            self.http.account_get_multiple_by_user_id(chunk, priority=priority)
             for chunk in chunks
         ]
         if tasks:
@@ -2959,27 +2954,27 @@ class Client(BasicClient):
 
         for results in done:
             for user in results:
-                users[user['id']] = user
+                users[user["id"]] = user
 
         # TODO: Add method for fetching friends and other stuff
 
         for friend in raw_friends:
             try:
-                data = users[friend['accountId']]
+                data = users[friend["accountId"]]
             except KeyError:
                 continue
 
-            if friend['status'] == 'ACCEPTED':
+            if friend["status"] == "ACCEPTED":
                 self.store_friend({**friend, **data})
 
-            elif friend['status'] == 'PENDING':
-                if friend['direction'] == 'INBOUND':
+            elif friend["status"] == "PENDING":
+                if friend["direction"] == "INBOUND":
                     self.store_incoming_pending_friend({**friend, **data})
                 else:
                     self.store_outgoing_pending_friend({**friend, **data})
 
-        for data in raw_summary['friends']:
-            friend = self.get_friend(data['accountId'])
+        for data in raw_summary["friends"]:
+            friend = self.get_friend(data["accountId"])
             if friend is not None:
                 friend._update_summary(data)
 
@@ -2987,7 +2982,7 @@ class Client(BasicClient):
             friend = self.get_friend(user_id)
             if friend is not None:
                 try:
-                    value = data[0]['last_online']
+                    value = data[0]["last_online"]
                 except (IndexError, KeyError):
                     value = None
 
@@ -2995,17 +2990,14 @@ class Client(BasicClient):
                     from_iso(value) if value is not None else None
                 )
 
-        for data in raw_summary['blocklist']:
-            user = users.get(data['accountId'])
+        for data in raw_summary["blocklist"]:
+            user = users.get(data["accountId"])
             if user is not None:
                 self.store_blocked_user(user)
 
     def store_user(self, data: dict, *, try_cache: bool = True) -> User:
         try:
-            user_id = data.get(
-                'accountId',
-                data.get('id', data.get('account_id'))
-            )
+            user_id = data.get("accountId", data.get("id", data.get("account_id")))
 
             if try_cache:
                 return self._users[user_id]
@@ -3027,14 +3019,11 @@ class Client(BasicClient):
                     self._users[user.id] = user
         return user
 
-    def store_friend(self, data: dict, *,
-                     summary: Optional[dict] = None,
-                     try_cache: bool = True) -> Friend:
+    def store_friend(
+        self, data: dict, *, summary: Optional[dict] = None, try_cache: bool = True
+    ) -> Friend:
         try:
-            user_id = data.get(
-                'accountId',
-                data.get('id', data.get('account_id'))
-            )
+            user_id = data.get("accountId", data.get("id", data.get("account_id")))
             if try_cache:
                 return self._friends[user_id]
         except KeyError:
@@ -3061,14 +3050,11 @@ class Client(BasicClient):
         """
         return self._friends.get(user_id)
 
-    def store_incoming_pending_friend(self, data: dict, *,
-                                      try_cache: bool = True
-                                      ) -> IncomingPendingFriend:
+    def store_incoming_pending_friend(
+        self, data: dict, *, try_cache: bool = True
+    ) -> IncomingPendingFriend:
         try:
-            user_id = data.get(
-                'accountId',
-                data.get('id', data.get('account_id'))
-            )
+            user_id = data.get("accountId", data.get("id", data.get("account_id")))
             if try_cache:
                 return self._pending_friends[user_id]
         except KeyError:
@@ -3078,14 +3064,11 @@ class Client(BasicClient):
         self._pending_friends[pending_friend.id] = pending_friend
         return pending_friend
 
-    def store_outgoing_pending_friend(self, data: dict, *,
-                                      try_cache: bool = True
-                                      ) -> OutgoingPendingFriend:
+    def store_outgoing_pending_friend(
+        self, data: dict, *, try_cache: bool = True
+    ) -> OutgoingPendingFriend:
         try:
-            user_id = data.get(
-                'accountId',
-                data.get('id', data.get('account_id'))
-            )
+            user_id = data.get("accountId", data.get("id", data.get("account_id")))
             if try_cache:
                 return self._pending_friends[user_id]
         except KeyError:
@@ -3095,10 +3078,9 @@ class Client(BasicClient):
         self._pending_friends[pending_friend.id] = pending_friend
         return pending_friend
 
-    def get_pending_friend(self,
-                           user_id: str
-                           ) -> Optional[Union[IncomingPendingFriend,
-                                               OutgoingPendingFriend]]:
+    def get_pending_friend(
+        self, user_id: str
+    ) -> Optional[Union[IncomingPendingFriend, OutgoingPendingFriend]]:
         """Tries to get a pending friend from the pending friend cache by the
         given user id.
 
@@ -3109,15 +3091,15 @@ class Client(BasicClient):
 
         Returns
         -------
-        Optional[Union[:class:`IncomingPendingFriend`, 
+        Optional[Union[:class:`IncomingPendingFriend`,
         :class:`OutgoingPendingFriend`]]
             The pending friend if found, else ``None``
         """  # noqa
         return self._pending_friends.get(user_id)
 
-    def get_incoming_pending_friend(self,
-                                    user_id: str
-                                    ) -> Optional[IncomingPendingFriend]:
+    def get_incoming_pending_friend(
+        self, user_id: str
+    ) -> Optional[IncomingPendingFriend]:
         """Tries to get an incoming pending friend from the pending friends
         cache by the given user id.
 
@@ -3135,9 +3117,9 @@ class Client(BasicClient):
         if pending_friend and pending_friend.incoming:
             return pending_friend
 
-    def get_outgoing_pending_friend(self,
-                                    user_id: str
-                                    ) -> Optional[OutgoingPendingFriend]:
+    def get_outgoing_pending_friend(
+        self, user_id: str
+    ) -> Optional[OutgoingPendingFriend]:
         """Tries to get an outgoing pending friend from the pending friends
         cache by the given user id.
 
@@ -3155,13 +3137,9 @@ class Client(BasicClient):
         if pending_friend and pending_friend.outgoing:
             return pending_friend
 
-    def store_blocked_user(self, data: dict, *,
-                           try_cache: bool = True) -> BlockedUser:
+    def store_blocked_user(self, data: dict, *, try_cache: bool = True) -> BlockedUser:
         try:
-            user_id = data.get(
-                'accountId',
-                data.get('id', data.get('account_id'))
-            )
+            user_id = data.get("accountId", data.get("id", data.get("account_id")))
             if try_cache:
                 return self._blocked_users[user_id]
         except KeyError:
@@ -3283,34 +3261,27 @@ class Client(BasicClient):
             Object of the friend you just added.
         """
         await super().add_friend(user_id)
-        friend = await self.wait_for('friend_add',
-                                     check=lambda f: f.id == user_id)
+        friend = await self.wait_for("friend_add", check=lambda f: f.id == user_id)
         return friend
 
     async def _reconnect_to_party(self, data: Optional[dict] = None) -> None:
         if data is None:
-            data = await self.http.party_lookup_user(
-                self.user.id
-            )
+            data = await self.http.party_lookup_user(self.user.id)
 
-        if data['current']:
-            party_data = data['current'][0]
+        if data["current"]:
+            party_data = data["current"][0]
             async with self._join_party_lock:
                 try:
-                    await self._join_party(
-                        party_data,
-                        event='party_member_reconnect'
-                    )
+                    await self._join_party(party_data, event="party_member_reconnect")
                 except Exception:
                     await self._create_party(acquire=False)
                     raise
         else:
             await self._create_party()
 
-    async def _create_party(self,
-                            config: Optional[dict] = None,
-                            acquire: bool = True,
-                            priority: int = 0) -> ClientParty:
+    async def _create_party(
+        self, config: Optional[dict] = None, acquire: bool = True, priority: int = 0
+    ) -> ClientParty:
         aquiring = not self.auth._refresh_lock.locked() and acquire
         try:
             if aquiring:
@@ -3323,40 +3294,32 @@ class Client(BasicClient):
 
             while True:
                 try:
-                    data = await self.http.party_create(
-                        cf,
-                        priority=priority
-                    )
+                    data = await self.http.party_create(cf, priority=priority)
                     break
                 except HTTPException as exc:
-                    if exc.message_code != ('errors.com.epicgames.social.'
-                                            'party.user_has_party'):
+                    if exc.message_code != (
+                        "errors.com.epicgames.social.party.user_has_party"
+                    ):
                         raise
 
                     data = await self.http.party_lookup_user(
-                        self.user.id,
-                        priority=priority
+                        self.user.id, priority=priority
                     )
 
                     try:
                         await self.http.party_leave(
-                            data['current'][0]['id'],
-                            priority=priority
+                            data["current"][0]["id"], priority=priority
                         )
                     except HTTPException as e:
-                        m = ('errors.com.epicgames.social.'
-                             'party.party_not_found')
+                        m = "errors.com.epicgames.social.party.party_not_found"
                         if e.message_code != m:
                             raise
 
                     await self.xmpp.leave_muc()
 
-            config = {**cf, **data['config']}
+            config = {**cf, **data["config"]}
             party = self.construct_party(data)
-            await party._update_members(
-                members=data['members'],
-                priority=priority
-            )
+            await party._update_members(members=data["members"], priority=priority)
             self.party = party
 
             tasks = [
@@ -3364,7 +3327,7 @@ class Client(BasicClient):
             ]
             await party.meta.meta_ready_event.wait()
 
-            updated, deleted, cfg1 = party.meta.set_privacy(config['privacy'])
+            updated, deleted, cfg1 = party.meta.set_privacy(config["privacy"])
             edit_updated, edit_deleted, cfg2 = await party._edit(
                 *party._default_config.meta
             )
@@ -3372,22 +3335,23 @@ class Client(BasicClient):
             # Filter out urn:epic:* properties that was set in party create
             # payload.
             default_schema = {
-                k: v for k, v in party.meta.schema.items()
-                if k.startswith('Default:')
+                k: v for k, v in party.meta.schema.items() if k.startswith("Default:")
             }
 
-            tasks.append(party.patch(
-                updated={
-                    **default_schema,
-                    **updated,
-                    **edit_updated,
-                    **party._construct_raw_squad_assignments(),
-                    **party.meta.set_voicechat_implementation('EOSVoiceChat')
-                },
-                deleted=[*deleted, *edit_deleted],
-                priority=priority,
-                config={**cfg1, **cfg2},
-            ))
+            tasks.append(
+                party.patch(
+                    updated={
+                        **default_schema,
+                        **updated,
+                        **edit_updated,
+                        **party._construct_raw_squad_assignments(),
+                        **party.meta.set_voicechat_implementation("EOSVoiceChat"),
+                    },
+                    deleted=[*deleted, *edit_deleted],
+                    priority=priority,
+                    config={**cfg1, **cfg2},
+                )
+            )
             await asyncio.gather(*tasks)
 
             return party
@@ -3402,11 +3366,12 @@ class Client(BasicClient):
     async def wait_until_party_ready(self) -> None:
         await self._join_party_lock.wait()
 
-    async def _join_party(self, party_data: dict, *,
-                          event: str = 'party_member_join') -> ClientParty:
+    async def _join_party(
+        self, party_data: dict, *, event: str = "party_member_join"
+    ) -> ClientParty:
         async with self._internal_join_party_lock:
             party = self.construct_party(party_data)
-            await party._update_members(party_data['members'])
+            await party._update_members(party_data["members"])
             self.party = party
 
             def check(m):
@@ -3426,23 +3391,21 @@ class Client(BasicClient):
                 if not future.cancelled():
                     future.cancel()
 
-                m = 'errors.com.epicgames.social.party.party_join_forbidden'  # noqa
+                m = "errors.com.epicgames.social.party.party_join_forbidden"  # noqa
                 if e.message_code == m:
-                    raise Forbidden(
-                        'You are not allowed to join this party.'
-                    )
+                    raise Forbidden("You are not allowed to join this party.")
                 raise
 
             party_data = await self.http.party_lookup(party.id)
             party = self.construct_party(party_data)
             self.party = party
             asyncio.ensure_future(party.join_chat())
-            await party._update_members(party_data['members'])
+            await party._update_members(party_data["members"])
 
         try:
             await future
         except asyncio.TimeoutError:
-            raise asyncio.TimeoutError('Party join timed out.')
+            raise asyncio.TimeoutError("Party join timed out.")
 
         return party
 
@@ -3489,30 +3452,24 @@ class Client(BasicClient):
         """
         async with self._join_party_lock:
             if party_id == self.party.id:
-                raise PartyError('You are already a member of this party.')
+                raise PartyError("You are already a member of this party.")
 
             try:
                 party_data = await self.http.party_lookup(party_id)
             except HTTPException as e:
-                m = 'errors.com.epicgames.social.party.party_not_found'
+                m = "errors.com.epicgames.social.party.party_not_found"
                 if e.message_code == m:
                     raise NotFound(
-                        'Could not find a party with the id {0}'.format(
-                            party_id
-                        )
+                        "Could not find a party with the id {0}".format(party_id)
                     )
 
-                m = 'errors.com.epicgames.social.party.party_query_forbidden'  # noqa
+                m = "errors.com.epicgames.social.party.party_query_forbidden"  # noqa
                 if e.message_code == m:
-                    raise Forbidden(
-                        'You are not allowed to join this party.'
-                    )
+                    raise Forbidden("You are not allowed to join this party.")
 
-                m = 'errors.com.epicgames.social.party.party_is_full'
+                m = "errors.com.epicgames.social.party.party_is_full"
                 if e.message_code == m:
-                    raise PartyIsFull(
-                        'The party you attempted to join is full.'
-                    )
+                    raise PartyIsFull("The party you attempted to join is full.")
 
                 raise
 
@@ -3524,8 +3481,9 @@ class Client(BasicClient):
                 await self._create_party(acquire=False)
                 raise
 
-    def set_presence(self, status: str, *,
-                     away: AwayStatus = AwayStatus.ONLINE) -> None:
+    def set_presence(
+        self, status: str, *, away: AwayStatus = AwayStatus.ONLINE
+    ) -> None:
         """|coro|
 
         Sends and sets the status. This status message will override all other
@@ -3544,15 +3502,19 @@ class Client(BasicClient):
             The status you tried to set were not a str.
         """
         if not isinstance(status, str):
-            raise TypeError('status must be a str')
+            raise TypeError("status must be a str")
 
         self.status = status
         self.away = away
         self.party.update_presence()
 
-    async def send_presence(self, status: Union[str, dict], *,
-                            away: AwayStatus = AwayStatus.ONLINE,
-                            to: Optional[JID] = None) -> None:
+    async def send_presence(
+        self,
+        status: Union[str, dict],
+        *,
+        away: AwayStatus = AwayStatus.ONLINE,
+        to: Optional[JID] = None,
+    ) -> None:
         """|coro|
 
         Sends this status to all or one single friend.
@@ -3572,11 +3534,7 @@ class Client(BasicClient):
         TypeError
             Status was an invalid type.
         """
-        await self.xmpp.send_presence(
-            status=status,
-            show=away.value,
-            to=to
-        )
+        await self.xmpp.send_presence(status=status, show=away.value, to=to)
 
     async def set_platform(self, platform: Platform) -> None:
         """|coro|
@@ -3598,5 +3556,5 @@ class Client(BasicClient):
 
         await asyncio.gather(
             self.auth.run_refresh(),
-            self.wait_for('muc_enter'),
+            self.wait_for("muc_enter"),
         )

@@ -30,12 +30,13 @@ import re
 
 from typing import Optional
 
-uuid_match_comp = re.compile(r'^[a-f0-9]{32}$')
+uuid_match_comp = re.compile(r"^[a-f0-9]{32}$")
 
 
 class MaybeLock:
-    def __init__(self, lock: asyncio.Lock,
-                 loop: Optional[asyncio.AbstractEventLoop] = None) -> None:
+    def __init__(
+        self, lock: asyncio.Lock, loop: Optional[asyncio.AbstractEventLoop] = None
+    ) -> None:
         self.lock = lock
         self.loop = loop or asyncio.get_running_loop()
         self._cleanup = False
@@ -44,7 +45,7 @@ class MaybeLock:
         await self.lock.acquire()
         self._cleanup = True
 
-    async def __aenter__(self) -> 'MaybeLock':
+    async def __aenter__(self) -> "MaybeLock":
         self._task = self.loop.create_task(self._acquire())
         return self
 
@@ -75,8 +76,10 @@ class LockEvent(asyncio.Lock):
         # Only set if no new acquire waiters exists. This is because we
         # don't want any wait()'s to return if there immediately will
         # be a new acquirer.
-        if not (self._waiters is not None and [w for w in self._waiters
-                                               if not w.cancelled()]):
+        if not (
+            self._waiters is not None
+            and [w for w in self._waiters if not w.cancelled()]
+        ):
             self._event.set()
             self.priority = 0
 
@@ -98,9 +101,9 @@ def from_iso(iso: str) -> datetime.datetime:
         return iso
 
     try:
-        return datetime.datetime.strptime(iso, '%Y-%m-%dT%H:%M:%S.%fZ')
+        return datetime.datetime.strptime(iso, "%Y-%m-%dT%H:%M:%S.%fZ")
     except ValueError:
-        return datetime.datetime.strptime(iso, '%Y-%m-%dT%H:%M:%SZ')
+        return datetime.datetime.strptime(iso, "%Y-%m-%dT%H:%M:%SZ")
 
 
 def to_iso(dt: datetime.datetime) -> str:
@@ -116,10 +119,10 @@ def to_iso(dt: datetime.datetime) -> str:
     -------
     :class:`str`
     """
-    iso = dt.strftime('%Y-%m-%dT%H:%M:%S.%f')
+    iso = dt.strftime("%Y-%m-%dT%H:%M:%S.%f")
 
     # fortnite's services expect three digit precision on millis
-    return iso[:23] + 'Z'
+    return iso[:23] + "Z"
 
 
 def is_id(value: str) -> bool:

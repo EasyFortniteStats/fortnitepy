@@ -16,19 +16,21 @@ import os
 import sys
 import re
 
-sys.path.insert(0, os.path.abspath('./..'))
-sys.path.append(os.path.abspath('localexts'))
+sys.path.insert(0, os.path.abspath("./.."))
+sys.path.append(os.path.abspath("localexts"))
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'fortnitepy'
-copyright = '2019-2021, Terbau'
-author = 'Terbau'
+project = "fortnitepy"
+copyright = "2019-2021, Terbau"
+author = "Terbau"
 
-version = ''
-with open('../fortnitepy/__init__.py') as f:
-    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
+version = ""
+with open("../fortnitepy/__init__.py") as f:
+    version = re.search(
+        r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE
+    ).group(1)
 
 # The full version, including alpha/beta/rc tags.
 release = version
@@ -40,25 +42,25 @@ release = version
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc', 
-    'sphinx.ext.coverage', 
-    'sphinx.ext.napoleon',
-    'sphinx.ext.intersphinx',
-    'sphinxcontrib_trio',
-    'viewcode',
-    'attributetable',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.coverage",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
+    "sphinxcontrib_trio",
+    "viewcode",
+    "attributetable",
 ]
 
 
-autodoc_member_order = 'bysource'
-autodoc_typehints = 'none'
+autodoc_member_order = "bysource"
+autodoc_typehints = "none"
 
 # Links used for cross-referencing stuff in other documentation
 intersphinx_mapping = {
-  'py': ('https://docs.python.org/3', None),
-  'aiohttp': ('https://aiohttp.readthedocs.io/en/stable/', None),
-  'requests': ('http://docs.python-requests.org/en/latest/', 'requests.inv'),
-  'aioxmpp': ('https://docs.zombofant.net/aioxmpp/devel/', None)
+    "py": ("https://docs.python.org/3", None),
+    "aiohttp": ("https://aiohttp.readthedocs.io/en/stable/", None),
+    "requests": ("http://docs.python-requests.org/en/latest/", "requests.inv"),
+    "aioxmpp": ("https://docs.zombofant.net/aioxmpp/devel/", None),
 }
 
 rst_prolog = """
@@ -69,35 +71,34 @@ rst_prolog = """
 """
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = []
 
-master_doc = 'index'
+master_doc = "index"
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'furo'
+html_theme = "furo"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 html_js_files = [
-    'custom.js',
-    'settings.js',
+    "custom.js",
+    "settings.js",
 ]
 
-html_css_files = [
-    'style.css'
-]
+html_css_files = ["style.css"]
+
 
 def setup(app):
     pass

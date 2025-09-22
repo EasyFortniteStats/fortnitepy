@@ -60,24 +60,29 @@ class ExternalAuth:
         than :class:`ClientUser`.
     """
 
-    __slots__ = ('client', 'type', 'id', 'external_id',
-                 'external_display_name', 'extra_info')
+    __slots__ = (
+        "client",
+        "type",
+        "id",
+        "external_id",
+        "external_display_name",
+        "extra_info",
+    )
 
-    def __init__(self, client: 'BasicClient', data: dict) -> None:
+    def __init__(self, client: "BasicClient", data: dict) -> None:
         self.client = client
-        self.type = data['type']
-        self.id = data['accountId']
+        self.type = data["type"]
+        self.id = data["accountId"]
 
-        if 'authIds' in data:
-            self.external_id = data['authIds'][0]['id'] if data['authIds'] else None  # noqa
+        if "authIds" in data:
+            self.external_id = data["authIds"][0]["id"] if data["authIds"] else None  # noqa
         else:
-            self.external_id = data['externalAuthId']
+            self.external_id = data["externalAuthId"]
 
-        self.external_display_name = data.get('externalDisplayName')
+        self.external_display_name = data.get("externalDisplayName")
 
     def _update_extra_info(self, data: dict) -> None:
-        to_be_removed = ('type', 'accountId', 'externalAuthId',
-                         'externalDisplayName')
+        to_be_removed = ("type", "accountId", "externalAuthId", "externalDisplayName")
         for field in to_be_removed:
             try:
                 del data[field]
@@ -90,9 +95,11 @@ class ExternalAuth:
         return self.external_display_name
 
     def __repr__(self) -> str:
-        return ('<ExternalAuth type={0.type!r} id={0.id!r} '
-                'external_display_name={0.external_display_name!r} '
-                'external_id={0.external_id!r}>'.format(self))
+        return (
+            "<ExternalAuth type={0.type!r} id={0.id!r} "
+            "external_display_name={0.external_display_name!r} "
+            "external_id={0.external_id!r}>".format(self)
+        )
 
     def __eq__(self, other):
         return isinstance(other, ExternalAuth) and other.id == self.id
@@ -102,21 +109,24 @@ class ExternalAuth:
 
     def get_raw(self) -> dict:
         return {
-            'type': self.type,
-            'accountId': self.id,
-            'externalAuthId': self.external_id,
-            'externalDisplayName': self.external_display_name,
-            **self.extra_info
+            "type": self.type,
+            "accountId": self.id,
+            "externalAuthId": self.external_id,
+            "externalDisplayName": self.external_display_name,
+            **self.extra_info,
         }
 
 
 class UserBase:
-    __slots__ = ('client', '_epicgames_display_name', '_external_display_name',
-                 '_id', '_external_auths')
+    __slots__ = (
+        "client",
+        "_epicgames_display_name",
+        "_external_display_name",
+        "_id",
+        "_external_auths",
+    )
 
-    def __init__(self, client: 'BasicClient',
-                 data: dict,
-                 **kwargs: Any) -> None:
+    def __init__(self, client: "BasicClient", data: dict, **kwargs: Any) -> None:
         self.client = client
         if data:
             self._update(data)
@@ -186,7 +196,7 @@ class UserBase:
     @property
     def jid(self) -> JID:
         """:class:`aioxmpp.JID`: The JID of the user."""
-        return JID.fromstr('{0.id}@{0.client.service_host}'.format(self))
+        return JID.fromstr("{0.id}@{0.client.service_host}".format(self))
 
     async def fetch(self) -> None:
         """|coro|
@@ -208,10 +218,12 @@ class UserBase:
 
         self._update(data)
 
-    async def fetch_br_stats(self, *,
-                             start_time: Optional[DatetimeOrTimestamp] = None,
-                             end_time: Optional[DatetimeOrTimestamp] = None
-                             ) -> 'StatsV2':
+    async def fetch_br_stats(
+        self,
+        *,
+        start_time: Optional[DatetimeOrTimestamp] = None,
+        end_time: Optional[DatetimeOrTimestamp] = None,
+    ) -> "StatsV2":
         """|coro|
 
         Fetches this users stats.
@@ -243,15 +255,15 @@ class UserBase:
             An object representing the stats for this user.
         """  # noqa
         return await self.client.fetch_br_stats(
-            self.id,
-            start_time=start_time,
-            end_time=end_time
+            self.id, start_time=start_time, end_time=end_time
         )
 
-    async def fetch_br_stats_collection(self, collection: StatsCollectionType,
-                                        start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
-                                        end_time: Optional[DatetimeOrTimestamp] = None  # noqa)
-                                        ) -> 'StatsCollection':
+    async def fetch_br_stats_collection(
+        self,
+        collection: StatsCollectionType,
+        start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+        end_time: Optional[DatetimeOrTimestamp] = None,  # noqa)
+    ) -> "StatsCollection":
         """|coro|
 
         Fetches a stats collections for this user.
@@ -290,15 +302,17 @@ class UserBase:
         )
 
         if self.id not in res:
-            raise Forbidden('User has opted out of public leaderboards.')
+            raise Forbidden("User has opted out of public leaderboards.")
 
         return res[self.id]
 
-    async def fetch_battlepass_level(self, *,
-                                     season: int,
-                                     start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
-                                     end_time: Optional[DatetimeOrTimestamp] = None  # noqa
-                                     ) -> float:
+    async def fetch_battlepass_level(
+        self,
+        *,
+        season: int,
+        start_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+        end_time: Optional[DatetimeOrTimestamp] = None,  # noqa
+    ) -> float:
         """|coro|
 
         Fetches this users battlepass level.
@@ -307,7 +321,7 @@ class UserBase:
         ----------
         season: :class:`int`
             The season number to request the battlepass level for.
-            
+
             .. warning::
 
                 If you are requesting the previous season and the new season has not been
@@ -339,39 +353,45 @@ class UserBase:
                 E.g. ``208.63`` -> ``Level 208 and 63% on the way to 209.``
         """  # noqa
         return await self.client.fetch_battlepass_level(
-            self.id,
-            season=season,
-            start_time=start_time,
-            end_time=end_time
+            self.id, season=season, start_time=start_time, end_time=end_time
         )
 
     def _update(self, data: dict) -> None:
-        self._epicgames_display_name = data.get('displayName',
-                                                data.get('account_dn'))
+        self._epicgames_display_name = data.get("displayName", data.get("account_dn"))
         self._update_external_auths(
-            data.get('externalAuths', data.get('external_auths', [])),
-            extra_external_auths=data.get('extraExternalAuths', []),
+            data.get("externalAuths", data.get("external_auths", [])),
+            extra_external_auths=data.get("extraExternalAuths", []),
         )
 
-        self._id = data.get('id', data.get('accountId', data.get('account_id')))  # noqa
+        self._id = data.get("id", data.get("accountId", data.get("account_id")))  # noqa
 
-    def _update_external_auths(self, external_auths: List[dict], *,
-                               extra_external_auths: Optional[List[dict]] = None  # noqa
-                               ) -> None:
+    def _update_external_auths(
+        self,
+        external_auths: List[dict],
+        *,
+        extra_external_auths: Optional[List[dict]] = None,  # noqa
+    ) -> None:
         extra_external_auths = extra_external_auths or []
-        extra_ext = {v['authIds'][0]['type'].split('_')[0].lower(): v
-                     for v in extra_external_auths}
+        extra_ext = {
+            v["authIds"][0]["type"].split("_")[0].lower(): v
+            for v in extra_external_auths
+        }
 
         ext_list = []
-        iterator = external_auths.values() if isinstance(external_auths, dict) else external_auths  # noqa
+        iterator = (
+            external_auths.values()
+            if isinstance(external_auths, dict)
+            else external_auths
+        )  # noqa
         for e in iterator:
             ext = ExternalAuth(self.client, e)
             ext._update_extra_info(extra_ext.get(ext.type, {}))
             ext_list.append(ext)
 
         self._external_display_name = None
-        for ext_auth in reversed([x for x in ext_list
-                                  if x.type.lower() not in ('twitch',)]):
+        for ext_auth in reversed(
+            [x for x in ext_list if x.type.lower() not in ("twitch",)]
+        ):
             self._external_display_name = ext_auth.external_display_name
             break
 
@@ -382,9 +402,9 @@ class UserBase:
 
     def get_raw(self) -> dict:
         return {
-            'displayName': self.display_name,
-            'id': self.id,
-            'externalAuths': [ext.get_raw() for ext in self._external_auths]
+            "displayName": self.display_name,
+            "id": self.id,
+            "externalAuths": [ext.get_raw() for ext in self._external_auths],
         }
 
 
@@ -436,15 +456,15 @@ class ClientUser(UserBase):
         The minor status of this account.
     """
 
-    def __init__(self, client: 'BasicClient',
-                 data: dict,
-                 **kwargs: Any) -> None:
+    def __init__(self, client: "BasicClient", data: dict, **kwargs: Any) -> None:
         super().__init__(client, data)
         self._update(data)
 
     def __repr__(self) -> str:
-        return ('<ClientUser id={0.id!r} display_name={0.display_name!r} '
-                'jid={0.jid!r} email={0.email!r}>'.format(self))
+        return (
+            "<ClientUser id={0.id!r} display_name={0.display_name!r} "
+            "jid={0.jid!r} email={0.email!r}>".format(self)
+        )
 
     @property
     def first_name(self) -> str:
@@ -452,7 +472,7 @@ class ClientUser(UserBase):
 
     @property
     def full_name(self) -> str:
-        return '{} {}'.format(self.name, self.last_name)
+        return "{} {}".format(self.name, self.last_name)
 
     @property
     def jid(self) -> JID:
@@ -463,27 +483,27 @@ class ClientUser(UserBase):
 
     def _update(self, data: dict) -> None:
         super()._update(data)
-        self.name = data['name']
-        self.email = data['email']
-        self.failed_login_attempts = data['failedLoginAttempts']
-        self.last_failed_login = (from_iso(data['lastFailedLogin'])
-                                  if 'lastFailedLogin' in data else None)
-        self.last_login = (from_iso(data['lastLogin'])
-                           if 'lastLogin' in data else None)
+        self.name = data["name"]
+        self.email = data["email"]
+        self.failed_login_attempts = data["failedLoginAttempts"]
+        self.last_failed_login = (
+            from_iso(data["lastFailedLogin"]) if "lastFailedLogin" in data else None
+        )
+        self.last_login = from_iso(data["lastLogin"]) if "lastLogin" in data else None
 
-        n_changes = data['numberOfDisplayNameChanges']
+        n_changes = data["numberOfDisplayNameChanges"]
         self.number_of_display_name_changes = n_changes
-        self.age_group = data['ageGroup']
-        self.headless = data['headless']
-        self.country = data['country']
-        self.last_name = data['lastName']
-        self.preferred_language = data['preferredLanguage']
-        self.can_update_display_name = data['canUpdateDisplayName']
-        self.tfa_enabled = data['tfaEnabled']
-        self.email_verified = data['emailVerified']
-        self.minor_verified = data['minorVerified']
-        self.minor_expected = data['minorExpected']
-        self.minor_status = data['minorStatus']
+        self.age_group = data["ageGroup"]
+        self.headless = data["headless"]
+        self.country = data["country"]
+        self.last_name = data["lastName"]
+        self.preferred_language = data["preferredLanguage"]
+        self.can_update_display_name = data["canUpdateDisplayName"]
+        self.tfa_enabled = data["tfaEnabled"]
+        self.email_verified = data["emailVerified"]
+        self.minor_verified = data["minorVerified"]
+        self.minor_expected = data["minorExpected"]
+        self.minor_status = data["minorStatus"]
 
 
 class User(UserBase):
@@ -491,14 +511,14 @@ class User(UserBase):
 
     __slots__ = UserBase.__slots__
 
-    def __init__(self, client: 'BasicClient',
-                 data: dict,
-                 **kwargs: Any) -> None:
+    def __init__(self, client: "BasicClient", data: dict, **kwargs: Any) -> None:
         super().__init__(client, data)
 
     def __repr__(self) -> str:
-        return ('<User id={0.id!r} display_name={0.display_name!r} '
-                'epicgames_account={0.epicgames_account!r}>'.format(self))
+        return (
+            "<User id={0.id!r} display_name={0.display_name!r} "
+            "epicgames_account={0.epicgames_account!r}>".format(self)
+        )
 
     async def block(self) -> None:
         """|coro|
@@ -552,13 +572,15 @@ class BlockedUser(UserBase):
 
     __slots__ = UserBase.__slots__
 
-    def __init__(self, client: 'BasicClient', data: dict) -> None:
+    def __init__(self, client: "BasicClient", data: dict) -> None:
         super().__init__(client, data)
 
     def __repr__(self) -> str:
-        return ('<BlockedUser id={0.id!r} '
-                'display_name={0.display_name!r} '
-                'epicgames_account={0.epicgames_account!r}>'.format(self))
+        return (
+            "<BlockedUser id={0.id!r} "
+            "display_name={0.display_name!r} "
+            "epicgames_account={0.epicgames_account!r}>".format(self)
+        )
 
     async def unblock(self) -> None:
         """|coro|
@@ -582,23 +604,28 @@ class UserSearchEntry(User):
     mutual_friend_count: :class:`int`
         The amount of **epic** mutual friends the client has with the user.
     """
-    def __init__(self, client: 'BasicClient',
-                 user_data: dict,
-                 search_data: dict) -> None:
+
+    def __init__(
+        self, client: "BasicClient", user_data: dict, search_data: dict
+    ) -> None:
         super().__init__(client, user_data)
 
-        self.matches = [(d['value'], UserSearchPlatform(d['platform']))
-                        for d in search_data['matches']]
-        self.match_type = UserSearchMatchType(search_data['matchType'])
-        self.mutual_friend_count = search_data['epicMutuals']
+        self.matches = [
+            (d["value"], UserSearchPlatform(d["platform"]))
+            for d in search_data["matches"]
+        ]
+        self.match_type = UserSearchMatchType(search_data["matchType"])
+        self.mutual_friend_count = search_data["epicMutuals"]
 
     def __str__(self) -> str:
         return self.matches[0][0]
 
     def __repr__(self) -> str:
-        return ('<UserSearchEntry id={0.id!r} '
-                'display_name={0.display_name!r} '
-                'epicgames_account={0.epicgames_account!r}>'.format(self))
+        return (
+            "<UserSearchEntry id={0.id!r} "
+            "display_name={0.display_name!r} "
+            "epicgames_account={0.epicgames_account!r}>".format(self)
+        )
 
 
 class SacSearchEntryUser(User):
@@ -613,17 +640,20 @@ class SacSearchEntryUser(User):
     verified: :class:`bool`
         Wether or not the creator code is verified or not.
     """
-    def __init__(self, client: 'BasicClient',
-                 user_data: dict,
-                 search_data: dict) -> None:
+
+    def __init__(
+        self, client: "BasicClient", user_data: dict, search_data: dict
+    ) -> None:
         super().__init__(client, user_data)
 
-        self.slug = search_data['slug']
-        self.active = search_data['status'] == 'ACTIVE'
-        self.verified = search_data['verified']
+        self.slug = search_data["slug"]
+        self.active = search_data["status"] == "ACTIVE"
+        self.verified = search_data["verified"]
 
     def __repr__(self) -> str:
-        return ('<SacSearchEntryUser slug={0.slug!r} '
-                'id={0.id!r} '
-                'display_name={0.display_name!r} '
-                'epicgames_account={0.epicgames_account!r}>'.format(self))
+        return (
+            "<SacSearchEntryUser slug={0.slug!r} "
+            "id={0.id!r} "
+            "display_name={0.display_name!r} "
+            "epicgames_account={0.epicgames_account!r}>".format(self)
+        )
