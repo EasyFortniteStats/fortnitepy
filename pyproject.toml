@@ -1,0 +1,18 @@
+[project]
+name = "fortnitepy"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.8,<3.13"
+dependencies = [
+    "aiohttp>=3.3",
+    "aioxmpp>=0.13.2",
+    "aioconsole>=0.1.15"
+]
+
+[project.optional-dependencies]
+docs = [
+    "sphinxcontrib_trio==1.1.2",
+    "furo==2021.4.11b34",
+    "Jinja2<3.1",
+]
