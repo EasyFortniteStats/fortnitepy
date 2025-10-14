@@ -36,11 +36,6 @@ class BattleRoyaleProfile:
             PastSeasonStats(ss) for ss in stats.get('past_seasons', [])
         ]
 
-        self.saved_loadout_ids: List[str] = stats['loadouts']
-        self.loadout_presets: Dict[str, Dict[str, str]] = stats.get('loadout_presets', {})
-        self.use_random_loadout = stats.get('use_random_loadout', False)
-        self.last_applied_loadout_id: Optional[str] = stats.get('last_applied_loadout')
-
         self.season_match_boost: int = stats.get('season_match_boost', 0)
         self.season_friend_match_boost: int = stats.get('season_friend_match_boost', 0)
 
