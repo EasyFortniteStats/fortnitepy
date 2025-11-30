@@ -135,6 +135,44 @@ class Auth:
             except HTTPException as e:
                 if e.message_code != 'errors.com.epicgames.bad_request':
                     raise
+    
+    async def take_corrective_action(self, exc: HTTPException) -> None:
+        action = exc.raw.get("correctiveAction")
+        log.debug("Corrective action is required: " + action)
+        if action == "DATE_OF_BIRTH":
+            if not self.client.correct_birthday:
+                raise AuthException(
+                    "Correct birthday is required to continue.", exc
+                ) from exc
+            client_credentials = await self.get_ios_client_credentials()
+            client_access_token = client_credentials.get("access_token")
+
+            random_date = "{:04d}-{:02d}-{:02d}".format(
+                randint(1990, 2002), randint(1, 12), randint(1, 28)
+            )
+
+            await self.client.http.account_put_date_of_birth_correction(
+                continuation=exc.raw.get("continuation"),
+                date_of_birth=random_date,
+                auth="bearer {0}".format(client_access_token),
+            )
+            return
+        elif action == "EULA_ACCEPTANCE":
+            if not self.client.accept_eula:
+                raise AuthException(
+                    "Correct EULA acceptance is required to continue.", exc
+                ) from exc
+            client_credentials = await self.get_ios_client_credentials()
+            client_access_token = client_credentials.get("access_token")
+
+            await self.client.http.account_put_eula_acceptance_correction(
+                continuation=exc.raw.get("continuation"),
+                auth="bearer {0}".format(client_access_token),
+            )
+            return
+        raise AuthException(
+            "Required corrective action {} is not supported".format(action), exc
+        ) from exc
 
     def _update_ios_data(self, data: dict) -> None:
         self.ios_access_token = data['access_token']
@@ -566,9 +604,14 @@ class ExchangeCodeAuth(Auth):
                     'Invalid exchange code supplied',
                     e
                 ) from e
-
+            elif (
+                e.message_code
+                == "errors.com.epicgames.oauth.corrective_action_required"
+            ):
+                await self.take_corrective_action(e)
+                return await self.ios_authenticate()
             raise
-
+            
         return data
 
     async def authenticate(self, **kwargs) -> None:
@@ -824,31 +867,12 @@ class DeviceAuth(Auth):
                     exc
                 ) from exc
 
-            if exc.message_code == 'errors.com.epicgames.oauth.corrective_action_required':
-                action = exc.raw.get('correctiveAction')
-                log.debug("Corrective action is required: " + action)
-                if action == 'DATE_OF_BIRTH':
-                    if not self.client.correct_birthday:
-                        raise AuthException(
-                            'Correct birthday is required to continue.',
-                            exc
-                        ) from exc
-                    client_credentials = await self.get_ios_client_credentials()
-                    client_access_token = client_credentials.get('access_token')
-
-                    random_date = "{:04d}-{:02d}-{:02d}".format(randint(1990, 2002), randint(1, 12), randint(1, 28))
-
-                    await self.client.http.account_put_date_of_birth_correction(
-                        continuation=exc.raw.get('continuation'),
-                        date_of_birth=random_date,
-                        auth='bearer {0}'.format(client_access_token)
-                    )
-                    return await self.ios_authenticate(priority)
-                raise AuthException(
-                    'Required corrective action {} is not supported'.format(action),
-                    exc
-                ) from exc
-
+            if (
+                exc.message_code
+                == "errors.com.epicgames.oauth.corrective_action_required"
+            ):
+                await self.take_corrective_action(exc)
+                return await self.ios_authenticate(priority)
             raise
 
         return data
