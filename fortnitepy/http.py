@@ -1166,6 +1166,17 @@ class HTTPClient:
         payload = {"continuation": continuation}
 
         return await self.put(r, json=payload, auth=auth)
+    
+    async def account_put_privacy_policy_correction(
+        self, continuation: str, auth: str
+    ):
+        r = AccountPublicService(
+            "/account/api/public/corrections/acceptPrivacyPolicy",
+        )
+
+        payload = {"continuation": continuation}
+
+        return await self.put(r, json=payload, auth=auth)
 
     async def account_create_device_code(self, auth: str):
         r = AccountPublicService('/account/api/oauth/deviceAuthorization')

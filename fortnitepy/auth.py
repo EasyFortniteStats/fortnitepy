@@ -170,6 +170,19 @@ class Auth:
                 auth="bearer {0}".format(client_access_token),
             )
             return
+        elif action == "PRIVACY_POLICY_ACCEPTANCE":
+            if not self.client.accept_eula:
+                raise AuthException(
+                    "Correct privacy policy acceptance is required to continue.", exc
+                ) from exc
+            client_credentials = await self.get_ios_client_credentials()
+            client_access_token = client_credentials.get("access_token")
+
+            await self.client.http.account_put_privacy_policy_correction(
+                continuation=exc.raw.get("continuation"),
+                auth="bearer {0}".format(client_access_token),
+            )
+            return
         raise AuthException(
             "Required corrective action {} is not supported".format(action), exc
         ) from exc
