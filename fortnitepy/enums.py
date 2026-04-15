@@ -264,6 +264,7 @@ class RankingType(Enum):
     OG_ZERO_BUILD = 'ranked-figment-nobuild'
     THE_GATEWAY_BUILD = 'ranked-bling'
     THE_GATEWAY_ZERO_BUILD = 'ranked-bling-nobuild'
+    ARENAS_BOXFIGHTS = 'ranked-squareclub'
     UNKNOWN = 'unknown'
 
 
