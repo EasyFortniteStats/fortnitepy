@@ -259,6 +259,7 @@ class RankingType(Enum):
     ROCKET_RACING = 'delmar-competitive'
     RELOAD_BUILD = 'ranked_blastberry_build'
     RELOAD_ZERO_BUILD = 'ranked_blastberry_nobuild'
+    RELOAD_COMBINED = 'ranked-blastberry-combined'
     BALLISTIC = 'ranked-feral'
     OG_BUILD = 'ranked-figment-build'
     OG_ZERO_BUILD = 'ranked-figment-nobuild'
