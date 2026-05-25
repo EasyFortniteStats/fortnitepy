@@ -365,7 +365,7 @@ class RankedStatsEntry:
         self.current_division: int = data['currentDivision']
         self.highest_division: int = data['highestDivision']
         self.progress: float = data['promotionProgress']
-        self.ranking: Optional[int] = data['currentPlayerRanking']
+        self.ranking: Optional[int] = data.get('currentPlayerRanking')
 
     @property
     def is_unranked(self) -> bool:
