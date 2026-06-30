@@ -341,7 +341,7 @@ class RankedSeasonEntry:
         self.track_guid: str = data['trackguid']
         try:
             self.ranking_type: RankingType = RankingType(data['rankingType'])
-        except KeyError:
+        except ValueError:
             log.warning(f'Failed to parse ranking type {data["rankingType"]}')
             self.ranking_type = RankingType.UNKNOWN
         self.starts_at: datetime.datetime = from_iso(data['beginTime'])
@@ -358,7 +358,7 @@ class RankedStatsEntry:
         self.account_id: str = data['accountId']
         try:
             self.ranking_type: RankingType = RankingType(data['rankingType'])
-        except KeyError:
+        except ValueError:
             log.warning(f'Failed to parse ranking type {data["rankingType"]}')
             self.ranking_type = RankingType.UNKNOWN
         self.last_update: datetime.datetime = from_iso(data['lastUpdated'])
